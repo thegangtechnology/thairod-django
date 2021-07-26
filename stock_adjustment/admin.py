@@ -1,3 +1,5 @@
 from django.contrib import admin
+from core.admin import CustomModelAdmin
+from stock_adjustment.models import StockAdjustment
 
-# Register your models here.
+admin.site.register(StockAdjustment, CustomModelAdmin)
