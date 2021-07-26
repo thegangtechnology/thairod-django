@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from rest_framework import viewsets, mixins
+from procurement.serializers import ProcurementSerializers
+from procurement.models import Procurement
 
-# Create your views here.
+
+class ProcurementViewSet(mixins.CreateModelMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+    serializer_class = ProcurementSerializers
+    queryset = Procurement.objects.all()

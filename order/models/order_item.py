@@ -5,7 +5,6 @@ from shipment.models import Shipment
 
 
 class OrderItem(AbstractModel):
-    # TODO: Shouldn't this bind to Order and not Shipment?
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
     product_variation = models.ForeignKey(ProductVariation, on_delete=models.CASCADE)
     quantity = models.IntegerField()
