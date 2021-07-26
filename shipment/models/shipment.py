@@ -22,6 +22,5 @@ class Shipment(AbstractModel):
     weight = models.DecimalField(decimal_places=3, max_digits=10)
     note = models.CharField(max_length=255)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    # TODO: purchase model?
-    purchase_id = models.CharField(max_length=255)
+    shippop_purchase_id = models.CharField(max_length=255)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.BOOKING)
