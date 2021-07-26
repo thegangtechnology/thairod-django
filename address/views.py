@@ -1,8 +1,3 @@
-from rest_framework import viewsets
-from address.models import Address
-from address.serializers import AddressSerializer
+from django.shortcuts import render
 
-
-class AddressViewSet(viewsets.ModelViewSet):
-    queryset = Address.objects.all()
-    serializer_class = AddressSerializer
+# Create your views here.
