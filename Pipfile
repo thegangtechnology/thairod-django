@@ -12,6 +12,7 @@ pytest-cov = "*"
 psycopg2-binary = "*"
 django-environ = "*"
 djangorestframework = "*"
+django-seed = {editable = true, git = "https://github.com/kronnakrit/django-seed"}
 
 [dev-packages]
 
