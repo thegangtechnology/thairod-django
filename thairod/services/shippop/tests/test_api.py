@@ -38,8 +38,16 @@ class ShippopAPITest(TestCase):
         self.assertEqual(len(response) > 0, True)
         self.assertEqual(type(response[0]), Pricing)
 
-    def test_get_label(self):
+    def test_print_label(self):
         self.shippop_api.confirm_order(purchase_id=self.shippop_order.purchase_id)
-        response = self.shippop_api.get_label(purchase_id=self.shippop_order.purchase_id)
+        response = self.shippop_api.print_label(purchase_id=self.shippop_order.purchase_id)
+        self.assertEqual(type(response), str)
+
+    def test_print_multiple_labels(self):
+        self.shippop_api.confirm_order(purchase_id=self.shippop_order.purchase_id)
+        new_order = self.shippop_api.create_order(order_data=self.order_data)
+        self.shippop_api.confirm_order(purchase_id=new_order.purchase_id)
+        tracking_codes = [new_order.lines[0].tracking_code, self.shippop_order.lines[0].tracking_code]
+        response = self.shippop_api.print_multiple_labels(tracking_codes=tracking_codes)
         self.assertEqual(type(response), str)
 
