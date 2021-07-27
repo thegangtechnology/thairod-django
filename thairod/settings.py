@@ -124,6 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'user.User'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'thairod.utils.paginations.CustomPageNumberPagination',
+    'PAGE_SIZE': 10,
+}
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 

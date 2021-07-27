@@ -35,6 +35,7 @@
 ```python
 from thairod.services.shippop.data import *
 
+
 # Note: For better understanding of each classes, please read the code 
 
 AddressData() # You need this to create order
@@ -80,4 +81,22 @@ shippop_api.get_pricing(OrderData)
 
 # Get label - Shippop HTML Label generated
 shippop_api.print_label(purchase_id)
+
+#Step 1 - create order
+shippop_api.create_order(OrderData)
+
+#Step 2 - Confirm order
+shippop_api.confirm_order(purchase_id)
+
+#Get order detail - after create order
+shippop_api.get_order_detail(purchase_id)
+
+#Get tracking data - after confirm order
+shippop_api.get_tracking_data(tracking_code)
+
+#Get pricelist - before create order you need to choose 1 courier code
+shippop_api.get_pricing(OrderData)
+
+#Get label - Shippop HTML Label generated
+shippop_api.get_label(purchase_id)
 ```

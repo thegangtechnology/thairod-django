@@ -6,7 +6,6 @@ from thairod.services.shippop.data import OrderData, OrderResponse, TrackingData
     ParcelData, Pricing
 from thairod.settings import SHIPPOP_API_KEY, SHIPPOP_URL
 
-
 # flake8: noqa
 
 class ShippopAPI:
