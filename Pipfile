@@ -12,6 +12,8 @@ pytest-cov = "*"
 psycopg2-binary = "*"
 django-environ = "*"
 djangorestframework = "*"
+django-extensions = "*"
+requests = "*"
 
 [dev-packages]
 

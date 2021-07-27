@@ -16,6 +16,8 @@
    DB_NAME="dbname"
    DB_USER="dbuser"
    DB_PASSWORD="password"
+   SHIPPOP_API_KEY="key"
+   SHIPPOP_URL="https://mkpservice.shippop.dev"
    ```
    *Make sure to have database connection with your specified user.
 4. Run migration files

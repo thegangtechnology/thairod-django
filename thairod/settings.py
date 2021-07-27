@@ -20,10 +20,8 @@ env = environ.Env(
 )
 environ.Env.read_env()
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -36,7 +34,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_extensions',
     'core',
     'user',
     'address',
@@ -88,7 +86,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'thairod.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 if os.environ.get('DB_URL') is not None:
@@ -106,7 +103,6 @@ else:
         }
 
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -128,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'user.User'
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -142,8 +137,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
+SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
+SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
