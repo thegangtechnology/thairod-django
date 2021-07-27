@@ -9,4 +9,5 @@ router.register(r'tracking_status', views.TrackingStatusModelViewSet, basename="
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('printlabel', views.print_label)
 ]

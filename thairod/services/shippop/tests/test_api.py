@@ -50,4 +50,3 @@ class ShippopAPITest(TestCase):
         tracking_codes = [new_order.lines[0].tracking_code, self.shippop_order.lines[0].tracking_code]
         response = self.shippop_api.print_multiple_labels(tracking_codes=tracking_codes)
         self.assertEqual(type(response), str)
-
