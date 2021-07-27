@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_extensions',
     'core',
     'user',
     'shopping_link',
@@ -152,3 +153,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
+SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
+SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
