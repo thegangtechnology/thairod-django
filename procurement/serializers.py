@@ -3,7 +3,7 @@ from procurement.models import Procurement
 from warehouse.models import Warehouse
 
 
-class ProcurementSerializers(serializers.ModelSerializer):
+class ProcurementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Procurement
         fields = '__all__'

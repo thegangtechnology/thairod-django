@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins
-from procurement.serializers import ProcurementSerializers
+from procurement.serializers import ProcurementSerializer
 from procurement.models import Procurement
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -12,7 +12,7 @@ class ProcurementViewSet(mixins.CreateModelMixin,
                          mixins.UpdateModelMixin,
                          mixins.ListModelMixin,
                          viewsets.GenericViewSet):
-    serializer_class = ProcurementSerializers
+    serializer_class = ProcurementSerializer
     queryset = Procurement.objects.all()
 
     def create(self, request, *args, **kwargs):
