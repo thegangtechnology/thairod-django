@@ -4,7 +4,7 @@ from procurement.views import ProcurementViewSet
 
 
 router = DefaultRouter()
-router.register(r'procurement', ProcurementViewSet, basename="procurement")
+router.register(r'procurements', ProcurementViewSet, basename="procurement")
 
 
 urlpatterns = [
