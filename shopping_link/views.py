@@ -4,7 +4,7 @@ from shopping_link.models import ShoppingLink
 from shopping_link.serializers import ShoppingLinkSerializer, CreateShoppingLinkSerializer
 from rest_framework.response import Response
 from rest_framework.views import status
-from datetime import datetime, timezone
+from django.utils import timezone
 
 
 class ShoppingLinkViewSet(mixins.CreateModelMixin,
@@ -33,12 +33,12 @@ class ShoppingLinkViewSet(mixins.CreateModelMixin,
         if callback_req:
             try:
                 shopping_link = ShoppingLink.objects.get(callback_secret=callback_req)
-                now = datetime.now(tz=timezone.utc)
-                shopping_link.update_is_expired(datetime_object=now)
+                now = timezone.now()
+                shopping_link.update_is_expired(timezone_object=now)
                 if shopping_link.is_expired:
                     return Response({'error': 'The callback is already expired'},
                                     status=status.HTTP_400_BAD_REQUEST)
                 return Response(ShoppingLinkSerializer(shopping_link).data)
             except ShoppingLink.DoesNotExist as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response()
+        return Response(status=status.HTTP_400_BAD_REQUEST)

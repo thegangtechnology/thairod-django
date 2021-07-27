@@ -7,6 +7,7 @@ from shipment.models import Shipment, TrackingStatus
 from stock_adjustment.models import StockAdjustment
 from user.models import User
 from warehouse.models import Warehouse
+from shopping_link.models import ShoppingLink
 
 
 def load_seed():
@@ -23,4 +24,5 @@ def load_seed():
     seeder.add_entity(Procurement, 1)
     seeder.add_entity(StockAdjustment, 1)
     seeder.add_entity(User, 1)
+    seeder.add_entity(ShoppingLink, 1)
     seeder.execute(turn_off_auto_now=False)
