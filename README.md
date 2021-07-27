@@ -56,28 +56,28 @@ TrackingData()
 Pricing()
 ```
 
-### Service 
+### Service
 
 ```python
 from thairod.services.shippop.api import ShippopAPI
 
 shippop_api = ShippopAPI()
 
-#Step 1 - create order
+# Step 1 - create order
 shippop_api.create_order(OrderData)
 
-#Step 2 - Confirm order
+# Step 2 - Confirm order
 shippop_api.confirm_order(purchase_id)
 
-#Get order detail - after create order
+# Get order detail - after create order
 shippop_api.get_order_detail(purchase_id)
 
-#Get tracking data - after confirm order
+# Get tracking data - after confirm order
 shippop_api.get_tracking_data(tracking_code)
 
-#Get pricelist - before create order you need to choose 1 courier code
+# Get pricelist - before create order you need to choose 1 courier code
 shippop_api.get_pricing(OrderData)
 
-#Get label - Shippop HTML Label generated
-shippop_api.get_label(purchase_id)
+# Get label - Shippop HTML Label generated
+shippop_api.print_label(purchase_id)
 ```
