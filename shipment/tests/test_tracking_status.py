@@ -28,11 +28,3 @@ class TrackingStatusAPITestCase(BaseTestSimpleApi, APITestCase):
             "courier_tracking_code": "987654321"
         }
 
-    def test_create(self) -> None:
-        response = self.client.post(self.list_url, self.valid_field, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_update(self) -> None:
-        response = self.client.put(self.detail_url, self.valid_field, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
