@@ -1,5 +1,17 @@
 # thairod-django
 
+## Documentation
+Run server then access url below
+```
+http://localhost:8000/docs/open_api/
+http://localhost:8000/docs/redoc/
+http://tg.localhost:8000/docs/open_api.yaml
+http://tg.localhost:8000/docs/open_api.json
+```
+
+
+
+
 ## Getting Started
 
 ### Installation
@@ -29,6 +41,7 @@
    ```
    python manage.py runserver
    ```
+   
 ## Shippop Usage
 
 ### Dataclass

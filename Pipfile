@@ -15,6 +15,7 @@ djangorestframework = "*"
 django-extensions = "*"
 requests = "*"
 django-seed = {editable = true, git = "https://github.com/kronnakrit/django-seed"}
+drf-yasg = "*"
 
 [dev-packages]
 
