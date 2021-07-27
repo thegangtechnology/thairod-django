@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'core',
     'user',
+    'shopping_link',
     'address',
     'warehouse',
     'product',
