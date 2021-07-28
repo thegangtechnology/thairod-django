@@ -1,4 +1,9 @@
-from typing import TypeVar
+import functools
+from typing import List
+
+from rest_framework.status import HTTP_401_UNAUTHORIZED
+
+from thairod.utils.html_tools import get_client_ip
 
 
 def swagger_example(example):
@@ -16,6 +21,20 @@ def swagger_example(example):
 
     return decorator
 
+
+def ip_whitelist(ip_list: List[str]):
+    def decorator(f):
+        print(f)
+        @functools.wraps(f)
+        def ret(self, request, *arg, **kwds):
+            print(request)
+            ip = get_client_ip(request)
+            if ip in ip_list:
+                return f(self, request, *arg, **kwds)
+            else:
+                return HTTP_401_UNAUTHORIZED(f'Access Denied for {ip}')
+        return ret
+    return decorator
 
 # https://youtrack.jetbrains.com/issue/PY-34569
 # def auto_serialize(cls: T) -> T:

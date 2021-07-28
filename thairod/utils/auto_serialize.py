@@ -30,10 +30,11 @@ class AutoSerialize:
     @classmethod
     @functools.lru_cache
     def serializer(cls: Type[T]) -> Type[TGSerializer[T]]:
+
         class Serializer(TGSerializer[cls]):
             class Meta:
                 dataclass = cls
-
+                ref_name = cls.__name__
             @classmethod
             def parse_request(cls, request: Request) -> T:
                 ser = cls(data=request.data)

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "af78063924ed34d60ee7cda51e33101a07f035162957377f2ea3f4e8d345fe3a"
+            "sha256": "fbb0459fe6b8f7ea4303542edbd0c88149b46609d0d354d2096f26247a44c220"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -165,12 +165,13 @@
             "version": "==3.12.4"
         },
         "djangorestframework-dataclasses": {
+            "editable": true,
+            "git": "https://github.com/piti118/djangorestframework-dataclasses",
             "hashes": [
                 "sha256:778d7d320465f68e1376cbd0f750b2752f5ea7b396bf6061509da61297633d5d",
                 "sha256:e8803e2787adb7fa85963fbdfa3ebda83faa45d21f012031a7a54e3c79773dac"
             ],
-            "index": "pypi",
-            "version": "==0.10"
+            "ref": "a5c5e78a0985cb93a159ec620641040b2a2b2fdf"
         },
         "drf-yasg": {
             "hashes": [
