@@ -1,20 +1,14 @@
-import functools
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
-from django.views.decorators.csrf import csrf_exempt
-from drf_yasg.openapi import Schema
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, filters
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_dataclasses.serializers import DataclassSerializer
 
 from order.models.order import Order
 from order.models.order_item import OrderItem
 from order.serializers import OrderSerializer, OrderItemSerializer
-from thairod.utils.decorators import swagger_example
+from thairod.utils.auto_serialize import AutoSerialize, swagger_auto_serialize_schema
 
 
 class OrderModelViewSet(viewsets.ModelViewSet):
@@ -31,35 +25,27 @@ class OrderItemModelViewSet(viewsets.ModelViewSet):
     search_fields = ['total_price', 'shipment__title', 'product_variation__name']
 
 @dataclass
-class CreateOrderParameter:
+class CreateOrderParameter(AutoSerialize):
     name: str
     money: int
 
-@swagger_example(CreateOrderParameter(name='piti', money=12000))
-class CreateOrderParameterSerializer(DataclassSerializer[CreateOrderParameter]):
-    class Meta:
-        dataclass = CreateOrderParameter
+    @classmethod
+    def example(cls):
+        return cls(name='piti', money=234)
 
 @dataclass
-class CreateOrderResponse:
+class CreateOrderResponse(AutoSerialize):
     a: str
     b: int
 
-@swagger_example(CreateOrderResponse(a="hello", b=44444))
-class CreateOrderResponseSerializer(DataclassSerializer[CreateOrderResponse]):
-    class Meta:
-        swagger_schema_fields = {
-            "example": asdict(CreateOrderResponse(a="hello", b=22)),
-        }
-        dataclass = CreateOrderResponse
+    @classmethod
+    def example(cls):
+        return cls(a="hello", b=44433434344)
+
 
 class CreateOrderAPI(GenericAPIView):
 
-    @swagger_auto_schema(
-        request_body=CreateOrderParameterSerializer,
-        responses={200:CreateOrderResponseSerializer})
-    def post(self, request: Request, format=None):
-        serializer = CreateOrderParameterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        param: CreateOrderParameter = serializer.save()
-        return Response({"2222name": param.name, "Money": param.money + 10})
+    @swagger_auto_serialize_schema(CreateOrderParameter, CreateOrderResponse)
+    def post(self, request: Request, format=None) -> Response:
+        param = CreateOrderParameter.from_request(request)
+        return CreateOrderResponse(a='str', b=param.money + 99).response()
