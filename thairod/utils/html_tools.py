@@ -14,6 +14,7 @@ def get_body(s: str) -> str:
         return ''
     return match.group(1)
 
+
 # TODO: this can be easily masquerade
 def get_client_ip(request):
     # https://stackoverflow.com/questions/4581789/how-do-i-get-user-ip-address-in-django

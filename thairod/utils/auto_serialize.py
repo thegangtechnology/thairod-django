@@ -1,5 +1,5 @@
 import functools
-from typing import Type, Generic, TypeVar
+from typing import Type, Generic, TypeVar, Dict, Any
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.request import Request
@@ -18,14 +18,21 @@ class TGSerializer(DataclassSerializer[T], Generic[T]):
 
 class AutoSerialize:
 
-    def response(self) -> Response:
-        return Response(self.__class__.serializer()(self).data)
+    def to_response(self) -> Response:
+        return Response(self.to_data())
+
+    def to_data(self) -> Dict[str, Any]:
+        return self.__class__.serializer()(self).data
+
+    @classmethod
+    def from_data(cls: Type[T], data: Dict[str, Any]) -> T:
+        ser = cls.serializer()(data=data)
+        ser.is_valid(raise_exception=True)
+        return ser.save()
 
     @classmethod
     def from_request(cls: Type[T], request: Request) -> T:
-        ser = cls.serializer()(data=request.data)
-        ser.is_valid(raise_exception=True)
-        return ser.save()
+        return cls.from_data(request.data)
 
     @classmethod
     @functools.lru_cache
@@ -35,6 +42,7 @@ class AutoSerialize:
             class Meta:
                 dataclass = cls
                 ref_name = cls.__name__
+
             @classmethod
             def parse_request(cls, request: Request) -> T:
                 ser = cls(data=request.data)

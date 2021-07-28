@@ -26,10 +26,10 @@ def print_label(request: HttpRequest):
     shipment_id: str = request.GET.get("shipment_id", None)
     if shipment_id is None or shipment_id.isdigit():
         return HttpResponseBadRequest()
-    #optimize this
+    # optimize this
     shipment = Shipment.objects.select_related().get(id=shipment_id)
-    purchase_id = shipment.shippop_purchase_id
-    receiver_name = shipment.order.receiver_name
+    # purchase_id = shipment.shippop_purchase_id
+    # receiver_name = shipment.order.receiver_name
     items = shipment.orderitem_set.select_related().all()
     for item in items:
         print(item.product_variation.name)

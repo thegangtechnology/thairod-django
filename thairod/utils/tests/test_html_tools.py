@@ -15,5 +15,4 @@ class HTMLToolsTest(TestCase):
             </body>
         </html>
         """
-        print(repr(ht.get_body(s).strip()))
         assert ht.get_body(s).strip() == "hello"

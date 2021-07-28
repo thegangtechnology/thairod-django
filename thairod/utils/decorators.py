@@ -24,10 +24,8 @@ def swagger_example(example):
 
 def ip_whitelist(ip_list: List[str]):
     def decorator(f):
-        print(f)
         @functools.wraps(f)
         def ret(self, request, *arg, **kwds):
-            print(request)
             ip = get_client_ip(request)
             if ip in ip_list:
                 return f(self, request, *arg, **kwds)

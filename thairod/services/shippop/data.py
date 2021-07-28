@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import List, Optional
 from datetime import datetime
 
+from address.models import Address
 from thairod.settings import SHIPPOP_DEFAULT_COURIER_CODE
 
 # flake8: noqa
@@ -23,6 +24,19 @@ class AddressData:
     mem_id: Optional[int] = None
     dest_id: Optional[int] = None
     email: Optional[str] = None
+
+    @classmethod
+    def from_address_model(cls, address: 'Address'):
+        # address: Address = address
+        return cls(
+            name = address.name,
+            address = address.house_number,
+            state = address.district,
+            district=address.subdistrict,
+            province=address.province,
+            postcode=address.postal_code,
+            tel = address.telno
+        )
 
     def to_request_dict(self) -> dict:
         return {

@@ -1,2 +1,2 @@
-from .user import User
-from .api_key import APIKey
+from .api_key import APIKey # noqa
+from .user import User # noqa

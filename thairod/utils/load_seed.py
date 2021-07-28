@@ -15,10 +15,11 @@ def load_seed():
     seeder.add_entity(Order, 1)
     seeder.add_entity(Product, 1)
     seeder.add_entity(ProductImage, 1)
-    seeder.add_entity(ProductVariation, 1)
-    seeder.add_entity(TrackingStatus, 1)
+    seeder.add_entity(ProductVariation, 3)
+
     seeder.add_entity(Warehouse, 4)
     seeder.add_entity(Shipment, 1)
+    seeder.add_entity(TrackingStatus, 1)
     seeder.add_entity(OrderItem, 1)
     seeder.add_entity(Procurement, 1)
     seeder.add_entity(StockAdjustment, 1)

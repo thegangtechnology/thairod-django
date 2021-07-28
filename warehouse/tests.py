@@ -13,6 +13,7 @@ class WarehouseAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = Warehouse
         self.obj = Warehouse.objects.first()
         self.address = Address.objects.first()
         self.list_url = reverse('warehouse-list')
