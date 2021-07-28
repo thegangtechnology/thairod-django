@@ -141,7 +141,7 @@ class OrderResponse:
     total_price: Decimal
     lines: List[OrderLineResponse]
     purchase_status: Optional[str] = None
-    total_discount: Optional[Decimal] = 0.0
+    total_discount: Optional[Decimal] = Decimal(0.0)
 
 
 @dataclass

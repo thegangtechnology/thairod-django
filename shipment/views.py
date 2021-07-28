@@ -1,6 +1,10 @@
+from dataclasses import dataclass
+
 from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, filters
+from rest_framework.request import Request
+from rest_framework.views import APIView
 
 from shipment.models import Shipment, TrackingStatus
 from shipment.serializers.shipment_serializer import ShipmentSerializer
@@ -19,6 +23,16 @@ class TrackingStatusModelViewSet(viewsets.ModelViewSet):
     queryset = TrackingStatus.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['tracking_code', 'status']
+
+
+@dataclass
+class PrintLabelParam:
+    pass
+
+
+class LabelPrinterView(APIView):
+    def print_label(self, request: Request):
+        pass
 
 
 @csrf_exempt

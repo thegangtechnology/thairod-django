@@ -16,6 +16,7 @@ from shipment.models import Shipment, TrackingStatus
 from shipment.models.shipment import ShipmentStatus
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderData, OrderLineData, AddressData, OrderResponse, ParcelData
+from thairod.settings import TELEMED_WHITELIST
 from thairod.utils.auto_serialize import AutoSerialize, swagger_auto_serialize_schema
 from thairod.utils.decorators import ip_whitelist
 from warehouse.models import Warehouse
@@ -132,7 +133,7 @@ class ShippopCreateOrderError(Exception):
 
 class CreateOrderAPI(GenericAPIView):
 
-    @ip_whitelist(['127.0.0.1'])
+    @ip_whitelist(TELEMED_WHITELIST)
     @swagger_auto_serialize_schema(CreateOrderParameter, CreateOrderResponse)
     def post(self, request: Request, format=None) -> Response:
         param = CreateOrderParameter.from_request(request)
