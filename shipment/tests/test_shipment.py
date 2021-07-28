@@ -1,7 +1,6 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
-from address.models import Address
 from core.tests import BaseTestSimpleApi
 from order.models import Order
 from shipment.models import Shipment, TrackingStatus
@@ -15,6 +14,7 @@ class ShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = Shipment
         self.obj = Shipment.objects.first()
         self.warehouse = Warehouse.objects.first()
         self.tracking = TrackingStatus.objects.first()
@@ -23,11 +23,12 @@ class ShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
         self.detail_url = reverse('shipment-detail', kwargs={'pk': self.obj.pk})
         self.valid_field = {
             "warehouse": self.warehouse.pk,
-            "tracking": self.tracking.pk,
+            "shipping_method": "testshipping_method",
             "order": self.order.pk,
             "title": "testtitle23456",
-            "shipping_method": "testshipping_method",
             "weight": 2345.678,
             "note": "test note",
-            "shippop_purchase_id": "1234abcd"
+            "shippop_purchase": 1234,
+            "tracking_code": "jlkjsdalfkj",
+            "courier_tracking_code": "asfdsafdsaf"
         }

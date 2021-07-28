@@ -1,2 +1,2 @@
-from .order import Order
-from .order_item import OrderItem
+from .order import Order # noqa
+from .order_item import OrderItem # noqa

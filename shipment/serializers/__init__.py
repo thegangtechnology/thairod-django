@@ -1,1 +1,1 @@
-from .shipment_serializer import ShipmentSerializer
+from .shipment_serializer import ShipmentSerializer # noqa

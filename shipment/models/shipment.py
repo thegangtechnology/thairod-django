@@ -1,14 +1,15 @@
 from django.db import models
-from core.models import AbstractModel
-from warehouse.models import Warehouse
-from order.models import Order
 from django.utils.translation import gettext_lazy as _
-from shipment.models import TrackingStatus
+
+from core.models import AbstractModel
+from order.models.order import Order
+from warehouse.models import Warehouse
 
 
 # TODO: Abbreviation?
 class ShipmentStatus(models.TextChoices):
-    BOOKING = 'BOOKING', _('Book shipment to Shippop')
+    CREATED = 'CREATED', _('Order for shipment created')
+    BOOKED = 'BOOKED', _('Book shipment to Shippop')
     CONFIRMED = 'CONFIRMED', _('Confirmed shipment')
 
 
@@ -17,10 +18,11 @@ class Shipment(AbstractModel):
     title = models.CharField(max_length=255)
     # This should be choices?
     shipping_method = models.CharField(max_length=255)
-    tracking = models.ForeignKey(TrackingStatus, on_delete=models.CASCADE)
     label_printed = models.BooleanField(default=False)
-    weight = models.DecimalField(decimal_places=3, max_digits=10)
+    weight = models.DecimalField(decimal_places=3, max_digits=10, null=True)
     note = models.CharField(max_length=255)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    shippop_purchase_id = models.CharField(max_length=255)
-    status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.BOOKING)
+    shippop_purchase_id = models.IntegerField(null=True)
+    tracking_code = models.CharField(max_length=255, blank=True, null=True)
+    courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
