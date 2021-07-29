@@ -3,7 +3,7 @@ from thairod.utils.test_util import TestCaseNoDB
 
 
 class TestLine(TestCaseNoDB):
-    patch_external = False
+    patch_external = True
 
     def setUp(self) -> None:
         self.uid = 'U5f7f3fc4414c147a0c029e93071d8700'
