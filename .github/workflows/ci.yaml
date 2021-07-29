@@ -32,6 +32,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     env:
       DB_URL: postgres://postgres:postgres@127.0.0.1:5432/github-actions
+      SHIPPOP_API_KEY: ${{ secrets.SHIPPOP_API_KEY }}
     steps:
       - name: Checkout code # checking our the code at current commit that triggers the workflow
         uses: actions/checkout@v2
@@ -63,7 +64,7 @@ jobs:
     name: SonarQube Trigger
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
