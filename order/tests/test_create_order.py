@@ -1,16 +1,16 @@
 from contextlib import contextmanager
 from unittest.mock import patch
 
-from django.test import TransactionTestCase
 
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderResponse, OrderLineResponse
 from thairod.utils.load_seed import load_seed
+from thairod.utils.test_util import TestCase
 
 
-class TestCreateOrder(TransactionTestCase):
+class TestCreateOrder(TestCase):
     reset_sequences = True
 
     def setUp(self):
@@ -43,7 +43,7 @@ class TestCreateOrder(TransactionTestCase):
     def test_create_order(self):
         with self.patch_shippop() as _:
             old_count = Order.objects.count()
-            OrderService().crate_order(
+            OrderService().create_order(
                 CreateOrderParameter.example()
             )
             new_count = Order.objects.count()
