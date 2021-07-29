@@ -128,9 +128,9 @@ docker run -d -p 8000:8000 --env-file ./.env  [DOCKER_IMAGE_URL]:latest
 # with variable
 docker run -d -p 8000:8000 
   --env DJANGO_SETTINGS_MODULE="./thairod/environments/develop" 
-  --env DB_URL="postgres://postgres:postgres@127.0.0.1:5432/github-actions"
+  --env DB_URL="postgres://postgres:postgres@127.0.0.1:5432/thairod"
   --env SHIPPOP_API_KEY="key"
-  --env SHIPPOP_URL="https://mkpservice.shippop.dev"
+  --env SHIPPOP_URL="url"
   --env SHIPPOP_DEFAULT_COURIER_CODE="SPE"  
   [DOCKER_IMAGE_URL]:latest
 ```
