@@ -17,9 +17,8 @@ class ProcurementViewSet(mixins.CreateModelMixin,
 
     def create(self, request, *args, **kwargs):
         # Check warehouse
-        try:
-            Warehouse.objects.get(pk=1)
-        except Warehouse.DoesNotExist:
+        default_warehouse = Warehouse.default_warehouse()
+        if not default_warehouse:
             return Response({'error': 'No default Warehouse.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             return super(ProcurementViewSet, self).create(request, *args, **kwargs)

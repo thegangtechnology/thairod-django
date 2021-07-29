@@ -12,5 +12,5 @@ class ProcurementSerializer(serializers.ModelSerializer):
         # drop any warehouse input.
         validated_data.pop('warehouse')
         # default warehouse for now.
-        warehouse = Warehouse.objects.get(pk=1)
+        warehouse = Warehouse.default_warehouse()
         return Procurement.objects.create(warehouse=warehouse, **validated_data)
