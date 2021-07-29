@@ -1,22 +1,29 @@
+from dataclasses import dataclass
+from typing import List
+
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.template import loader
 from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, filters
-from rest_framework.request import Request
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from shipment.utils.print_label_util import split_print_label
-from thairod.services.shippop.api import ShippopAPI
 from rest_framework.decorators import action
-from shipment.models import Shipment, TrackingStatus, BatchShipment
-from shipment.serializers.shipment_serializer import ShipmentSerializer, ShipmentAssignSerializer
-from shipment.serializers.tracking_status_serializer import TrackingStatusSerializer
-from shipment.serializers.batch_shipment_serializer import BatchShipmentSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from shipment.dataclasses.batch_shipment import GeneratedBatchNameResponse, AssignBatchToShipmentRequest
 from shipment.dataclasses.print_label import PrintLabelParam
-from shipment.services.print_label_service import PrintLabelService
+from shipment.models import Shipment, TrackingStatus, BatchShipment
+from shipment.serializers.batch_shipment_serializer import BatchShipmentSerializer
+from shipment.serializers.shipment_serializer import ShipmentSerializer, ShipmentAssignSerializer
+from shipment.serializers.tracking_status_serializer import TrackingStatusSerializer
 from shipment.services.batch_shipment_service import BatchShipmentService
+from shipment.services.print_label_service import PrintLabelService
+from shipment.utils.print_label_util import split_print_label
+from thairod.services.shippop.api import ShippopAPI
+from thairod.utils.auto_serialize import AutoSerialize
+from thairod.utils.collection_util import pair_leftover
 
 
 class ShipmentModelViewSet(viewsets.ModelViewSet):
@@ -65,6 +72,29 @@ class PrintLabelView(APIView):
         label_html = shippop.print_multiple_labels(tracking_codes=[s.tracking_code for s in shipments])
         labels = split_print_label(label_html)
         return PrintLabelService().generate_label_interleave(labels, shipments)
+
+
+class PrintLabelService:
+
+    def generate_label_interleave(self, labels: List[str], shipments: List[Shipment]) -> str:
+        pairs, _, leftover_shipments = pair_leftover(labels, shipments)
+        template = loader.get_template('shipping_label.html')
+        context = {
+            'pairs': pairs,
+            'left_over': leftover_shipments
+        }
+        s = template.render(context)
+        return s
+
+
+# TODO: Refactor to dataclass
+@dataclass
+class GeneratedBatchNameResponse(AutoSerialize):
+    name: str
+
+    @classmethod
+    def example(cls):
+        return cls(name="2021-07-29_1")
 
 
 class BatchShipmentModelViewSet(viewsets.ModelViewSet):
