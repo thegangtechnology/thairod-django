@@ -5,6 +5,7 @@ from shopping_link.serializers import ShoppingLinkSerializer, CreateShoppingLink
 from rest_framework.response import Response
 from rest_framework.views import status
 from django.utils import timezone
+from thairod.utils.auto_serialize import swagger_auto_serialize_schema
 
 
 class ShoppingLinkViewSet(mixins.CreateModelMixin,
@@ -19,6 +20,7 @@ class ShoppingLinkViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         return serializer.save()
 
+    # @swagger_auto_serialize_schema(CreateShoppingLinkSerializer, ShoppingLinkSerializer)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
