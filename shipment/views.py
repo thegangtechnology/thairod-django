@@ -8,6 +8,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, filters
 from rest_framework.request import Request
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
 
 from shipment.models import Shipment, TrackingStatus
 from shipment.serializers.shipment_serializer import ShipmentSerializer
@@ -18,6 +20,7 @@ from thairod.utils.auto_serialize import AutoSerialize
 
 
 class ShipmentModelViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated,]
     serializer_class = ShipmentSerializer
     queryset = Shipment.objects.all()
     filter_backends = [filters.SearchFilter]
