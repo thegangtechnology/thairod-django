@@ -1,284 +1,31 @@
 <html>
-
 <head>
     <meta charset="utf-8">
-    <title>SHIPPOP Label : size a4</title>
+    <title>ไทยรอด Label</title>
     <link type="text/css" href="//www1.shippop.dev/assets/css/label-th.css?v=0.01061" rel="stylesheet">
     <style type="text/css" media="print">
         @page {
             size: A4 landscape;
         }
     </style>
-
-
+    <style type="text/css">
+        table.productlist, tr, th, td {
+            border: 2px solid gray;
+            border-collapse:collapse;
+        }
+    </style>
     <link type="text/css" href="//www1.shippop.dev/assets/vendor/font-awesome-4.7.0/css/font-awesome.min.css?v=0.01061"
           rel="stylesheet">
 </head>
-
 <body>
 
-<div class="page landscape sizeA4  ">
-    <div class="page-wrapper a4 A4">
+{% for label, shipment in pairs %}
+    {{ label | safe }}
+    {% include "shipment.html" with shipment=shipment %}
+{% endfor %}
+{% for shipment in leftover %}
+    {% include "shipment.html" with shipment=shipment %}
+{% endfor %}
 
-        <div class="page-border">
-
-            <div class="marketplace-logo ">
-                <img class="logo _marginLeft " src="https://www1.shippop.dev/assets/images/logo.png"/>
-                <div class="dropoff hide-sizeA">(บริการ Drop off)</div>
-            </div>
-
-            <div class="address-box sender-area  _marginLeft  ">
-                <div class="font-extra _bold">
-                    ชื่อที่อยู่ผู้ฝากส่ง
-                    <span class="dropoff hide-receipt">(บริการ Drop off)</span>
-                </div>
-
-                <div class="address-row _bold ">from testing</div>
-                <div>123/456 Testor Tower บางรัก บางรัก กรุงเทพมหานคร</div>
-
-                <div class="zipcode-area small-box">
-                    <ul class="clearfix">
-                        <li>1</li>
-                        <li>0</li>
-                        <li>2</li>
-                        <li>0</li>
-                        <li>0</li>
-                    </ul>
-
-                    <div class="address-row tel">โทร. 0850035533</div>
-                </div>
-            </div>
-
-
-            <div class="address-box customer-area  ">
-                <div class="font-extra _bold">
-                    ชื่อที่อยู่ผู้รับ
-                </div>
-
-                <div class="address-row _bold ">to testing</div>
-                <div>1231123/456 Testor Tower บางรัก บางรัก กรุงเทพมหานคร</div>
-
-                <div class="zipcode-area">
-                    <ul class="clearfix">
-                        <li>1</li>
-                        <li>0</li>
-                        <li>2</li>
-                        <li>0</li>
-                        <li>0</li>
-                    </ul>
-
-                    <div class="address-row tel">โทร. 0850035533</div>
-                </div>
-
-            </div>
-            <div class="detail-area _marginTop _marginRight">
-                <div class="top-right-mark">
-                    <div>บริการจัดส่งสินค้า (e-Parcel)</div>
-                    <div>ใบอนุญาตสำหรับลูกค้าธุรกิจ</div>
-                    <div>เลขที่ บธ.<span class="dot-line w20">2</span> / 2559</div>
-                    <div>ชำระค่าฝากส่งตามที่ ปณท กำหนด</div>
-                </div>
-                <div class="detail-barcode thp">
-                    <ul>
-
-                        <li class="price border ">
-                            ไม่เก็บเงินค่าสินค้า
-                        </li>
-
-                        <li class="logo-courier-area hide-receipt border">
-                            <img class="logo" src="//www1.shippop.dev/assets/images/logistic/ems.png?v=0.01061"
-                                 width="130" alt="EMS">
-                        </li>
-
-
-                        <li class="logo-area hide-receipt border border-bottom">
-                            <img class="logo" src="//www1.shippop.dev/assets/images/logo.png?v=0.01061" width="160"
-                                 alt="SHIPPOP">
-                        </li>
-
-                        <li>
-                            <img class="img-barcode"
-                                 src="data:image/jpeg;base64,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">
-                            <div>TE337016293ST</div>
-                            <div>EMS / Inv. No.</div>
-                        </li>
-
-
-                    </ul>
-
-                </div>
-
-            </div>
-
-            <div class="logo-area hide-sizeA">
-                <img class="logo" src="//www1.shippop.dev/assets/images/logo.png?v=0.01061" width="160"
-                     alt="SHIPPOP">
-            </div>
-
-            <div class="footer-label">
-                <div class="remark-box ">
-                    <div>หมายเหตุ</div>
-                </div>
-            </div>
-
-
-            <div class="remark">
-                *หากต้องการเปลี่ยนแปลงหรือคืนสินค้า กรุณาติดต่อบริษัทที่ท่านสั่งซื้อสินค้าโดยตรง และหากพัสดุตีกลับ
-                กรุณานำส่งตามชื่อผู้ฝากส่ง
-            </div>
-
-        </div> <!-- end page border -->
-    </div> <!-- end page-wrapper -->
-</div>
-<!-- end page -->
-
-<div class="page landscape sizeA4">
-    <div class=""
-    <div>
-        <table>
-            <tr>
-                <td>helloooo</td>
-                <td>helloooo</td>
-                <td>helloooo</td>
-            </tr>
-            <tr>
-                <td>helloooo</td>
-                <td>helloooo</td>
-                <td>helloooo</td>
-            </tr>
-            <tr>
-                <td>helloooo</td>
-                <td>helloooo</td>
-                <td>helloooo</td>
-            </tr>
-            <tr>
-                <td>helloooo</td>
-                <td>helloooo</td>
-                <td>helloooo</td>
-            </tr>
-            <tr>
-                <td>helloooo</td>
-                <td>helloooo</td>
-                <td>helloooo</td>
-            </tr>
-        </table>
-    </div>
-</div>
-
-<div class="page landscape sizeA4  ">
-
-
-    <div class="page-wrapper a4 A4">
-
-        <div class="page-border">
-
-            <div class="marketplace-logo ">
-                <img class="logo _marginLeft " src="https://www1.shippop.dev/assets/images/logo.png"/>
-                <div class="dropoff hide-sizeA">(บริการ Drop off)</div>
-            </div>
-
-            <div class="address-box sender-area  _marginLeft  ">
-                <div class="font-extra _bold">
-                    ชื่อที่อยู่ผู้ฝากส่ง
-                    <span class="dropoff hide-receipt">(บริการ Drop off)</span>
-                </div>
-
-                <div class="address-row _bold ">from testing</div>
-                <div>123/456 Testor Tower บางรัก บางรัก กรุงเทพมหานคร</div>
-
-                <div class="zipcode-area small-box">
-                    <ul class="clearfix">
-                        <li>1</li>
-                        <li>0</li>
-                        <li>2</li>
-                        <li>0</li>
-                        <li>0</li>
-                    </ul>
-
-                    <div class="address-row tel">โทร. 0850035533</div>
-                </div>
-            </div>
-
-
-            <div class="address-box customer-area  ">
-                <div class="font-extra _bold">
-                    ชื่อที่อยู่ผู้รับ
-                </div>
-
-                <div class="address-row _bold ">to testing</div>
-                <div>1231123/456 Testor Tower บางรัก บางรัก กรุงเทพมหานคร</div>
-
-                <div class="zipcode-area">
-                    <ul class="clearfix">
-                        <li>1</li>
-                        <li>0</li>
-                        <li>2</li>
-                        <li>0</li>
-                        <li>0</li>
-                    </ul>
-
-                    <div class="address-row tel">โทร. 0850035533</div>
-                </div>
-
-            </div>
-            <div class="detail-area _marginTop _marginRight">
-                <div class="top-right-mark">
-                    <div>บริการจัดส่งสินค้า (e-Parcel)</div>
-                    <div>ใบอนุญาตสำหรับลูกค้าธุรกิจ</div>
-                    <div>เลขที่ บธ.<span class="dot-line w20">2</span> / 2559</div>
-                    <div>ชำระค่าฝากส่งตามที่ ปณท กำหนด</div>
-                </div>
-                <div class="detail-barcode thp">
-                    <ul>
-
-                        <li class="price border ">
-                            ไม่เก็บเงินค่าสินค้า
-                        </li>
-
-                        <li class="logo-courier-area hide-receipt border">
-                            <img class="logo" src="//www1.shippop.dev/assets/images/logistic/ems.png?v=0.01061"
-                                 width="130" alt="EMS">
-                        </li>
-
-
-                        <li class="logo-area hide-receipt border border-bottom">
-                            <img class="logo" src="//www1.shippop.dev/assets/images/logo.png?v=0.01061" width="160"
-                                 alt="SHIPPOP">
-                        </li>
-
-                        <li>
-                            <img class="img-barcode"
-                                 src="data:image/jpeg;base64,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">
-                            <div>TE337016293ST</div>
-                            <div>EMS / Inv. No.</div>
-                        </li>
-
-
-                    </ul>
-
-                </div>
-
-            </div>
-
-            <div class="logo-area hide-sizeA">
-                <img class="logo" src="//www1.shippop.dev/assets/images/logo.png?v=0.01061" width="160"
-                     alt="SHIPPOP">
-            </div>
-
-            <div class="footer-label">
-                <div class="remark-box ">
-                    <div>หมายเหตุ</div>
-                </div>
-            </div>
-
-
-            <div class="remark">
-                *หากต้องการเปลี่ยนแปลงหรือคืนสินค้า กรุณาติดต่อบริษัทที่ท่านสั่งซื้อสินค้าโดยตรง และหากพัสดุตีกลับ
-                กรุณานำส่งตามชื่อผู้ฝากส่ง
-            </div>
-        </div> <!-- end page border -->
-    </div> <!-- end page-wrapper -->
-</div>
-<!-- end page -->
 </body>
 </html>

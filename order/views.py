@@ -16,6 +16,7 @@ from shipment.models import Shipment, TrackingStatus
 from shipment.models.shipment import ShipmentStatus
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderData, OrderLineData, AddressData, OrderResponse, ParcelData
+from thairod.settings import TELEMED_WHITELIST, SHIPPOP_EMAIL
 from thairod.utils.auto_serialize import AutoSerialize, swagger_auto_serialize_schema
 from thairod.utils.decorators import ip_whitelist
 from warehouse.models import Warehouse
@@ -73,7 +74,7 @@ class ShippingAddress(AutoSerialize):
             sub_district='ราชดำเนิน',
             district='พระนคร',
             province='กรุงเทพ',
-            zipcode='12345',
+            zipcode='10400',
             note="บ้านอยู่ชั้นสอง"
         )
 
@@ -90,6 +91,7 @@ class CartItem(AutoSerialize):
 
 @dataclass
 class CreateOrderParameter(AutoSerialize):
+    account: str
     doctor: Doctor
     patient: Patient
     shipping_address: ShippingAddress
@@ -99,12 +101,14 @@ class CreateOrderParameter(AutoSerialize):
 
     @classmethod
     def example(cls):
-        return cls(doctor=Doctor.example(),
-                   patient=Patient.example(),
-                   shipping_address=ShippingAddress.example(),
-                   line_id="steven_weinberg",
-                   session_id="AAABB2134",
-                   items=[CartItem.example()])
+        return cls(
+            account='frappet',
+            doctor=Doctor.example(),
+            patient=Patient.example(),
+            shipping_address=ShippingAddress.example(),
+            line_id="steven_weinberg",
+            session_id="AAABB2134",
+            items=[CartItem.example()])
 
 
 @dataclass
@@ -132,10 +136,11 @@ class ShippopCreateOrderError(Exception):
 
 class CreateOrderAPI(GenericAPIView):
 
-    @ip_whitelist(['127.0.0.1'])
+    # TODO this white list need to be per account
+    @ip_whitelist(TELEMED_WHITELIST)
     @swagger_auto_serialize_schema(CreateOrderParameter, CreateOrderResponse)
     def post(self, request: Request, format=None) -> Response:
-        param = CreateOrderParameter.from_request(request)
+        param = CreateOrderParameter.from_post_request(request)
         service = OrderService()
         return service.crate_order(param).to_response()
 
@@ -196,7 +201,7 @@ class OrderService:
 
     def create_order_data(self, shipment: Shipment) -> OrderData:
         return OrderData(
-            email='',
+            email=SHIPPOP_EMAIL,
             success_url='',
             fail_url='',
             data=[

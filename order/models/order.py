@@ -1,7 +1,8 @@
 from django.db import models
-from core.models import AbstractModel
-from address.models import Address
 from django.utils.translation import gettext_lazy as _
+
+from address.models import Address
+from core.models import AbstractModel
 
 
 # TODO: Abbreviation?

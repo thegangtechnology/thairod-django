@@ -162,8 +162,13 @@ SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
 SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
+TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('SHIPPOP_EMAIL', ""))]
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
 }
+
+SHELL_PLUS_IMPORTS = [
+    'from thairod.utils.load_seed import load_seed, load_meaningful_seed'
+]
