@@ -1,3 +1,4 @@
+# Please DJANGO_SETTINGS_MODULE to environement setting
 FROM python:3.9-slim
 LABEL INCREMENTMEWHENSTUCK=1
 ENV PYTHONUNBUFFERED 1
@@ -44,6 +45,8 @@ EXPOSE 8000
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
 RUN DATABASE_URL="postgres://nonexistence:5432/none" python manage.py collectstatic --noinput
+
+# Please DJANGO_SETTINGS_MODULE to environement setting
 
 # Tell uWSGI where to find your wsgi file (change this):
 ENV UWSGI_WSGI_FILE="thairod/wsgi.py"
