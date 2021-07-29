@@ -28,9 +28,15 @@ http://tg.localhost:8000/docs/open_api.json
    DB_NAME="dbname"
    DB_USER="dbuser"
    DB_PASSWORD="password"
+   
    SHIPPOP_API_KEY="key"
    SHIPPOP_URL="https://mkpservice.shippop.dev"
    SHIPPOP_DEFAULT_COURIER_CODE="SPE"
+   SHIPPOP_EMAIL="xxxx@yyyy.com"
+   
+   TELEMED_WHITELIST="127.0.0.1"
+   LINE_CHANNEL_ACCESS_TOKEN=""
+
    ```
    *Make sure to have database connection with your specified user.
 4. Run migration files
