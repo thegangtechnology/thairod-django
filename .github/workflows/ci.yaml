@@ -72,6 +72,7 @@ jobs:
     - name: SonarQube Scan
       uses: kitabisa/sonarqube-action@v1.1.0
       with:
+        JAVA_HOME: '' # Avoid 'java: not found' error
         host: ${{ secrets.SONAR_HOST_URL }}
         login: ${{ secrets.SONAR_TOKEN }}
         projectKey: "thairod-django"
