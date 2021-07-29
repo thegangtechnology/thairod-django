@@ -17,63 +17,63 @@ on:
 # TODO: DJANGO_SETTINGS_MODULE set this in development when build or run!!
 # three job definition
 jobs:
-#  health-check-job: # health check job for testing and code formatting check
-#    runs-on: ubuntu-latest # os for running the job
-#    services:
-#      postgres: # we need a postgres docker image to be booted a side car service to run the tests that needs a db
-#        image: postgres
-#        env: # the environment variable must match with app/settings.py if block of DATBASES variable otherwise test will fail due to connectivity issue.
-#          POSTGRES_USER: postgres
-#          POSTGRES_PASSWORD: postgres
-#          POSTGRES_DB: github-actions
-#        ports:
-#          - 5432:5432 # exposing 5432 port for application to use
-#        # needed because the postgres container does not provide a healthcheck
-#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-#    env:
-#      DB_URL: postgres://postgres:postgres@127.0.0.1:5432/github-actions
-#      SHIPPOP_API_KEY: ${{ secrets.SHIPPOP_API_KEY }}
-#    steps:
-#      - name: Checkout code # checking our the code at current commit that triggers the workflow
-#        uses: actions/checkout@v2
-#        with:
-#          fetch-depth: 0
-#      - name: Cache dependency # caching dependency will make our build faster.
-#        uses: actions/cache@v2 # for more info checkout pip section documentation at https://github.com/actions/cache
-#        with:
-#          path: ~/.cache/pip
-#          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-#          restore-keys: |
-#            ${{ runner.os }}-pip-
-#      - name: Setup python environment # setting python environment to 3.x
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: '3.x' # if you want multiple python version run just use matrix strategy in job config. See the documentation of GitHub Actions
-#      - name: Check Python version # checking the python version to see if 3.x is installed.
-#        run: python --version
-#      - name: Install Pipenv
-#        run: pip install pipenv pycodestyle coverage
-#      - name: Convert Pipenv to requirement file
-#        run: pipenv lock -r > requirements.txt
-#      - name: Install requirements # install application requirements
-#        run: pip install -r requirements.txt
-#      - name: Check Syntax # check code formatting
-#        run: pycodestyle --statistics .
-#      - name: Run Test # running tests
-#        run: |
-#          coverage run manage.py test
-#          coverage report -m
-#          coverage xml
-#      - name: SonarCloud Scan
-#        uses: sonarsource/sonarqube-scan-action@master
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  health-check-job: # health check job for testing and code formatting check
+    runs-on: ubuntu-latest # os for running the job
+    services:
+      postgres: # we need a postgres docker image to be booted a side car service to run the tests that needs a db
+        image: postgres
+        env: # the environment variable must match with app/settings.py if block of DATBASES variable otherwise test will fail due to connectivity issue.
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github-actions
+        ports:
+          - 5432:5432 # exposing 5432 port for application to use
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DB_URL: postgres://postgres:postgres@127.0.0.1:5432/github-actions
+      SHIPPOP_API_KEY: ${{ secrets.SHIPPOP_API_KEY }}
+    steps:
+      - name: Checkout code # checking our the code at current commit that triggers the workflow
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Cache dependency # caching dependency will make our build faster.
+        uses: actions/cache@v2 # for more info checkout pip section documentation at https://github.com/actions/cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Setup python environment # setting python environment to 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x' # if you want multiple python version run just use matrix strategy in job config. See the documentation of GitHub Actions
+      - name: Check Python version # checking the python version to see if 3.x is installed.
+        run: python --version
+      - name: Install Pipenv
+        run: pip install pipenv pycodestyle coverage
+      - name: Convert Pipenv to requirement file
+        run: pipenv lock -r > requirements.txt
+      - name: Install requirements # install application requirements
+        run: pip install -r requirements.txt
+      - name: Check Syntax # check code formatting
+        run: pycodestyle --statistics .
+      - name: Run Test # running tests
+        run: |
+          coverage run manage.py test
+          coverage report -m
+          coverage xml
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   docker-build:
     runs-on: ubuntu-latest
-#    needs: [health-check-job]
+    needs: [health-check-job]
     env:
       DO_REGISTRY_URL: registry.digitalocean.com/gang-registry
       IMAGE_NAME: ${{ secrets.DO_REGISTRY_URL }}/thairod/thairod-django
@@ -90,12 +90,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Docker Build
         run: |
-          echo "Building"
-          echo $GITHUB_ACTION_PATH
-          echo $GITHUB_SHA
-          echo ${{ env.IMAGE_NAME }}
-          ls $GITHUB_WORKSPACE
-          docker build --pull -t ${{ env.IMAGE_NAME }}:$GITHUB_SHA --file ./Dockerfile .
+          docker build --pull -t ${{ env.IMAGE_NAME }}:$GITHUB_SHA .
           docker tag ${{ env.IMAGE_NAME }}:$GITHUB_SHA ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:$GITHUB_SHA
           docker push ${{ env.IMAGE_NAME }}:latest
