@@ -47,7 +47,7 @@ jobs:
       - name: Check Python version # checking the python version to see if 3.x is installed.
         run: python --version
       - name: Install Pipenv
-        run: pip install pipenv pycodestyle
+        run: pip install pipenv pycodestyle flake8
       - name: Convert Pipenv to requirement file
         run: pipenv lock -r > requirements.txt
       - name: Install requirements # install application requirements
