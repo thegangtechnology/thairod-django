@@ -13,6 +13,7 @@ class BatchShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
 
     def setUp(self):
         self.model = BatchShipment
+        self.set_up_user()
         self.obj = BatchShipment.objects.first()
         self.list_url = reverse('batch-shipment-list')
         self.detail_url = reverse('batch-shipment-detail', kwargs={'pk': self.obj.pk})

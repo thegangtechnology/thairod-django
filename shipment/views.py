@@ -39,6 +39,7 @@ class ShipmentModelViewSet(viewsets.ModelViewSet):
 
 
 class TrackingStatusModelViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, ]
     serializer_class = TrackingStatusSerializer
     queryset = TrackingStatus.objects.all()
     filter_backends = [filters.SearchFilter]
@@ -67,6 +68,7 @@ class PrintLabelView(APIView):
 
 
 class BatchShipmentModelViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, ]
     serializer_class = BatchShipmentSerializer
     queryset = BatchShipment.objects.all()
     filter_backends = [filters.SearchFilter]
