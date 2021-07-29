@@ -164,7 +164,7 @@ SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
 
 try:
-    TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('SHIPPOP_EMAIL', ""))]
+    TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('TELEMED_WHITELIST', ""))]
 except ValueError:
     TELEMED_WHITELIST = []
 

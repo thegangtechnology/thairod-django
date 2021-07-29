@@ -33,6 +33,7 @@ jobs:
     env:
       DB_URL: postgres://postgres:postgres@127.0.0.1:5432/github-actions
       SHIPPOP_API_KEY: ${{ secrets.SHIPPOP_API_KEY }}
+      SHIPPOP_EMAIL: "test@example.co"
     steps:
       - name: Checkout code # checking our the code at current commit that triggers the workflow
         uses: actions/checkout@v2

@@ -20,7 +20,8 @@ class ShippopAPI:
         return r.json()
 
     def create_order(self, order_data: OrderData) -> OrderResponse:
-        resp = self.shippop_request(path="booking/", payload=order_data.to_request_dict())
+        request_dict = order_data.to_request_dict()
+        resp = self.shippop_request(path="booking/", payload=request_dict)
         data = resp.pop('data').values()
         return OrderResponse(**resp, lines=[OrderLineResponse.from_create_api(response=d) for d in data])
 
