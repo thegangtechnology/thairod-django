@@ -117,8 +117,6 @@ def print_label(request: HttpRequest):
         return HttpResponseBadRequest()
     # optimize this
     shipment = Shipment.objects.select_related().get(id=shipment_id)
-    # purchase_id = shipment.shippop_purchase_id
-    # receiver_name = shipment.order.receiver_name
     items = shipment.orderitem_set.select_related().all()
     for item in items:
         print(item.product_variation.name)

@@ -163,6 +163,13 @@ SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
 
+LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', "")
+
+LINE_TRACKING_MESSAGE = """
+กล่องไทยรอดกำลังถูกส่งไปให้ คุณ {name}
+โดยท่านสามารถติดตามสถานะได้ที่ {tracking_url}
+""".strip()
+
 try:
     TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('TELEMED_WHITELIST', ""))]
 except ValueError:

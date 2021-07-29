@@ -46,5 +46,5 @@ def load_meaningful_seed():
         warehouse = Warehouse.example()
         warehouse.address.save()
         warehouse.save()
-        orders = [OrderService().crate_order(CreateOrderParameter.example()) for _ in range(5)]
+        orders = [OrderService().create_order(CreateOrderParameter.example()) for _ in range(5)]
         return orders

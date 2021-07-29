@@ -14,6 +14,7 @@ from order.serializers import OrderSerializer, OrderItemSerializer
 from product.models import ProductVariation
 from shipment.models import Shipment, TrackingStatus
 from shipment.models.shipment import ShipmentStatus
+from thairod.services.line.line import send_line_tracking_message
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderData, OrderLineData, AddressData, OrderResponse, ParcelData
 from thairod.settings import TELEMED_WHITELIST, SHIPPOP_EMAIL
@@ -106,7 +107,7 @@ class CreateOrderParameter(AutoSerialize):
             doctor=Doctor.example(),
             patient=Patient.example(),
             shipping_address=ShippingAddress.example(),
-            line_id="steven_weinberg",
+            line_id="",
             session_id="AAABB2134",
             items=[CartItem.example()])
 
@@ -142,15 +143,15 @@ class CreateOrderAPI(GenericAPIView):
     def post(self, request: Request, format=None) -> Response:
         param = CreateOrderParameter.from_post_request(request)
         service = OrderService()
-        return service.crate_order(param).to_response()
+        return service.create_order(param).to_response()
 
 
 class OrderService:
-    def crate_order(self, param: CreateOrderParameter) -> CreateOrderResponse:
+    def create_order(self, param: CreateOrderParameter) -> CreateOrderResponse:
         try:
             with transaction.atomic():
                 address = self.create_address(param)
-                order = self.create_order(param, address)
+                order = self.create_order_from_param(param, address)
                 shipment = self.create_shipment(param, order)
                 self.create_order_items(param, shipment)
 
@@ -166,6 +167,10 @@ class OrderService:
                 if not confirm_success:
                     raise ShippopConfirmationError()
                 self.update_shipment_with_confirmation(shipment)
+                if param.line_id:
+                    send_line_tracking_message(line_uid=param.line_id,
+                                               name=param.patient.name,
+                                               shippop_tracking_code=shipment.tracking_code)
                 return CreateOrderResponse(success=True,
                                            order_id=order.id,
                                            shippop_tracking_code=shipment.tracking_code,
@@ -239,7 +244,7 @@ class OrderService:
             note=param.shipping_address.note
         )
 
-    def create_order(self, param: CreateOrderParameter, address: Address) -> Order:
+    def create_order_from_param(self, param: CreateOrderParameter, address: Address) -> Order:
         return Order.objects.create(
             status=OrderStatus.STARTED,
             receiver_address=address,
