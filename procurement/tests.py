@@ -15,6 +15,7 @@ class ProcurementAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.set_up_user()
         self.model = Procurement
         self.obj = Procurement.objects.first()
         self.address = Address.objects.first()

@@ -14,6 +14,7 @@ class UserAPITestCase(BaseTestSimpleApi, APITestCase):
 
     def setUp(self):
         self.model = User
+        self.set_up_user()
         self.obj = User.objects.first()
         self.list_url = reverse('user-list')
         self.detail_url = reverse('user-detail', kwargs={'pk': self.obj.pk})

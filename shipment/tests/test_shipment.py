@@ -14,6 +14,7 @@ class ShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
 
     def setUp(self):
         self.model = Shipment
+        self.set_up_user()
         self.obj = Shipment.objects.first()
         self.warehouse = Warehouse.objects.first()
         self.tracking = TrackingStatus.objects.first()
