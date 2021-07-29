@@ -88,6 +88,6 @@ class BatchShipmentModelViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['POST'], url_path='assign')
     def assign_batch(self, request):
         assign_batch_to_shipment_request = AssignBatchToShipmentRequest.from_post_request(request=request)
-        BatchShipmentService().assign_batch_to_shipments(assign_batch_to_shipment_request
-                                                         =assign_batch_to_shipment_request)
+        BatchShipmentService().assign_batch_to_shipments(
+            assign_batch_to_shipment_request=assign_batch_to_shipment_request)
         return Response()
