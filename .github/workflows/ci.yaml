@@ -78,10 +78,12 @@ jobs:
       DO_REGISTRY_URL: registry.digitalocean.com/gang-registry
       IMAGE_NAME: ${{ secrets.DO_REGISTRY_URL }}/thairod/methairod-django
     steps:
-      - name: Docker login
-        run: |
-          echo "${{ secrets.DO_REGISTRY_FILE }}" > ~/.docker/config.json
-          docker login ${{ secrets.DO_REGISTRY_URL }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.DO_REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Docker Build
         run: |
           echo "Building"
