@@ -19,7 +19,7 @@ from thairod.services.shippop.api import ShippopAPI
 from thairod.utils.auto_serialize import AutoSerialize
 from rest_framework.decorators import action
 from shipment.models import Shipment, TrackingStatus, BatchShipment
-from shipment.serializers.shipment_serializer import ShipmentSerializer
+from shipment.serializers.shipment_serializer import ShipmentSerializer, ShipmentAssignSerializer
 from shipment.serializers.tracking_status_serializer import TrackingStatusSerializer
 from shipment.serializers.batch_shipment_serializer import BatchShipmentSerializer
 from rest_framework.response import Response
@@ -33,6 +33,17 @@ class ShipmentModelViewSet(viewsets.ModelViewSet):
     queryset = Shipment.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'shipping_method', 'note', 'shippop_purchase_id', 'status']
+
+    @action(detail=True, methods=['POST'])
+    def assign(self, request, *args, **kwargs):
+        batch_name = request.data.get('batch_name', None)
+        shipment = self.get_object()
+        if batch_name is None:
+            return Response("Batch Name is None.", status=400)
+        batch = BatchShipment.objects.get(name=batch_name)
+        shipment.batch = batch
+        shipment.save()
+        return Response(ShipmentAssignSerializer(shipment).data)
 
 
 class TrackingStatusModelViewSet(viewsets.ModelViewSet):
