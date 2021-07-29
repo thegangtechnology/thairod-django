@@ -1,7 +1,7 @@
 from os.path import dirname, join
 
 from bs4 import BeautifulSoup
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 from order.views import OrderService, CreateOrderParameter
 from shipment.models import Shipment
@@ -11,7 +11,8 @@ from thairod.services.shippop.tests import load_test_data
 from thairod.utils.load_seed import load_seed
 
 
-class TestPrintLabel(TestCase):
+class TestPrintLabel(TransactionTestCase):
+    reset_sequences = True
     def setUp(self):
         load_seed()
         self.label_html_file = join(dirname(__file__), './ttt.html')
