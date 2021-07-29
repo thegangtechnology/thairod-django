@@ -14,6 +14,7 @@ class TrackingStatusAPITestCase(BaseTestSimpleApi, APITestCase):
 
     def setUp(self):
         self.model = TrackingStatus
+        self.set_up_user()
         self.obj = TrackingStatus.objects.first()
         self.order = Order.objects.first()
         self.shipment = Shipment.objects.first()
