@@ -1,6 +1,5 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
-
 from core.tests import BaseTestSimpleApi
 from order.models import Order
 from shipment.models import Shipment, TrackingStatus

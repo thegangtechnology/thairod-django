@@ -36,19 +36,18 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('procurement.urls')),
-    path('api/address/', include('address.urls')),
-    path('api/order/', include('order.urls')),
-    path('api/product/', include('product.urls')),
-    path('api/shipment/', include('shipment.urls')),
-    path('api/stock_adjustment/', include('stock_adjustment.urls')),
-    path('api/warehouse/', include('warehouse.urls')),
-    path('api/user/', include('user.urls')),
-
+    path('api/', include('shopping_link.urls')),
+    path('api/', include('address.urls')),
+    path('api/', include('order.urls')),
+    path('api/', include('product.urls')),
+    path('api/', include('shipment.urls')),
+    path('api/', include('stock_adjustment.urls')),
+    path('api/', include('warehouse.urls')),
+    path('api/', include('user.urls')),
     re_path(r'^docs/open_api(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^docs/open_api/$', schema_view.with_ui('swagger',
             cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^docs/redoc/$', schema_view.with_ui('redoc',
             cache_timeout=0), name='schema-redoc'),
-
 ]

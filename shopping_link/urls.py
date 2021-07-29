@@ -1,10 +1,10 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
-from procurement.views import ProcurementViewSet
+from shopping_link.views import ShoppingLinkViewSet
 
 
 router = DefaultRouter()
-router.register(r'procurements', ProcurementViewSet, basename="procurement")
+router.register(r'shopping-links', ShoppingLinkViewSet, basename="shopping-link")
 
 
 urlpatterns = [

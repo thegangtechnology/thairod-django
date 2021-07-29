@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # Custom
     'core',
     'user',
+    'shopping_link',
     'address',
     'warehouse',
     'product',
