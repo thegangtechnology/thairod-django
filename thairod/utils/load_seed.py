@@ -31,7 +31,7 @@ def load_seed():
     seeder.add_entity(User, 1)
     seeder.add_entity(ShoppingLink, 1)
     seeder.add_entity(ShoppingLink, 1)
-    seeder.add_entity(BatchShipment, 1, {"name": "test batch shipment"})
+    seeder.add_entity(BatchShipment, 1)
     seeder.execute(turn_off_auto_now=False)
 
 
