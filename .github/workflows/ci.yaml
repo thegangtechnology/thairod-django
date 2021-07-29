@@ -65,8 +65,9 @@ jobs:
     - name: SonarQube Scan
       uses: kitabisa/sonarqube-action@v1.1.0
       with:
-        host: ${{ secrets.SONARQUBE_HOST }}
-        login: ${{ secrets.SONARQUBE_TOKEN }}
+        host: ${{ secrets.SONAR_HOST_URL }}
+        login: ${{ secrets.SONAR_TOKEN }}
+        projectKey: "thairod-django"
 
 #  package-job: # package job for building and publishing docker images
 #    runs-on: ubuntu-latest
