@@ -45,7 +45,20 @@ class ShippopAPI:
         data = resp.pop('data').get("0", {}).values()
         return [Pricing(**d) for d in data]
 
-    def get_label(self, purchase_id: int, size: str = 'A4') -> str:
-        """ Return string of HTML. Beware of injection """
-        resp = self.shippop_request(path="label/", payload={"purchase_id": purchase_id, "size": size})
-        return resp['html']
+    def print_label(self, purchase_id: int, size: str = 'A4', label_type: str = 'html') -> str:
+        """
+            Return string of HTML. Beware of injection
+            Type: html, pdf
+        """
+        resp = self.shippop_request(path="label/",
+                                    payload={"purchase_id": purchase_id, "size": size, "type": label_type})
+        return resp[label_type]
+
+    def print_multiple_labels(self, tracking_codes: List[str], size: str = 'A4', label_type: str = 'html') -> str:
+        """
+            Return string of HTML. Beware of injection
+            Type: html, pdf
+        """
+        resp = self.shippop_request(path="label_tracking_code/", payload={"tracking_code": ",".join(tracking_codes), "size": size,
+                                                            "type": label_type})
+        return resp[label_type]
