@@ -38,6 +38,7 @@ class ShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
     def test_assign_batch_to_shipment(self):
         url = reverse("shipment-assign", kwargs={"pk": self.obj.pk})
         response = self.client.post(url, {"batch_name": self.batch_shipments.name}, format='json')
+        print(response.data)
         self.assertEqual(response.data['batch_name'], self.batch_shipments.name)
         self.assertEqual(response.data['is_assigned'], True)
         self.assertEqual(response.status_code, 200)

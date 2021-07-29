@@ -1,22 +1,16 @@
-from dataclasses import dataclass
 from typing import List
 
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, HttpRequest
 from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, filters
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-
-
-from shipment.models import Shipment, TrackingStatus
-from shipment.serializers.shipment_serializer import ShipmentSerializer
-from shipment.serializers.tracking_status_serializer import TrackingStatusSerializer
 from shipment.utils.print_label_util import split_print_label
 from thairod.services.shippop.api import ShippopAPI
-from thairod.utils.auto_serialize import AutoSerialize
 from rest_framework.decorators import action
 from shipment.models import Shipment, TrackingStatus, BatchShipment
 from shipment.serializers.shipment_serializer import ShipmentSerializer, ShipmentAssignSerializer
