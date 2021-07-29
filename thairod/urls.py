@@ -51,7 +51,7 @@ urlpatterns = [
             schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^docs/open_api/$', schema_view.with_ui('swagger',
                                                      cache_timeout=0), name='schema-swagger-ui'),
-    re_path(r'^docs/redoc/$', schema_view.with_ui('redoc',cache_timeout=0), name='schema-redoc'),
+    re_path(r'^docs/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

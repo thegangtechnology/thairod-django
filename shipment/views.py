@@ -22,7 +22,7 @@ from dataclasses import dataclass
 
 
 class ShipmentModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
     serializer_class = ShipmentSerializer
     queryset = Shipment.objects.all()
     filter_backends = [filters.SearchFilter]
