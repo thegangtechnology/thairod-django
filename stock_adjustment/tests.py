@@ -15,6 +15,7 @@ class StockAdjustmentAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = StockAdjustment
         self.obj = StockAdjustment.objects.first()
         self.warehouse = Warehouse.objects.first()
         self.product_variation = ProductVariation.objects.first()

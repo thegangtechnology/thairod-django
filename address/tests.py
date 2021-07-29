@@ -12,10 +12,12 @@ class AddressAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = Address
         self.obj = Address.objects.first()
         self.list_url = reverse('address-list')
         self.detail_url = reverse('address-detail', kwargs={'pk': self.obj.pk})
         self.valid_field = {
+            "name": 'the gang tech',
             "lat": 67856.1234567,
             "lon": 567778.1234567,
             "house_number": "23456",
@@ -23,6 +25,7 @@ class AddressAPITestCase(BaseTestSimpleApi, APITestCase):
             "district": "rtyuu",
             "province": "bangkok",
             "postal_code": "10123",
+            "telno": "1234678",
             "country": "Thailand",
         }
 

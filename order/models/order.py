@@ -18,9 +18,8 @@ class Order(AbstractModel):
         default=OrderStatus.STARTED,
     )
     # TODO: This looks like we should make a receiver table later? like patient list or sth.
-    receiver_name = models.CharField(max_length=255)
     receiver_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
-    receiver_tel = models.CharField(max_length=11)
     cid = models.CharField(max_length=255)
-    order_by = models.CharField(max_length=255)
+    orderer_name = models.CharField(max_length=255)
+    orderer_license = models.CharField(max_length=255)
     order_time = models.DateTimeField(auto_now=True)  # TODO: Is this manual input?

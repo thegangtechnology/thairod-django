@@ -1,1 +1,1 @@
-from .warehouse import Warehouse
+from .warehouse import Warehouse  # noqa

@@ -13,15 +13,14 @@ class OrderAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = Order
         self.obj = Order.objects.first()
         self.address = Address.objects.first()
         self.list_url = reverse('order-list')
         self.detail_url = reverse('order-detail', kwargs={'pk': self.obj.pk})
         self.valid_field = {
-            "receiver_name": "test_receiver_name",
             "receiver_address": self.address.pk,
-            "receiver_tel": "23456",
             "cid": "qwerty",
-            "order_by": "rtyuu",
-            "order_time": "bangkok",
+            "orderer_name": 'piti',
+            "orderer_license": 'sun',
         }

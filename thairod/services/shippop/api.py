@@ -6,6 +6,7 @@ from thairod.services.shippop.data import OrderData, OrderResponse, TrackingData
     ParcelData, Pricing
 from thairod.settings import SHIPPOP_API_KEY, SHIPPOP_URL
 
+
 # flake8: noqa
 
 class ShippopAPI:
@@ -59,6 +60,7 @@ class ShippopAPI:
             Return string of HTML. Beware of injection
             Type: html, pdf
         """
-        resp = self.shippop_request(path="label_tracking_code/", payload={"tracking_code": ",".join(tracking_codes), "size": size,
-                                                            "type": label_type})
+        resp = self.shippop_request(path="label_tracking_code/",
+                                    payload={"tracking_code": ",".join(tracking_codes), "size": size,
+                                             "type": label_type})
         return resp[label_type]

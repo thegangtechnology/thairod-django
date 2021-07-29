@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from core.tests import BaseTestSimpleApi
 from product.models import Product, ProductVariation
 from product.models.product_variation import ProductVariationUnit
@@ -13,6 +14,7 @@ class ProductVariationAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = ProductVariation
         self.obj = ProductVariation.objects.first()
         self.list_url = reverse('product-variation-list')
         self.detail_url = reverse('product-variation-detail', kwargs={'pk': self.obj.pk})

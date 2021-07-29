@@ -1,10 +1,9 @@
 from django.urls import reverse
-from rest_framework import status
 from rest_framework.test import APITestCase
 
 from address.models import Address
-from procurement.models import Procurement
 from core.tests import BaseTestSimpleApi
+from procurement.models import Procurement
 from product.models import ProductVariation
 from thairod.utils.load_seed import load_seed
 from warehouse.models import Warehouse
@@ -16,6 +15,7 @@ class ProcurementAPITestCase(BaseTestSimpleApi, APITestCase):
         load_seed()
 
     def setUp(self):
+        self.model = Procurement
         self.obj = Procurement.objects.first()
         self.address = Address.objects.first()
         try:
