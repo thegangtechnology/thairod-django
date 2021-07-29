@@ -40,7 +40,7 @@ class BatchShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
 
     def test_assign_batch(self):
         batch_name = "batch_name"
-        shipments = [1]
+        shipments = [Shipment.objects.first().id]
         request = {"batch_name": batch_name, "shipments": shipments}
         url = reverse("batch-shipment-assign-batch")
         response = self.client.post(url, request, format='json')
