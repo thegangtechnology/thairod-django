@@ -6,7 +6,7 @@ from order.models import Order, OrderItem
 from order.views import OrderService, CreateOrderParameter
 from procurement.models import Procurement
 from product.models import ProductVariation, Product, ProductImage
-from shipment.models import Shipment, TrackingStatus
+from shipment.models import Shipment, TrackingStatus, BatchShipment
 from stock_adjustment.models import StockAdjustment
 from user.models import User
 from warehouse.models import Warehouse
@@ -30,6 +30,8 @@ def load_seed():
     seeder.add_entity(StockAdjustment, 1)
     seeder.add_entity(User, 1)
     seeder.add_entity(ShoppingLink, 1)
+    seeder.add_entity(ShoppingLink, 1)
+    seeder.add_entity(BatchShipment, 1, {"name": "test batch shipment"})
     seeder.execute(turn_off_auto_now=False)
 
 
