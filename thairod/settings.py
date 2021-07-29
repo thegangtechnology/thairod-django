@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
+
 import dj_database_url
 import environ
 
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'corsheaders',
     'drf_yasg',
+    'rest_framework_simplejwt',
     # Custom
     'core',
     'user',
@@ -132,6 +135,9 @@ AUTH_USER_MODEL = 'user.User'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'thairod.utils.paginations.CustomPageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -156,6 +162,17 @@ SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
 SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
+
+TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('SHIPPOP_EMAIL', ""))]
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
+}
+
+SHELL_PLUS_IMPORTS = [
+    'from thairod.utils.load_seed import load_seed, load_meaningful_seed'
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

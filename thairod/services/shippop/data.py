@@ -53,11 +53,11 @@ class AddressData:
 
 @dataclass
 class ParcelData:
-    weight: Optional[int] = None
-    width: Optional[int] = None
-    length: Optional[int] = None
-    height: Optional[int] = None
-    name: Optional[str] = ""
+    weight: Optional[int] = 1
+    width: Optional[int] = 31
+    length: Optional[int] = 36
+    height: Optional[int] = 26
+    name: Optional[str] = "ไทยรอด"
 
 
 @dataclass
@@ -142,7 +142,7 @@ class OrderResponse:
     total_price: Decimal
     lines: List[OrderLineResponse]
     purchase_status: Optional[str] = None
-    total_discount: Optional[Decimal] = 0.0
+    total_discount: Optional[Decimal] = Decimal(0.0)
 
 
 @dataclass

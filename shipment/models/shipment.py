@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from core.models import AbstractModel
 from order.models.order import Order
 from warehouse.models import Warehouse
+from shipment.models import BatchShipment
 
 
 # TODO: Abbreviation?
@@ -26,3 +27,4 @@ class Shipment(AbstractModel):
     tracking_code = models.CharField(max_length=255, blank=True, null=True)
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
+    batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True)

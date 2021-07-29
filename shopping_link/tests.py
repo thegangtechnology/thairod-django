@@ -7,6 +7,8 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 
+from user.models import User
+
 json_content_type = "application/json"
 
 
@@ -16,6 +18,7 @@ class ShoppingLinkAPITestCase(APITestCase):
         load_seed()
 
     def setUp(self):
+        self.client.force_authenticate(User.objects.first())
         self.obj = ShoppingLink.objects.first()
         self.list_url = reverse('shopping-link-list')
         raw_data = '{\r\n    \"raw_json_data\": {\r\n  \"username\": \"frappet\",\r\n  \"doctor\": {\r\n    \"name\": ' \

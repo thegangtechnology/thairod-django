@@ -1,7 +1,9 @@
 from __future__ import annotations
-from core.models import AbstractModel
+
 from django.db import models
+
 from address.models import Address
+from core.models import AbstractModel
 
 
 class Warehouse(AbstractModel):
@@ -12,3 +14,11 @@ class Warehouse(AbstractModel):
     @classmethod
     def default_warehouse(cls) -> Warehouse:
         return Warehouse.objects.first()
+
+    @classmethod
+    def example(cls) -> Warehouse:
+        return Warehouse(
+            name='โกดังหลัก',
+            tel='',
+            address=Address.example()
+        )

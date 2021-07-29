@@ -19,6 +19,8 @@ drf-yasg = "*"
 djangorestframework-dataclasses = {editable = true, ref="v-stable", git="https://github.com/piti118/djangorestframework-dataclasses"}
 flake8 = "*"
 django-cors-headers = "*"
+djangorestframework-simplejwt = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 

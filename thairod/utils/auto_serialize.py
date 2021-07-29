@@ -31,7 +31,11 @@ class AutoSerialize:
         return ser.save()
 
     @classmethod
-    def from_request(cls: Type[T], request: Request) -> T:
+    def from_get_request(cls: Type[T], request: Request) -> T:
+        return cls.from_data(request.query_params.dict())
+
+    @classmethod
+    def from_post_request(cls: Type[T], request: Request) -> T:
         return cls.from_data(request.data)
 
     @classmethod

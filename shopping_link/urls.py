@@ -4,7 +4,7 @@ from shopping_link.views import ShoppingLinkViewSet
 
 
 router = DefaultRouter()
-router.register(r'shopping-links', ShoppingLinkViewSet, basename="shopping-link")
+router.register(r'shopping_links', ShoppingLinkViewSet, basename="shopping-link")
 
 
 urlpatterns = [
