@@ -5,7 +5,6 @@ from django.test import TransactionTestCase
 
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
-from product.models import ProductVariation
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderResponse, OrderLineResponse
 from thairod.utils.load_seed import load_seed
@@ -43,7 +42,6 @@ class TestCreateOrder(TransactionTestCase):
 
     def test_create_order(self):
         with self.patch_shippop() as _:
-            print(ProductVariation.objects.all())
             old_count = Order.objects.count()
             OrderService().crate_order(
                 CreateOrderParameter.example()

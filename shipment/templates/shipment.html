@@ -1,0 +1,38 @@
+<div class="page landscape sizeA4  ">
+    <div class="page-wrapper a4 A4">
+        <div class="page-border">
+            <h1>ไทยรอด</h1>
+            <ul>
+                <li>แพทย์ผู้ดูแล: {{ shipment.order.orderer_name }}({{ shipment.order.orderer_license }})</li>
+                <li>คนไข้: {{ shipment.order.receiver_address.name }}</li>
+                <li>ที่อยู่ : {{ shipment.order.receiver_address.full_address }}</li>
+                <li>วันที่สั่ง : {{ shipment.order.order_time|date:'Y-m-d H:i' }}</li>
+                <li>หมายเลข Order: {{ shipment.order.id }}</li>
+                <li>หมายเลข Tracking: {{ shipment.tracking_code }} / {{ shipment.courier_tracking_code }}</li>
+            </ul>
+            <h2>รายการ สิ่งของที่ส่งมา</h2>
+            <table class="productlist">
+                <tr>
+                    <th>ลำดับที่</th>
+                    <th>สิ่งของ</th>
+                    <th>จำนวน</th>
+                </tr>
+                {% for item in shipment.orderitem_set.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <p>{{ item.product_variation.product.name }}</p>
+                            <pre>
+{{ item.product_variation.product.name }}
+                    </pre>
+                        </td>
+                        <td> {{ item.quantity }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <div>
+                ตรวจเช็คโดย
+            </div>
+        </div>
+    </div>
+</div>

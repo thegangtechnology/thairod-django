@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from django.db import models
+
 from core.models import AbstractModel
 
 
@@ -14,3 +17,21 @@ class Address(AbstractModel):
     country = models.CharField(max_length=255)
     telno = models.CharField(max_length=255)
     note = models.CharField(max_length=255, blank=True, default="")
+
+    def full_address(self) -> str:
+        s = self
+        return f'{s.house_number} แขวง/ตำบล {s.subdistrict} เขต/อำเภอ {s.district} จังหวัด {s.province} {s.postal_code}'
+
+    @classmethod
+    def example(cls) -> Address:
+        return Address(
+            name='คนไทย ใจดี',
+            house_number='เลขที่ 599 สามแยกกล้วยน้ำไท',
+            subdistrict='คลองเตย',
+            district='คลองเตย',
+            province='กรุงเทพมหานคร',
+            postal_code='10110',
+            country='Thailand',
+            telno='0928908989',
+            note='เลยร้านตามสั่งมา 2 หลัง'
+        )

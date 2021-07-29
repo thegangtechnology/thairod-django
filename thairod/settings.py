@@ -168,3 +168,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
 }
+
+SHELL_PLUS_IMPORTS = [
+    'from thairod.utils.load_seed import load_seed, load_meaningful_seed'
+]
