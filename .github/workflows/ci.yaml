@@ -91,8 +91,8 @@ jobs:
           echo $GITHUB_SHA
           echo $GITHUB_WORKSPACE
           echo ${{ env.IMAGE_NAME }}
-          pwd
-          docker build --pull -t ${{ env.IMAGE_NAME }}:$GITHUB_SHA $GITHUB_ACTION_PATH
+          ehco $GITHUB_WORKSPACE
+          docker build --pull -t ${{ env.IMAGE_NAME }}:$GITHUB_SHA $GITHUB_ACTION_PATH/..
           docker tag ${{ env.IMAGE_NAME }}:$GITHUB_SHA ${{ env.IMAGE_NAME }}:latest
           docker push ${{ env.IMAGE_NAME }}:$GITHUB_SHA
           docker push ${{ env.IMAGE_NAME }}:latest
