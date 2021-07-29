@@ -11,5 +11,5 @@ router.register(r'tracking_status', views.TrackingStatusModelViewSet, basename="
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('printlabel', csrf_exempt(PrintLabelView.as_view()))
+    path('printlabel/', csrf_exempt(PrintLabelView.as_view()))
 ]
