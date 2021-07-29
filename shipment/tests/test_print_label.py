@@ -1,7 +1,6 @@
 from os.path import dirname, join
 
 from bs4 import BeautifulSoup
-from django.test import TransactionTestCase
 
 from order.views import OrderService, CreateOrderParameter
 from shipment.models import Shipment
@@ -9,9 +8,10 @@ from shipment.utils.print_label_util import split_print_label
 from shipment.views import PrintLabelView, PrintLabelParam, PrintLabelService
 from thairod.services.shippop.tests import load_test_data
 from thairod.utils.load_seed import load_seed
+from thairod.utils.test_util import TestCase
 
 
-class TestPrintLabel(TransactionTestCase):
+class TestPrintLabel(TestCase):
     reset_sequences = True
 
     def setUp(self):
@@ -35,10 +35,10 @@ class TestPrintLabel(TransactionTestCase):
         assert len(pages) == 4
 
     def test_print_label_live(self):
-        first_order = OrderService().crate_order(
+        first_order = OrderService().create_order(
             CreateOrderParameter.example()
         )
-        second_order = OrderService().crate_order(
+        second_order = OrderService().create_order(
             CreateOrderParameter.example()
         )
         shipments = Shipment.objects.filter(order_id__in=[first_order.order_id, second_order.order_id])
