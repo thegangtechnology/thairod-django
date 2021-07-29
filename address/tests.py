@@ -30,36 +30,43 @@ class AddressAPITestCase(BaseTestSimpleApi, APITestCase):
         }
 
     def test_search_house_number(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.house_number}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])
 
     def test_search_subdistrict(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.subdistrict}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])
 
     def test_search_district(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.district}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])
 
     def test_search_province(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.province}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])
 
     def test_search_postal_code(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.postal_code}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])
 
     def test_search_country(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.country}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])
 
     def test_search_note(self):
+        self.set_up_user()
         search_url = self.list_url + f'?search={self.obj.note}'
         response = self.client.get(search_url)
         self.assertNotEqual(response.data['results'], [])

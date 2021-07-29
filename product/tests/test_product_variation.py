@@ -26,6 +26,7 @@ class ProductVariationAPITestCase(BaseTestSimpleApi, APITestCase):
         }
 
     def test_update(self) -> None:
+        self.set_up_user()
         response = self.client.put(self.detail_url, {
             "product": Product.objects.first().id,
             "price": 3133.123,

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
+
 import dj_database_url
 import environ
 
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_extensions',
     'drf_yasg',
+    'rest_framework_simplejwt',
     # Custom
     'core',
     'user',
@@ -128,8 +131,14 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'thairod.utils.paginations.CustomPageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -153,3 +162,8 @@ SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
 SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
+}
