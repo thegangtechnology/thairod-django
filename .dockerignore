@@ -1,0 +1,12 @@
+.pipelines
+.deploy
+ci
+.coveragerc
+.gitlab-ci.yml
+README.md
+sonar-project.properties
+tox.ini
+.DS_Store
+.git
+.gitignore
+Dockerfile

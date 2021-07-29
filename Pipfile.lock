@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e912db6113331c6c20c3080d6db9ae5487191cd5cea3013abb7872ba01686bfe"
+            "sha256": "ccddb3e0d7a61f5ff98e7d77c25de5f7e632a544c130234a71bb9cf0966bbf09"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -144,6 +144,14 @@
             "index": "pypi",
             "version": "==3.2.5"
         },
+        "django-cors-headers": {
+            "hashes": [
+                "sha256:1ac2b1213de75a251e2ba04448da15f99bcfcbe164288ae6b5ff929dc49b372f",
+                "sha256:96069c4aaacace786a34ee7894ff680780ec2644e4268b31181044410fecd12e"
+            ],
+            "index": "pypi",
+            "version": "==3.7.0"
+        },
         "django-environ": {
             "hashes": [
                 "sha256:6c9d87660142608f63ec7d5ce5564c49b603ea8ff25da595fd6098f6dc82afde",
@@ -176,10 +184,6 @@
         "djangorestframework-dataclasses": {
             "editable": true,
             "git": "https://github.com/piti118/djangorestframework-dataclasses",
-            "hashes": [
-                "sha256:778d7d320465f68e1376cbd0f750b2752f5ea7b396bf6061509da61297633d5d",
-                "sha256:e8803e2787adb7fa85963fbdfa3ebda83faa45d21f012031a7a54e3c79773dac"
-            ],
             "ref": "a5c5e78a0985cb93a159ec620641040b2a2b2fdf"
         },
         "djangorestframework-simplejwt": {

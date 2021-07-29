@@ -13,6 +13,7 @@ from thairod.utils.load_seed import load_seed
 
 class TestPrintLabel(TransactionTestCase):
     reset_sequences = True
+
     def setUp(self):
         load_seed()
         self.label_html_file = join(dirname(__file__), './ttt.html')

@@ -6,7 +6,7 @@ from user.serializers import UserSerializers
 
 
 class UserModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
     serializer_class = UserSerializers
     queryset = User.objects.all()
     filter_backends = [filters.SearchFilter]

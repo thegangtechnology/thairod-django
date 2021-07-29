@@ -32,7 +32,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '_!1ln^vy8@xx5c^-u8anhw(v29gk(fv^r4si_*f558k(difg!5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=True)
 
 ALLOWED_HOSTS = []
 
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_extensions',
+    'corsheaders',
     'drf_yasg',
     'rest_framework_simplejwt',
     # Custom
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -154,12 +156,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
 SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_API_KEY', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
-TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('SHIPPOP_EMAIL', ""))]
+
+try:
+    TELEMED_WHITELIST = [ip.strip() for ip in ','.split(os.environ.get('TELEMED_WHITELIST', ""))]
+except ValueError:
+    TELEMED_WHITELIST = []
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
@@ -168,4 +175,8 @@ SIMPLE_JWT = {
 
 SHELL_PLUS_IMPORTS = [
     'from thairod.utils.load_seed import load_seed, load_meaningful_seed'
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
 ]
