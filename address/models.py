@@ -7,8 +7,8 @@ from core.models import AbstractModel
 
 class Address(AbstractModel):
     name = models.CharField(max_length=255)
-    lat = models.DecimalField(decimal_places=7, max_digits=15, null=True)
-    lon = models.DecimalField(decimal_places=7, max_digits=15, null=True)
+    lat = models.DecimalField(decimal_places=7, max_digits=15, null=True, blank=True)
+    lon = models.DecimalField(decimal_places=7, max_digits=15, null=True, blank=True)
     house_number = models.CharField(max_length=255)
     subdistrict = models.CharField(max_length=255)
     district = models.CharField(max_length=255)
