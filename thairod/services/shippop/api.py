@@ -8,6 +8,8 @@ from thairod.settings import SHIPPOP_API_KEY, SHIPPOP_URL
 
 
 # flake8: noqa
+from thairod.utils.exceptions import ShippopAPIException
+
 
 class ShippopAPI:
     api_key: str = SHIPPOP_API_KEY
@@ -17,7 +19,10 @@ class ShippopAPI:
         if not no_key:
             payload = {"api_key": self.api_key, **payload}
         r = requests.request("POST", f"{self.url}/{path}", json=payload)
-        return r.json()
+        r_json = r.json()
+        if not r_json['status']:
+            raise ShippopAPIException(r_json['message'])
+        return r_json
 
     def create_order(self, order_data: OrderData) -> OrderResponse:
         request_dict = order_data.to_request_dict()
