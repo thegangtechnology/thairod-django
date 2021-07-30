@@ -104,10 +104,11 @@ jobs:
       env:
           ENV_NAME: dev-thairod-backend
           IMAGE_TAG: latest
+
       steps:
         - name: Redeploy to Proen
           run: |
-            curl -X POST ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?
+            curl -I -X POST ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?
             envName=${{ env.ENV_NAME }}&tag=${{ env.IMAGE_TAG }}&session=${{ secrets.REDEPLOY_TOKEN }}
 
 
