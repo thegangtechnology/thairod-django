@@ -20,7 +20,6 @@ class OrderAPITestCase(BaseTestSimpleApi, APITestCase):
         self.detail_url = reverse('order-detail', kwargs={'pk': self.obj.pk})
         self.valid_field = {
             "receiver_address": self.address.pk,
-            "receiver_name": 'gift',
             "cid": "qwerty",
             "orderer_name": 'piti',
             "orderer_license": 'sun',
