@@ -1,9 +1,8 @@
 from django.urls import path, include
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from .views import PrintLabelView
+from .views import PrintLabelView, PrintSampleLabelView
 
 router = DefaultRouter()
 router.register(r'shipments', views.ShipmentModelViewSet, basename="shipment")
@@ -12,5 +11,6 @@ router.register(r'batch-shipments', views.BatchShipmentModelViewSet, basename="b
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('printlabel/', csrf_exempt(PrintLabelView.as_view()))
+    path('printlabel/', PrintLabelView.as_view(), name='print-label'),
+    path('samplelabel/', PrintSampleLabelView.as_view(), name='sample-label')
 ]

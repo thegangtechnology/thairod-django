@@ -1,16 +1,11 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
 
-
-from core.tests import BaseTestSimpleApi
-from thairod.utils.load_seed import load_seed
+from core.tests import BaseTestSimpleApiMixin
+from thairod.utils.test_util import APITestCase
 from user.models import User
 
 
-class UserAPITestCase(BaseTestSimpleApi, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+class UserAPITestCase(APITestCase, BaseTestSimpleApiMixin):
 
     def setUp(self):
         self.model = User

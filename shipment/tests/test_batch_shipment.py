@@ -1,15 +1,12 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
-from core.tests import BaseTestSimpleApi
-from shipment.models import BatchShipment, Shipment
-from thairod.utils.load_seed import load_seed
 from django.utils import timezone
 
+from core.tests import BaseTestSimpleApiMixin
+from shipment.models import BatchShipment, Shipment
+from thairod.utils.test_util import APITestCase
 
-class BatchShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+
+class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
 
     def setUp(self):
         self.model = BatchShipment

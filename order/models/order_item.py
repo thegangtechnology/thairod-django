@@ -9,3 +9,11 @@ class OrderItem(AbstractModel):
     product_variation = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=3)
+
+    @classmethod
+    def example(cls):
+        return OrderItem(
+            product_variation=ProductVariation.example(),
+            quantity=10,
+            total_price=100
+        )

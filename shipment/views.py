@@ -1,16 +1,18 @@
-from dataclasses import dataclass
-from typing import List
+from os.path import join, dirname
 
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.template import loader
 from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from order.dataclasses.order import CreateOrderParameter
+from order.services.order_service import OrderService
 from django_filters.rest_framework import DjangoFilterBackend
 from shipment.dataclasses.batch_shipment import GeneratedBatchNameResponse, AssignBatchToShipmentRequest
 from shipment.dataclasses.print_label import PrintLabelParam
@@ -22,8 +24,6 @@ from shipment.services.batch_shipment_service import BatchShipmentService
 from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
 from thairod.services.shippop.api import ShippopAPI
-from thairod.utils.auto_serialize import AutoSerialize
-from thairod.utils.collection_util import pair_leftover
 
 
 class ShipmentModelViewSet(viewsets.ModelViewSet):
@@ -54,6 +54,21 @@ class TrackingStatusModelViewSet(viewsets.ModelViewSet):
     search_fields = ['tracking_code', 'status']
 
 
+class PrintSampleLabelView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request):
+        with transaction.atomic():
+            with open(join(dirname(__file__), './tests/ttt.html')) as f:
+                label_html = f.read()
+            labels = split_print_label(label_html)
+            ro = OrderService().create_raw_order(CreateOrderParameter.example_with_valid_item())
+            shipments = [ro.shipment] * len(labels)
+            ret = PrintLabelService().generate_label_interleave(labels, shipments)
+            transaction.set_rollback(True)
+        return HttpResponse(ret)
+
+
 class PrintLabelView(APIView):
     @swagger_auto_schema(
         operation_description='Print Shipment Label support multiple label via ?shipments=1&shipments=2&shipments=3',
@@ -73,29 +88,6 @@ class PrintLabelView(APIView):
         label_html = shippop.print_multiple_labels(tracking_codes=[s.tracking_code for s in shipments])
         labels = split_print_label(label_html)
         return PrintLabelService().generate_label_interleave(labels, shipments)
-
-
-class PrintLabelService:
-
-    def generate_label_interleave(self, labels: List[str], shipments: List[Shipment]) -> str:
-        pairs, _, leftover_shipments = pair_leftover(labels, shipments)
-        template = loader.get_template('shipping_label.html')
-        context = {
-            'pairs': pairs,
-            'left_over': leftover_shipments
-        }
-        s = template.render(context)
-        return s
-
-
-# TODO: Refactor to dataclass
-@dataclass
-class GeneratedBatchNameResponse(AutoSerialize):
-    name: str
-
-    @classmethod
-    def example(cls):
-        return cls(name="2021-07-29_1")
 
 
 class BatchShipmentModelViewSet(viewsets.ModelViewSet):

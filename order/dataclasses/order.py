@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from thairod.utils.auto_serialize import AutoSerialize
-from order.dataclasses.doctor import Doctor
-from order.dataclasses.shipping_address import ShippingAddress
-from order.dataclasses.patient import Patient
-from order.dataclasses.cart_item import CartItem
 from typing import List
+
+from order.dataclasses.cart_item import CartItem
+from order.dataclasses.doctor import Doctor
+from order.dataclasses.patient import Patient
+from order.dataclasses.shipping_address import ShippingAddress
+from product.models import ProductVariation
+from thairod.utils.auto_serialize import AutoSerialize
 
 
 @dataclass
@@ -18,7 +22,7 @@ class CreateOrderParameter(AutoSerialize):
     items: List[CartItem]
 
     @classmethod
-    def example(cls):
+    def example(cls) -> CreateOrderParameter:
         return cls(
             account='frappet',
             doctor=Doctor.example(),
@@ -27,6 +31,13 @@ class CreateOrderParameter(AutoSerialize):
             line_id="",
             session_id="AAABB2134",
             items=[CartItem.example()])
+
+    @classmethod
+    def example_with_valid_item(cls):
+        ret = cls.example()
+        for item in ret.items:
+            item.item_id = ProductVariation.objects.first().id
+        return ret
 
 
 @dataclass

@@ -1,6 +1,11 @@
+from dataclasses import dataclass
 from typing import List
+
 from django.db import transaction
+
 from address.models import Address
+from order.dataclasses.order import CreateOrderParameter, CreateOrderResponse
+from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
 from order.models.order import Order, OrderStatus
 from order.models.order_item import OrderItem
 from product.models import ProductVariation
@@ -11,41 +16,63 @@ from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderData, OrderLineData, AddressData, OrderResponse, ParcelData
 from thairod.settings import SHIPPOP_EMAIL
 from warehouse.models import Warehouse
-from order.dataclasses.order import CreateOrderParameter, CreateOrderResponse
-from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
+
+
+@dataclass
+class RawOrder:
+    order: Order
+    shipment: Shipment
 
 
 class OrderService:
+
     def create_order(self, param: CreateOrderParameter) -> CreateOrderResponse:
         try:
             with transaction.atomic():
-                address = self.create_address(param)
-                order = self.create_order_from_param(param, address)
-                shipment = self.create_shipment(param, order)
-                self.create_order_items(param, shipment)
-                shippop_api = ShippopAPI()
-                response = shippop_api.create_order(self.create_order_data(shipment))
-
-                if not response.status:
-                    raise ShippopCreateOrderError()
-
-                self.update_shipment_with_shippop_booking(response, shipment)
-
-                confirm_success = shippop_api.confirm_order(shipment.shippop_purchase_id)
-                if not confirm_success:
-                    raise ShippopConfirmationError()
-                self.update_shipment_with_confirmation(shipment)
-                if param.line_id:
-                    send_line_tracking_message(line_uid=param.line_id,
-                                               name=param.patient.name,
-                                               shippop_tracking_code=shipment.tracking_code)
+                ro = self.create_order_no_callback(param)
                 return CreateOrderResponse(success=True,
-                                           order_id=order.id,
-                                           shippop_tracking_code=shipment.tracking_code,
-                                           courier_tracking_code=shipment.courier_tracking_code)
+                                           order_id=ro.order.id,
+                                           shippop_tracking_code=ro.shipment.tracking_code,
+                                           courier_tracking_code=ro.shipment.courier_tracking_code)
 
         except (ShippopConfirmationError, ShippopCreateOrderError):
             return CreateOrderResponse(success=False)
+
+    def create_order_no_callback(self, param) -> RawOrder:
+        ro = self.create_raw_order(param)
+        shippop_order_response = self.add_order_to_shippop(ro)
+        self.update_shipment_with_shippop_booking(shippop_order_response, ro.shipment)
+        self.confirm_order_with_shippop(ro)
+        self.update_shipment_with_confirmation(ro.shipment)
+        return ro
+
+    def create_raw_order(self, param: CreateOrderParameter) -> RawOrder:
+        address = self.create_address(param)
+        order = self.create_order_from_param(param, address)
+        shipment = self.create_shipment(param, order)
+        self.create_order_items(param, shipment)
+        return RawOrder(order=order, shipment=shipment)
+
+    def add_order_to_shippop(self, ro: RawOrder) -> OrderResponse:
+        shippop_api = ShippopAPI()
+        response = shippop_api.create_order(self.create_order_data(ro.shipment))
+
+        if not response.status:
+            raise ShippopCreateOrderError()
+        return response
+
+    def confirm_order_with_shippop(self, ro: RawOrder):
+        shippop_api = ShippopAPI()
+
+        confirm_success = shippop_api.confirm_order(ro.shipment.shippop_purchase_id)
+        if not confirm_success:
+            raise ShippopConfirmationError()
+
+    def notify_user_with_tracking(self, ro: RawOrder, param: CreateOrderParameter):
+        if param.line_id:
+            send_line_tracking_message(line_uid=param.line_id,
+                                       name=param.patient.name,
+                                       shippop_tracking_code=ro.shipment.tracking_code)
 
     # TODO: Decouple these
     def update_shipment_with_confirmation(self, shipment: Shipment):

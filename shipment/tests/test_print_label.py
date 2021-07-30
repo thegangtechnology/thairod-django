@@ -3,6 +3,7 @@ from os.path import dirname, join
 from bs4 import BeautifulSoup
 
 from order.views import OrderService, CreateOrderParameter
+from product.models import ProductVariation
 from shipment.models import Shipment
 from shipment.utils.print_label_util import split_print_label
 from shipment.views import PrintLabelView, PrintLabelParam, PrintLabelService
@@ -12,7 +13,6 @@ from thairod.utils.test_util import TestCase
 
 
 class TestPrintLabel(TestCase):
-    reset_sequences = True
 
     def setUp(self):
         load_seed()
@@ -35,12 +35,10 @@ class TestPrintLabel(TestCase):
         assert len(pages) == 4
 
     def test_print_label_live(self):
-        first_order = OrderService().create_order(
-            CreateOrderParameter.example()
-        )
-        second_order = OrderService().create_order(
-            CreateOrderParameter.example()
-        )
+        param = CreateOrderParameter.example()
+        param.items[0].item_id = ProductVariation.objects.first().id
+        first_order = OrderService().create_order(param)
+        second_order = OrderService().create_order(param)
         shipments = Shipment.objects.filter(order_id__in=[first_order.order_id, second_order.order_id])
         html = PrintLabelView().generate_label(PrintLabelParam(
             shipments=shipments

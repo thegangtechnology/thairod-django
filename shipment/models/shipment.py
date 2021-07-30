@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
 from order.models.order import Order
-from warehouse.models import Warehouse
 from shipment.models import BatchShipment
+from warehouse.models import Warehouse
 
 
 class ShipmentStatus(models.TextChoices):
@@ -34,3 +36,17 @@ class Shipment(AbstractModel):
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True, blank=True)
+
+    @classmethod
+    def example(cls) -> Shipment:
+        return Shipment(
+            warehouse=Warehouse.example(),
+            title='Example Shipment',
+            shipping_method='SPE',
+            order=Order.example(),
+            shippop_purchase_id=12345,
+            tracking_code='SP12345',
+            courier_tracking_code='TG12345',
+            status=ShipmentStatus.CONFIRMED,
+            batch=BatchShipment.example()
+        )

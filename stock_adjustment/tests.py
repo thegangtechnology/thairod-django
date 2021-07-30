@@ -1,18 +1,14 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
 
-from core.tests import BaseTestSimpleApi
+from core.tests import BaseTestSimpleApiMixin
 from product.models import ProductVariation
 from stock_adjustment.models import StockAdjustment
-from thairod.utils.load_seed import load_seed
+from thairod.utils.test_util import APITestCase
 from user.models import User
 from warehouse.models import Warehouse
 
 
-class StockAdjustmentAPITestCase(BaseTestSimpleApi, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+class StockAdjustmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
 
     def setUp(self):
         self.set_up_user()
