@@ -1,13 +1,17 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, PatientConfirmationRequest
+from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, \
+    PatientConfirmationRequest, OrderFlowResponse
+from order.dataclasses.order import CreateOrderResponse
 from order_flow.services import OrderFlowService
 from rest_framework import status
+from thairod.utils.auto_serialize import swagger_auto_serialize_schema
 
 
 class CreateOrderFlowsAPI(GenericAPIView):
 
+    @swagger_auto_serialize_schema(CreateOrderFlowRequest, OrderFlowResponse)
     def post(self, request: Request) -> Response:
         param = CreateOrderFlowRequest.from_post_request(request)
         service = OrderFlowService()
@@ -28,6 +32,7 @@ class OrderFlowsHashAPI(GenericAPIView):
 
 class CheckoutDoctorOrderAPI(GenericAPIView):
 
+    @swagger_auto_serialize_schema(CheckoutDoctorOrderRequest, OrderFlowResponse)
     def post(self, request: Request) -> Response:
         param = CheckoutDoctorOrderRequest.from_post_request(request)
         service = OrderFlowService()
@@ -36,6 +41,7 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
 
 class PatientConfirmationAPI(GenericAPIView):
 
+    @swagger_auto_serialize_schema(PatientConfirmationRequest, CreateOrderResponse)
     def post(self, request: Request) -> Response:
         param = PatientConfirmationRequest.from_post_request(request)
         service = OrderFlowService()
