@@ -109,6 +109,11 @@ jobs:
           REDEPLOY_TOKEN: ${{ secrets.REDEPLOY_TOKEN }}
       steps:
         - name: Redeploy to Proen
-          uses: wei/curl@v1
+          uses: indiesdev/curl@v1
+          id: api
           with:
-            args: ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?envName=${{ env.ENV_NAME }}&tag=${{ env.IMAGE_TAG }}&nodeID=${{ env.NODE_ID }}&session=$REDEPLOY_TOKEN"
+            url: ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers
+            method: 'GET'
+            params: '{ "envName": "${{ env.ENV_NAME }}", "tag": "${{ env.IMAGE_TAG }}", "nodeID": "${{ env.NODE_ID }}", "session": "${{ env.REDEPLOY_TOKEN}}" }''
+        - name: 'Use response'
+          run: echo ${{ steps.api.outputs.response }}
