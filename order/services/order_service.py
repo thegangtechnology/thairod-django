@@ -23,7 +23,6 @@ class OrderService:
                 order = self.create_order_from_param(param, address)
                 shipment = self.create_shipment(param, order)
                 self.create_order_items(param, shipment)
-
                 shippop_api = ShippopAPI()
                 response = shippop_api.create_order(self.create_order_data(shipment))
 

@@ -7,11 +7,15 @@ from warehouse.models import Warehouse
 from shipment.models import BatchShipment
 
 
-# TODO: Abbreviation?
 class ShipmentStatus(models.TextChoices):
+    # Shippop process status
     CREATED = 'CREATED', _('Order for shipment created')
     BOOKED = 'BOOKED', _('Book shipment to Shippop')
-    CONFIRMED = 'CONFIRMED', _('Confirmed shipment')
+    # Our delivery status
+    CONFIRMED = 'CONFIRMED', _('Confirmed shipment')  # ที่ต้องจัดส่ง
+    PRINTED = 'PRINTED', _('Printed')  # พิมพ์ใบจัดส่งแล้ว
+    DELIVERING = 'DELIVERING', _('Delivering')  # ดำเนินการส่งแล้ว
+    DELIVERED = 'DELIVERED', _('Delivered')  # ส่งมอบสำเร็จ
 
 
 class Shipment(AbstractModel):
@@ -26,5 +30,5 @@ class Shipment(AbstractModel):
     shippop_purchase_id = models.IntegerField(null=True)
     tracking_code = models.CharField(max_length=255, blank=True, null=True)
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
-    status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
+    status = models.CharField(max_length=10, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True, blank=True)

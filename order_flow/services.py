@@ -2,6 +2,8 @@ from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest
 from order_flow.models import OrderFlow
 from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
+from order.dataclasses.patient import Patient
+from order.dataclasses.doctor import Doctor
 from django.utils import timezone
 
 
@@ -15,10 +17,10 @@ class OrderFlowService:
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
-        return OrderFlow.objects.get(doctor_link_hash=doctor_hash)
+        return OrderFlowResponse.from_order_flow_model(OrderFlow.objects.get(doctor_link_hash=doctor_hash))
 
     def get_order_flow_from_patient_hash(self, patient_hash: str) -> OrderFlowResponse:
-        return OrderFlow.objects.get(patient_link_hash=patient_hash)
+        return OrderFlowResponse.from_order_flow_model(OrderFlow.objects.get(patient_link_hash=patient_hash))
 
     def write_doctor_order_to_order_flow(self, checkout_doctor_order_request: CheckoutDoctorOrderRequest) \
             -> OrderFlowResponse:
@@ -40,8 +42,8 @@ class OrderFlowService:
     def construct_create_order_parameter_from_order_flow(self, order_flow: OrderFlow) -> CreateOrderParameter:
         order_flow_response = OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
         create_order_parameter = CreateOrderParameter(account=order_flow_response.doctor_info.account,
-                                                      doctor=order_flow_response.doctor_info.doctor,
-                                                      patient=order_flow_response.doctor_info.patient,
+                                                      doctor=Doctor(**order_flow_response.doctor_info.doctor),
+                                                      patient=Patient(**order_flow_response.doctor_info.patient),
                                                       shipping_address=order_flow_response.patient_confirmation,
                                                       line_id=order_flow_response.doctor_info.line_id,
                                                       session_id=order_flow_response.doctor_info.session_id,

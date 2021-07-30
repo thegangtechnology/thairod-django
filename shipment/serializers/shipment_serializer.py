@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from shipment.models import Shipment
+from order.serializers import OrderItemSerializer
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
+    order = OrderItemSerializer(source='orderitem_set', many=True)
+
     class Meta:
         model = Shipment
         fields = '__all__'
