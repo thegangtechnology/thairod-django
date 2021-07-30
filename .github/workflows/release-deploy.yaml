@@ -1,0 +1,30 @@
+name: Release
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+    if: github.actor == github.event.repository.owner.login
+    env:
+      IMAGE_NAME: ${{ secrets.DO_REGISTRY_URL }}/thairod/thairod-django
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.DO_REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Set Version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Docker Build
+        run: |
+          docker pull ${{ env.IMAGE_NAME }}:$GITHUB_SHA
+          docker tag ${{ env.IMAGE_NAME }}:$GITHUB_SHA $IMAGE_NAME:$RELEASE_VERSION
+          docker push ${{ env.IMAGE_NAME }}:$RELEASE_VERSION
+          echo "Image ${{ env.IMAGE_NAME }}:$RELEASE_VERSION pushed"
+      - name: Docker Logout
+        run: |
+          docker logout "${{ secrets.DO_REGISTRY_URL }}"
