@@ -1,0 +1,80 @@
+{% load simple %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <style>
+        tr.odd td {
+            background-color: #c9e2b3;
+        }
+    </style>
+    <title>Title</title>
+</head>
+<div>
+    <input id="bulkprint" type="button" value="Print"/>
+    <input id="all" type="button" value="All"/>
+    <input id="none" type="button" value="None"/>
+</div>
+<table id="shipment">
+    <thead>
+    <tr>
+        <th id="check"></th>
+        <th id="no">ลำดับ</th>
+        <th id="patient">คนไข้</th>
+        <th id="orderdate">วันที่สั่ง</th>
+        <th id="ordertime">เวลา</th>
+        <th id="printlabel">พิมพ์ใบปะหน้า</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for shipment in shipments %}
+        <tr>
+            <td><input type="checkbox" value="{{ shipment.id }}"/></td>
+            <td>{{ shipment.id }}</td>
+            <td>{{ shipment.order.receiver_address.name }}</td>
+            <td>{{ shipment.order.order_time | date:"d/m" }}</td>
+            <td>{{ shipment.order.order_time | date:"G:i" }}</td>
+            <td><a href="{{ shipment.id | label_link }}">label</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $('#all').click(function () {
+            $('input[type=checkbox]').map(function () {
+                $(this).prop('checked', true);
+            })
+        })
+        $('#none').click(function () {
+            $('input[type=checkbox]').map(function () {
+                $(this).prop('checked', false);
+            })
+        })
+        $('#shipment').DataTable({"iDisplayLength": 100});
+        $('#bulkprint').click(
+            function () {
+                s = $('input[type=checkbox]:checked').map(function () {
+                    return parseInt($(this).val())
+                }).get()
+                var url = '/api/printlabel/?' + $.param({shipments: s}, true);
+                window.location.href = url
+            }
+        );
+    });
+</script>
+</body>
+</html>
