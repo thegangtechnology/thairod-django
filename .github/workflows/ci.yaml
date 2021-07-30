@@ -1,5 +1,5 @@
 # name of our workflow
-name: Thairod Django CI/CD Workflow
+name: Main Workflow
 
 # triggers for our workflow
 on:
