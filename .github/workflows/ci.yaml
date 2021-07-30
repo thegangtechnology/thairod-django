@@ -109,5 +109,5 @@ jobs:
       steps:
         - name: Redeploy to Proen
           run: |
-            curl -I -X POST ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?
+            curl -X POST ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?
             envName=${{ env.ENV_NAME }}&tag=${{ env.IMAGE_TAG }}&nodeID=${{ env.NODE_ID }}&session=${{ secrets.REDEPLOY_TOKEN }}
