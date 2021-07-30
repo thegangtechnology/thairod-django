@@ -4,7 +4,7 @@ from order.serializers import OrderItemSerializer
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
-    order = OrderItemSerializer(source='orderitem_set', many=True)
+    order = OrderItemSerializer(source='orderitem_set', many=True, read_only=True, allow_null=True)
 
     class Meta:
         model = Shipment

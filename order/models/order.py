@@ -20,6 +20,7 @@ class Order(AbstractModel):
     )
     # TODO: This looks like we should make a receiver table later? like patient list or sth.
     receiver_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    receiver_name = models.CharField(max_length=255)
     cid = models.CharField(max_length=255)
     orderer_name = models.CharField(max_length=255)
     orderer_license = models.CharField(max_length=255)

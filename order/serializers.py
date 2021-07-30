@@ -12,7 +12,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product_variation = ProductVariationSerializer()
+    product_variation = ProductVariationSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = OrderItem
