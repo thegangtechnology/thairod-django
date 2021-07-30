@@ -70,3 +70,6 @@ class ShippopAPI:
                                     payload={"tracking_code": ",".join(tracking_codes), "size": size,
                                              "type": label_type})
         return resp[label_type]
+
+    def tracking_link(self, shippop_tracking_code: str) -> str:
+        return f'https://www.shippop.com/tracking?typeid=domestic&tracking_code={shippop_tracking_code}'

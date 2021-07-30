@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class BatchShipment(AbstractModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     @classmethod
     def generate_batch_name(cls) -> str:

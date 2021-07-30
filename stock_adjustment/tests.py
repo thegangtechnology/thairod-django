@@ -1,7 +1,6 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
-
 from core.tests import BaseTestSimpleApi
 from product.models import ProductVariation
 from stock_adjustment.models import StockAdjustment

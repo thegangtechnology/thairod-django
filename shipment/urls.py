@@ -7,8 +7,8 @@ from .views import PrintLabelView
 
 router = DefaultRouter()
 router.register(r'shipments', views.ShipmentModelViewSet, basename="shipment")
-router.register(r'tracking_status', views.TrackingStatusModelViewSet, basename="tracking")
-router.register(r'batch_shipments', views.BatchShipmentModelViewSet, basename="batch-shipment")
+router.register(r'tracking-status', views.TrackingStatusModelViewSet, basename="tracking")
+router.register(r'batch-shipments', views.BatchShipmentModelViewSet, basename="batch-shipment")
 
 urlpatterns = [
     path('', include(router.urls)),

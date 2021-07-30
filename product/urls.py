@@ -5,8 +5,8 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'products', views.ProductModelViewSet, basename="product")
-router.register(r'product_images', views.ProductImageModelViewSet, basename="product-image")
-router.register(r'product_variations', views.ProductVariationModelViewSet, basename="product-variation")
+router.register(r'product-images', views.ProductImageModelViewSet, basename="product-image")
+router.register(r'product-variations', views.ProductVariationModelViewSet, basename="product-variation")
 
 urlpatterns = [
     path('', include(router.urls))

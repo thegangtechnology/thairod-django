@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderResponse, TrackingData, Pricing
@@ -50,3 +50,7 @@ class ShippopAPITest(TestCase):
         tracking_codes = [new_order.lines[0].tracking_code, self.shippop_order.lines[0].tracking_code]
         response = self.shippop_api.print_multiple_labels(tracking_codes=tracking_codes)
         self.assertEqual(type(response), str)
+
+    def test_tracking_link(self):
+        s = self.shippop_api.tracking_link('SP025181932')
+        self.assertEqual(s, 'https://www.shippop.com/tracking?typeid=domestic&tracking_code=SP025181932')
