@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from shipment.models import Shipment
 from order.serializers import OrderItemSerializer
+from shipment.serializers.batch_shipment_serializer import BatchShipmentSerializer
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
     order = OrderItemSerializer(source='orderitem_set', many=True, read_only=True, allow_null=True)
+    batch = BatchShipmentSerializer(allow_null=True, read_only=True)
 
     class Meta:
         model = Shipment

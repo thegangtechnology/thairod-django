@@ -22,6 +22,7 @@ django-cors-headers = "*"
 djangorestframework-simplejwt = "*"
 beautifulsoup4 = "*"
 line-bot-sdk = "*"
+django-filter = "*"
 
 [dev-packages]
 
