@@ -95,7 +95,8 @@ shippop_api.get_order_detail(purchase_id)
 # Get tracking data - after confirm order
 shippop_api.get_tracking_data(tracking_code)
 
-# Get pricelist - before create order you need to choose 1 courier code
+# Get pricelist - befo
+# re create order you need to choose 1 courier code
 shippop_api.get_pricing(OrderData)
 
 # Get label - Shippop HTML Label generated
