@@ -137,10 +137,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'thairod.utils.paginations.CustomPageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+        'thairod.auth_debug.DebugAuthentication'
+    ]
 }
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 

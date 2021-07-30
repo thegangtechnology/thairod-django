@@ -1,6 +1,5 @@
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
-from product.models import ProductVariation
 from thairod.utils.test_util import TestCase
 
 
