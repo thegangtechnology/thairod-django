@@ -12,7 +12,11 @@ class ShipmentStatus(models.TextChoices):
     CREATED = 'CREATED', _('Order for shipment created')
     BOOKED = 'BOOKED', _('Book shipment to Shippop')
     # Our delivery status
-    CONFIRMED = 'CONFIRMED', _('Confirmed shipment')
+    CONFIRMED = 'CONFIRMED', _('Confirmed shipment')  # ที่ต้องจัดส่ง
+    # TODO: Bring them back next week
+    # PRINTED = 'PRINTED', _('Printed')  # พิมพ์ใบจัดส่งแล้ว
+    # DELIVERING = 'DELIVERING', _('Delivering')  # ดำเนินการส่งแล้ว
+    # DELIVERED = 'DELIVERED', _('Delivered')  # ส่งมอบสำเร็จ
 
 
 class Shipment(AbstractModel):
