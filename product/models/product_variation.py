@@ -1,13 +1,18 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 from core.models import AbstractModel
 from product.models import Product
-from django.utils.translation import gettext_lazy as _
 
 
 class ProductVariationUnit(models.TextChoices):
     PIECES = 'PIECES', _('Pieces (เม็ด)')
     PACKS = 'PACKS', _('Packs (แผง)')
     BOXES = 'BOXES', _('Boxes (กล่อง)')
+
+
+class ProductVariation:
+    pass
 
 
 class ProductVariation(AbstractModel):
@@ -18,3 +23,13 @@ class ProductVariation(AbstractModel):
     unit = models.CharField(max_length=6,
                             choices=ProductVariationUnit.choices,
                             default=ProductVariationUnit.PIECES)
+
+    @classmethod
+    def example(cls) -> ProductVariation:
+        return ProductVariation(
+            product=Product.example(),
+            price=20,
+            name='random product variation',
+            description='hello',
+            unit=ProductVariationUnit.PIECES
+        )

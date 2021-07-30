@@ -6,6 +6,7 @@ from thairod.services.shippop.tests import load_test_data
 
 
 class ShippopAPITest(TestCase):
+
     def setUp(self) -> None:
         obj = load_test_data()
         self.order_data = obj["order_data"]

@@ -1,15 +1,10 @@
-from thairod.utils.load_seed import load_seed
-from thairod.utils.test_util import TestCase
-from order_flow.services import OrderFlowService
 from order_flow.dataclasses import CreateOrderFlowRequest
 from order_flow.models import OrderFlow
+from order_flow.services import OrderFlowService
+from thairod.utils.test_util import TestCase
 
 
 class TestOrderFlowService(TestCase):
-    reset_sequences = True
-
-    def setUp(self):
-        load_seed()
 
     # TODO: More test after this week
     def test_create_order_flow(self):

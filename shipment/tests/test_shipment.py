@@ -1,21 +1,20 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from core.tests import BaseTestSimpleApi
+
+from core.tests import BaseTestSimpleApiMixin
 from order.models import Order
 from shipment.models import Shipment, TrackingStatus, BatchShipment
-from thairod.utils.load_seed import load_seed
+from thairod.utils.test_util import APITestCase
+from user.models import User
 from warehouse.models import Warehouse
 
 
-class ShipmentAPITestCase(BaseTestSimpleApi, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
 
     def setUp(self):
-        self.model = Shipment
         self.set_up_user()
+        print(User.objects.all())
+        self.model = Shipment
         self.obj = Shipment.objects.first()
         self.batch_shipments = BatchShipment.objects.first()
         self.warehouse = Warehouse.objects.first()

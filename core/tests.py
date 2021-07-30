@@ -1,17 +1,7 @@
 from rest_framework import status
 
-from user.models import User
 
-
-class BaseTestSimpleApi:
-    def set_up_user(self):
-        password = User.objects.make_random_password()
-        self.user = User.objects.create(username='forceauth',
-                                        email='testpassuser@thegang.tech',
-                                        password=password,
-                                        is_staff=True, is_superuser=True
-                                        )
-        self.client.force_authenticate(self.user)
+class BaseTestSimpleApiMixin:
 
     def test_list(self) -> None:
         response = self.client.get(self.list_url, content_type="application/json")

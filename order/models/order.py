@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,3 +26,12 @@ class Order(AbstractModel):
     orderer_name = models.CharField(max_length=255)
     orderer_license = models.CharField(max_length=255)
     order_time = models.DateTimeField(auto_now=True)  # TODO: Is this manual input?
+
+    @classmethod
+    def example(cls) -> Order:
+        return Order(
+            receiver_address=Address.example(),
+            cid='1234567890123',
+            orderer_name='คุณหมอ คนเก่ง',
+            orderer_license='DOCTOR007'
+        )
