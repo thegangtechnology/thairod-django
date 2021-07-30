@@ -5,7 +5,6 @@ from core.tests import BaseTestSimpleApiMixin
 from order.models import Order
 from shipment.models import Shipment, TrackingStatus, BatchShipment
 from thairod.utils.test_util import APITestCase
-from user.models import User
 from warehouse.models import Warehouse
 
 
@@ -13,7 +12,6 @@ class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
 
     def setUp(self):
         self.set_up_user()
-        print(User.objects.all())
         self.model = Shipment
         self.obj = Shipment.objects.first()
         self.batch_shipments = BatchShipment.objects.first()

@@ -8,7 +8,7 @@ class DebugAuthentication(authentication.BaseAuthentication):
         if not settings.DEBUG:
             return None
         from user.models import User
-        user = User.objects.first()
+        user = User.objects.last()
 
         if user is None:
             password = User.objects.make_random_password()

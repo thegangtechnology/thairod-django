@@ -18,6 +18,10 @@ class TestPrintLabelAPI(APITestCase):
         self.set_up_user()
         param = CreateOrderParameter.example_with_valid_item()
         ros = [OrderService().create_order_no_callback(param) for _ in range(2)]
-        print(ros[0].shipment.id)
         res = self.client.get(reverse('print-label'), {"shipments": [ro.shipment.id for ro in ros]})
+        self.assertEqual(res.status_code, 200)
+
+    def test_simple_shipment_list(self):
+        self.set_up_user()
+        res = self.client.get(reverse('simple-shipment-list'))
         self.assertEqual(res.status_code, 200)

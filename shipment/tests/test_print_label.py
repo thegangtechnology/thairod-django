@@ -4,9 +4,11 @@ from bs4 import BeautifulSoup
 
 from order.views import OrderService, CreateOrderParameter
 from product.models import ProductVariation
+from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
+from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
-from shipment.views import PrintLabelView, PrintLabelParam, PrintLabelService
+from shipment.views.print_label_views import PrintLabelView
 from thairod.services.shippop.tests import load_test_data
 from thairod.utils.load_seed import load_seed
 from thairod.utils.test_util import TestCase
