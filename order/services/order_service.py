@@ -116,7 +116,6 @@ class OrderService:
         return Order.objects.create(
             status=OrderStatus.STARTED,
             receiver_address=address,
-            receiver_name=param.patient.name,
             cid=param.patient.cid,
             orderer_name=param.doctor.name,
             orderer_license=param.doctor.license
