@@ -7,7 +7,7 @@ from .views import CreateOrderAPI
 
 router = DefaultRouter()
 router.register(r'orders', views.OrderModelViewSet, basename="order")
-router.register(r'order_items', views.OrderItemModelViewSet, basename="order-item")
+router.register(r'order-items', views.OrderItemModelViewSet, basename="order-item")
 
 
 urlpatterns = [

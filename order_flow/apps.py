@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ShoppingLinkConfig(AppConfig):
+class OrderFlowConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'shopping_link'
+    name = 'order_flow'

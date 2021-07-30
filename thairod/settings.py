@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     # Custom
     'core',
     'user',
-    'shopping_link',
+    'order_flow',
     'address',
     'warehouse',
     'product',
