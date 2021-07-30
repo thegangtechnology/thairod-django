@@ -7,7 +7,6 @@ on:
 jobs:
   tag-and-release:
     runs-on: ubuntu-latest
-    if: github.actor == github.event.repository.owner.login
     env:
       IMAGE_NAME: ${{ secrets.DO_REGISTRY_URL }}/thairod/thairod-django
     steps:
