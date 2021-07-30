@@ -105,8 +105,8 @@ jobs:
           ENV_NAME: env-5503621
           IMAGE_TAG: latest
           NODE_ID: 16766
-
+          REDEPLOY_TOKEN: ${{ secrets.REDEPLOY_TOKEN }}
       steps:
         - name: Redeploy to Proen
           run: |
-            curl -V ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?envName=${{ env.ENV_NAME }}&tag=${{ env.IMAGE_TAG }}&nodeID=${{ env.NODE_ID }}&session=${{ secrets.REDEPLOY_TOKEN }}
+            curl ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers?envName=${{ env.ENV_NAME }}&tag=${{ env.IMAGE_TAG }}&nodeID=${{ env.NODE_ID }}&session=${{ env.REDEPLOY_TOKEN }}
