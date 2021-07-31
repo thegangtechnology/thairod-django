@@ -1,7 +1,7 @@
 import functools
 from typing import List
 
-from rest_framework.status import HTTP_401_UNAUTHORIZED
+from django.core.exceptions import BadRequest
 
 from thairod.utils.html_tools import get_client_ip
 
@@ -27,11 +27,14 @@ def ip_whitelist(ip_list: List[str]):
         @functools.wraps(f)
         def ret(self, request, *arg, **kwds):
             ip = get_client_ip(request)
+
             if ip in ip_list:
                 return f(self, request, *arg, **kwds)
             else:
-                return HTTP_401_UNAUTHORIZED(f'Access Denied for {ip}')
+                raise BadRequest(f'Access Denied for {ip}')
+
         return ret
+
     return decorator
 
 # https://youtrack.jetbrains.com/issue/PY-34569

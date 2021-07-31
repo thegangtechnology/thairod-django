@@ -12,5 +12,5 @@ router.register(r'order-items', views.OrderItemModelViewSet, basename="order-ite
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('orders/create-order/', csrf_exempt(CreateOrderAPI.as_view()))
+    path('orders/create-order', CreateOrderAPI.as_view(), name='create-order')
 ]
