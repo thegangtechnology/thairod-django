@@ -1,7 +1,6 @@
 import functools
 from typing import List
 
-from django.core.exceptions import BadRequest
 from django.http import HttpResponseForbidden
 
 from thairod.utils.html_tools import get_client_ip
