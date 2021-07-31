@@ -175,7 +175,7 @@ LINE_TRACKING_MESSAGE = """
 """.strip()
 
 try:
-    TELEMED_WHITELIST = [ip.strip() for ip in os.environ.get('TELEMED_WHITELIST', "").split(',')]
+    TELEMED_WHITELIST = [ip.strip() for ip in os.environ.get('TELEMED_WHITELIST', "127.0.0.1").split(',')]
 except ValueError:
     TELEMED_WHITELIST = []
 
