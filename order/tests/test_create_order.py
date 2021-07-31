@@ -23,5 +23,5 @@ class TestCreateOrderAPI(APITestCase):
         # note no login
         param = CreateOrderParameter.example_with_valid_item()
         url = reverse('create-order')
-        res = self.client.post(url, data = asdict(param), format='json')
+        res = self.client.post(url, data=asdict(param), format='json')
         self.assertEqual(res.status_code, 200)

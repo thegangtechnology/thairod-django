@@ -9,8 +9,7 @@ router = DefaultRouter()
 router.register(r'orders', views.OrderModelViewSet, basename="order")
 router.register(r'order-items', views.OrderItemModelViewSet, basename="order-item")
 
-
 urlpatterns = [
     path('', include(router.urls)),
-    path('orders/create-order', CreateOrderAPI.as_view(), name='create-order')
+    path('orders/create-order', csrf_exempt(CreateOrderAPI.as_view()), name='create-order')
 ]
