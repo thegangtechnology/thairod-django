@@ -1,15 +1,17 @@
 from rest_framework import viewsets, filters
-from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from order.dataclasses.order import CreateOrderResponse, CreateOrderParameter
 from order.models.order import Order
 from order.models.order_item import OrderItem
 from order.serializers import OrderSerializer, OrderItemSerializer
+from order.services.order_service import OrderService
 from thairod.settings import TELEMED_WHITELIST
 from thairod.utils.auto_serialize import swagger_auto_serialize_schema
 from thairod.utils.decorators import ip_whitelist
-from order.dataclasses.order import CreateOrderResponse, CreateOrderParameter
-from order.services.order_service import OrderService
 
 
 class OrderModelViewSet(viewsets.ModelViewSet):
@@ -26,12 +28,13 @@ class OrderItemModelViewSet(viewsets.ModelViewSet):
     search_fields = ['total_price', 'shipment__title', 'product_variation__name']
 
 
-class CreateOrderAPI(GenericAPIView):
+class CreateOrderAPI(APIView):
+    permission_classes = [AllowAny]
 
     # TODO this white list need to be per account
     @ip_whitelist(TELEMED_WHITELIST)
     @swagger_auto_serialize_schema(CreateOrderParameter, CreateOrderResponse)
-    def post(self, request: Request) -> Response:
+    def post(self, request: Request, format=None) -> Response:
         param = CreateOrderParameter.from_post_request(request)
         service = OrderService()
         return service.create_order(param).to_response()

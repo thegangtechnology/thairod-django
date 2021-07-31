@@ -28,7 +28,7 @@ class CreateOrderParameter(AutoSerialize):
             doctor=Doctor.example(),
             patient=Patient.example(),
             shipping_address=ShippingAddress.example(),
-            line_id="",
+            line_id="12321",
             session_id="AAABB2134",
             items=[CartItem.example()])
 

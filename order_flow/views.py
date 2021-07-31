@@ -1,11 +1,15 @@
+from drf_yasg.openapi import Parameter
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from order.dataclasses.order import CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, \
     PatientConfirmationRequest, OrderFlowResponse
-from order.dataclasses.order import CreateOrderResponse
 from order_flow.services import OrderFlowService
-from rest_framework import status
 from thairod.utils.auto_serialize import swagger_auto_serialize_schema
 
 
@@ -18,8 +22,14 @@ class CreateOrderFlowsAPI(GenericAPIView):
         return service.create_order_flow(param).to_response()
 
 
-class OrderFlowsHashAPI(GenericAPIView):
+class OrderFlowsHashAPI(APIView):
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            Parameter('doctor', in_='query', type='str', description='doctor hash', example='dfadfsa'),
+            Parameter('patient', in_='query', type='str', description='patient hash', example='dfadfsa')
+        ]
+    )
     def get(self, request: Request) -> Response:
         doctor_hash = request.query_params.get('doctor', None)
         if doctor_hash:
