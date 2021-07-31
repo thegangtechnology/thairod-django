@@ -2,6 +2,7 @@ import functools
 from typing import List
 
 from django.core.exceptions import BadRequest
+from django.http import HttpResponseForbidden
 
 from thairod.utils.html_tools import get_client_ip
 
@@ -31,7 +32,7 @@ def ip_whitelist(ip_list: List[str]):
             if ip in ip_list:
                 return f(self, request, *arg, **kwds)
             else:
-                raise BadRequest(f'Access Denied for {ip}')
+                raise HttpResponseForbidden(f'Access Denied for {ip}')
 
         return ret
 
