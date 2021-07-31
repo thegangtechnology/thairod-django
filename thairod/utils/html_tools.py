@@ -23,9 +23,9 @@ def get_body(s: str) -> str:
 # TODO: this can be easily masquerade
 def get_client_ip(request: Request):
     # https://stackoverflow.com/questions/4581789/how-do-i-get-user-ip-address-in-django
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
+    real_ip = request.META.get('HTTP_X_REAL_IP')
+    if real_ip:
+        ip = real_ip  # x_forwarded_for.split(',')[0]
     else:
         logger.warning(request.headers)
         ip = request.META.get('REMOTE_ADDR')
