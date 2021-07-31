@@ -4,9 +4,9 @@ from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData
 def load_test_data():
     parcel = ParcelData(name='name', weight=1, width=2, length=3, height=4)
     from_address = AddressData(name="from testing", address="123/456 Testor Tower", district="บางรัก",
-                               state="บางรัก", province="กรุงเทพมหานคร", postcode="10200", tel="0850035533")
-    to_address = AddressData(name="to testing", address="1231123/456 Testor Tower", district="บางรัก",
-                             state="บางรัก", province="กรุงเทพมหานคร", postcode="10200", tel="0850035533")
+                               state="ราชเทวี", province="กรุงเทพมหานคร", postcode="10200", tel="0850035533")
+    to_address = AddressData(name="to testing", address="1231123/456 Testor Tower", district="บางบอน",
+                             state="บางขุนเทียน", province="กรุงเทพมหานคร", postcode="10200", tel="0850035533")
 
     order_lines = [OrderLineData(from_address=from_address, to_address=to_address, parcel=parcel)]
 
