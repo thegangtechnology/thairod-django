@@ -1,4 +1,5 @@
 {% load simple %}
+{% load tz %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,16 +41,18 @@
     </tr>
     </thead>
     <tbody>
+
     {% for shipment in shipments %}
         <tr>
             <td><input type="checkbox" value="{{ shipment.id }}"/></td>
             <td>{{ shipment.id }}</td>
             <td>{{ shipment.order.receiver_address.name }}</td>
-            <td>{{ shipment.order.order_time | date:"d/m" }}</td>
-            <td>{{ shipment.order.order_time | date:"G:i" }}</td>
+            <td>{{ shipment.order.order_time | localtime | date:"d/m" }}</td>
+            <td>{{ shipment.order.order_time | localtime | date:"G:i" }}</td>
             <td><a href="{{ shipment.id | label_link }}">label</a></td>
         </tr>
     {% endfor %}
+
     </tbody>
 </table>
 <script>
