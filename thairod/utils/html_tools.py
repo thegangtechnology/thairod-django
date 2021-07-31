@@ -27,6 +27,5 @@ def get_client_ip(request: Request):
     if real_ip:
         ip = real_ip  # x_forwarded_for.split(',')[0]
     else:
-        logger.warning(request.headers)
         ip = request.META.get('REMOTE_ADDR')
     return ip
