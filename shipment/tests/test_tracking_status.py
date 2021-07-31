@@ -1,11 +1,10 @@
 from django.urls import reverse
-from thairod.utils.test_util import APITestCase
 
 from core.tests import BaseTestSimpleApiMixin
 from order.models import Order
 from shipment.models import TrackingStatus, Shipment
 from thairod.utils.load_seed import load_seed
-from user.models import User
+from thairod.utils.test_util import APITestCase
 
 
 class TrackingStatusAPITestCase(BaseTestSimpleApiMixin, APITestCase):
@@ -29,12 +28,3 @@ class TrackingStatusAPITestCase(BaseTestSimpleApiMixin, APITestCase):
             "courier_code": "123456789",
             "courier_tracking_code": "987654321"
         }
-
-    def set_up_user(self):
-        password = User.objects.make_random_password()
-        self.user = User.objects.create(username='forceauth',
-                                        email='testpassuser@thegang.tech',
-                                        password=password,
-                                        is_staff=True, is_superuser=True
-                                        )
-        self.client.force_authenticate(self.user)
