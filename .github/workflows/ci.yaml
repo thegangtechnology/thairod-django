@@ -72,7 +72,7 @@ jobs:
 
   docker-build:
     runs-on: ubuntu-latest
-    needs: [health-check-job]
+    needs: [ health-check-job ]
     env:
       DO_REGISTRY_URL: registry.digitalocean.com/gang-registry
       IMAGE_NAME: ${{ secrets.DO_REGISTRY_URL }}/thairod/thairod-django
@@ -99,22 +99,27 @@ jobs:
           docker logout "${{ secrets.DO_REGISTRY_URL }}"
 
   deploy:
-      name: Deploy
-      runs-on: ubuntu-latest
-      needs: [docker-build]
-      env:
-          ENV_NAME: env-5503621
-          IMAGE_TAG: latest
-          NODE_ID: 16766
-          REDEPLOY_TOKEN: ${{ secrets.REDEPLOY_TOKEN }}
-      steps:
-        - name: Redeploy to Proen
-          uses: indiesdev/curl@v1
-          id: api
-          with:
-            url: ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers
-            method: 'GET'
-            timeout: 1000000
-            params: '{ "envName": "${{ env.ENV_NAME }}", "tag": "${{ env.IMAGE_TAG }}", "nodeID": "${{ env.NODE_ID }}", "session": "${{ env.REDEPLOY_TOKEN}}" }'
-        - name: 'Use response'
-          run: echo ${{ steps.api.outputs.response }}
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [ docker-build ]
+    env:
+      ENV_NAME: env-5503621
+      IMAGE_TAG: latest
+      NODE_ID: 16766
+      REDEPLOY_TOKEN: ${{ secrets.REDEPLOY_TOKEN }}
+    steps:
+      - name: redeploy new image
+        uses: wei/curl@master
+        with:
+          args: -X POST -d 'session=${{ secrets.REDEPLOY_TOKEN }}&envName=${{ env.ENV_NAME }}&nodeGroup=cp&tag=${{ env.IMAGE_TAG }}' ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers
+      #        - name: Redeploy to Proen
+      #          uses: indiesdev/curl@v1
+      #          id: api
+      #
+      #          with:
+      #            url: ${{ secrets.REDEPLOY_URL }}/1.0/environment/control/rest/redeploycontainers
+      #            method: 'GET'
+      #            timeout: 1000000
+      #            params: '{ "envName": "${{ env.ENV_NAME }}", "tag": "${{ env.IMAGE_TAG }}", "nodeID": "${{ env.NODE_ID }}", "session": "${{ env.REDEPLOY_TOKEN}}" }'
+      - name: 'Use response'
+        run: echo ${{ steps.api.outputs.response }}
