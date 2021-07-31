@@ -38,6 +38,7 @@
         <th id="orderdate">วันที่สั่ง</th>
         <th id="ordertime">เวลา</th>
         <th id="printlabel">พิมพ์ใบปะหน้า</th>
+        <th id="printlabel">ติดตามสถานะ</th>
     </tr>
     </thead>
     <tbody>
@@ -50,6 +51,7 @@
             <td>{{ shipment.order.order_time | localtime | date:"d/m" }}</td>
             <td>{{ shipment.order.order_time | localtime | date:"G:i" }}</td>
             <td><a href="{{ shipment.id | label_link }}">label</a></td>
+            <td><a href="{{ shipment.tracking_code | shippop_tracking }}">{{ shipment.tracking_code }}</a></td>
         </tr>
     {% endfor %}
 
