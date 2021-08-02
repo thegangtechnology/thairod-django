@@ -1,10 +1,12 @@
 from rest_framework import serializers
 
 from order.models import Order, OrderItem
+from address.serializers import AddressSerializer
 from product.serializers.product_variation_serializer import ProductVariationSerializer
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    receiver_address = AddressSerializer(read_only=True)
 
     class Meta:
         model = Order
