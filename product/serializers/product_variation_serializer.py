@@ -3,6 +3,8 @@ from product.models import ProductVariation
 
 
 class ProductVariationSerializer(serializers.ModelSerializer):
+    product_description = serializers.CharField(source='product.description',  read_only=True)
+
     class Meta:
         model = ProductVariation
         fields = '__all__'
