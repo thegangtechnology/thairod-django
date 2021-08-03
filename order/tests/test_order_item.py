@@ -10,9 +10,7 @@ from thairod.utils.load_seed import load_seed
 
 
 class OrderItemAPITestCase(BaseTestSimpleApiMixin, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+
 
     def setUp(self):
         self.model = OrderItem

@@ -17,7 +17,6 @@ from thairod.utils.test_util import TestCase
 class TestPrintLabel(TestCase):
 
     def setUp(self):
-        load_seed()
         self.label_html_file = join(dirname(__file__), './ttt.html')
         with open(self.label_html_file) as f:
             self.label_html = f.read()

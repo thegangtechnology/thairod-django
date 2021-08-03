@@ -8,9 +8,7 @@ from thairod.utils.test_util import APITestCase
 
 
 class TrackingStatusAPITestCase(BaseTestSimpleApiMixin, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+
 
     def setUp(self):
         self.model = TrackingStatus

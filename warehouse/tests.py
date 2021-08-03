@@ -8,9 +8,7 @@ from warehouse.models import Warehouse
 
 
 class WarehouseAPITestCase(BaseTestSimpleApiMixin, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
+
 
     def setUp(self):
         self.model = Warehouse

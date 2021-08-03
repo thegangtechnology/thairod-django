@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from core.models import AbstractModel
 from order.models.order import Order
 from shipment.models import BatchShipment
+from shipment.models.box_size import BoxSize
 from warehouse.models import Warehouse
 
 
@@ -36,6 +37,7 @@ class Shipment(AbstractModel):
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True, blank=True)
+    box_size = models.ForeignKey(BoxSize, null=False, default=BoxSize.get_default_box, on_delete=models.RESTRICT)
 
     @classmethod
     def example(cls) -> Shipment:
