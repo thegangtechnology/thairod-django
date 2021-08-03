@@ -141,7 +141,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'thairod.auth_debug.DebugAuthentication'
-    ]
+    ],
+    'COERCE_DECIMAL_TO_STRING': False
 }
 
 # Internationalization
