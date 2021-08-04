@@ -1,16 +1,12 @@
 from django.urls import reverse
-from thairod.utils.test_util import APITestCase
 
 from address.models import Address
 from core.tests import BaseTestSimpleApiMixin
-from thairod.utils.load_seed import load_seed
+from thairod.utils.test_util import APITestCase
 from warehouse.models import Warehouse
 
 
 class WarehouseAPITestCase(BaseTestSimpleApiMixin, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
 
     def setUp(self):
         self.model = Warehouse

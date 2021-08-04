@@ -10,6 +10,7 @@ from order.models.order import Order, OrderStatus
 from order.models.order_item import OrderItem
 from product.models import ProductVariation
 from shipment.models import Shipment, TrackingStatus
+from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
 from thairod.services.line.line import send_line_tracking_message
 from thairod.services.shippop.api import ShippopAPI
@@ -110,10 +111,18 @@ class OrderService:
                         shipment.warehouse.address
                     ),
                     to_address=AddressData.from_address_model(shipment.order.receiver_address),
-                    parcel=ParcelData()
+                    parcel=self.parcel_adapter(box_size=shipment.box_size)
                 )
             ],
+        )
 
+    def parcel_adapter(self, box_size: BoxSize, name="ไทยรอด") -> ParcelData:
+        return ParcelData(
+            name=name,
+            weight=1,
+            width=box_size.width,
+            length=box_size.length,
+            height=box_size.height
         )
 
     def crate_shippop_address_data(self, param: CreateOrderParameter) -> AddressData:
@@ -155,8 +164,13 @@ class OrderService:
             label_printed=False,
             order=order,
             shippop_purchase_id=None,
-            status=ShipmentStatus.CREATED
+            status=ShipmentStatus.CREATED,
+            box_size=self.determine_box_size(param)
         )
+
+    def determine_box_size(self, param: CreateOrderParameter) -> BoxSize:
+        # Fix this in the future to do something meaningful
+        return BoxSize.get_default_box()
 
     def create_order_items(self, param: CreateOrderParameter,
                            shipment: Shipment) -> List[OrderItem]:

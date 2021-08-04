@@ -2,14 +2,10 @@ from django.urls import reverse
 
 from address.models import Address
 from core.tests import BaseTestSimpleApiMixin
-from thairod.utils.load_seed import load_seed
 from thairod.utils.test_util import APITestCase
 
 
 class AddressAPITestCase(APITestCase, BaseTestSimpleApiMixin):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
 
     def setUp(self):
         self.model = Address

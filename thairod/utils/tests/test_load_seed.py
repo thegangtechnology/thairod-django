@@ -1,9 +1,10 @@
 from thairod.utils.load_seed import load_meaningful_seed
-from thairod.utils.test_util import TestCaseNoDB
+from thairod.utils.test_util import TestCase
 from warehouse.models import Warehouse
 
 
-class TestLoadSeed(TestCaseNoDB):
+class TestLoadSeed(TestCase):
+    with_db = False
 
     def setUp(self):
         load_meaningful_seed()

@@ -3,14 +3,10 @@ from django.urls import reverse
 from core.tests import BaseTestSimpleApiMixin
 from order.models import Order
 from shipment.models import TrackingStatus, Shipment
-from thairod.utils.load_seed import load_seed
 from thairod.utils.test_util import APITestCase
 
 
 class TrackingStatusAPITestCase(BaseTestSimpleApiMixin, APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        load_seed()
 
     def setUp(self):
         self.model = TrackingStatus
