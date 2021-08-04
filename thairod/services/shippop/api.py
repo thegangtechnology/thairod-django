@@ -5,8 +5,6 @@ import requests
 from thairod.services.shippop.data import OrderData, OrderResponse, TrackingData, OrderLineResponse, TrackingState, \
     ParcelData, Pricing
 from thairod.settings import SHIPPOP_API_KEY, SHIPPOP_URL
-
-
 # flake8: noqa
 from thairod.utils.exceptions import ShippopAPIException
 
