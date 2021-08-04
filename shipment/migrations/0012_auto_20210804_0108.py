@@ -4,8 +4,8 @@ from django.db import migrations
 
 
 def forward(apps, schema_editor):
-    BoxSize = apps.get_model('shipment', 'BoxSize')
-    BoxSize(
+    box_size_model = apps.get_model('shipment', 'BoxSize')
+    box_size_model(
         name='G',
         width=31,
         length=36,
@@ -15,8 +15,8 @@ def forward(apps, schema_editor):
 
 
 def backward(apps, schema_editor):
-    BoxSize = apps.get_model('shipment', 'BoxSize')
-    BoxSize.objects.filter(name='G').first().delete()
+    box_size_model = apps.get_model('shipment', 'BoxSize')
+    box_size_model.objects.filter(name='G').first().delete()
 
 
 class Migration(migrations.Migration):

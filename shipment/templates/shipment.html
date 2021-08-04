@@ -11,11 +11,11 @@
                 <li>หมายเลข Tracking: {{ shipment.tracking_code }} / {{ shipment.courier_tracking_code }}</li>
             </ul>
             <h2>รายการ สิ่งของที่ส่งมา</h2>
-            <table class="productlist">
+            <table class="productlist" aria-label="product list">
                 <tr>
-                    <th>ลำดับที่</th>
-                    <th>สิ่งของ</th>
-                    <th>จำนวน</th>
+                    <th id="no">ลำดับที่</th>
+                    <th id="description">สิ่งของ</th>
+                    <th id="quantity">จำนวน</th>
                 </tr>
                 {% for item in shipment.orderitem_set.all %}
                     <tr>
