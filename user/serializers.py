@@ -15,3 +15,9 @@ class UserAPIKeySerializers(serializers.ModelSerializer):
     class Meta:
         model = APIKey
         fields = '__all__'
+
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name']
