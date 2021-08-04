@@ -1,3 +1,6 @@
+from dataclasses import dataclass, field
+from typing import List
+
 from django_seed import Seed
 
 from address.models import Address
@@ -56,6 +59,40 @@ def load_seed():
     seeder.add_entity(User, 1)
     seeder.add_entity(BatchShipment, 1)
     seeder.execute(turn_off_auto_now=False)
+
+
+@dataclass
+class RealisticSeed:
+    warehouses: List[Warehouse] = field(default_factory=list)
+    products: List[Product] = field(default_factory=list)
+    product_variations: List[ProductVariation] = field(default_factory=list)
+
+
+def load_realistic_seed() -> RealisticSeed:
+    """A Warehouse and two products
+
+    Returns:
+
+    """
+    seed = RealisticSeed()
+    warehouse = Warehouse.example()
+    warehouse.address.save()
+    warehouse.save()
+    seed.warehouses.append(warehouse)
+
+    product = Product.example()
+    product.save()
+    seed.products.append(product)
+
+    product_variation = ProductVariation.example()
+    product_variation.product = product
+    product_variation.save()
+    product_variation2 = ProductVariation.example()
+    product_variation2.product = product
+    product_variation2.save()
+    seed.product_variations.append(product_variation)
+    seed.product_variations.append(product_variation2)
+    return seed
 
 
 def load_meaningful_seed():

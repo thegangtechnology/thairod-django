@@ -49,14 +49,14 @@ def patch_shippop(cls):
 
 class TestCase(TC):
     patch_external = True
-    with_db = True
+    with_seed = True
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         if cls.patch_external:
             patch_line_bot_api(cls)
-        if cls.with_db:
+        if cls.with_seed:
             load_seed()
 
 

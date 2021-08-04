@@ -4,7 +4,7 @@ from warehouse.models import Warehouse
 
 
 class TestLoadSeed(TestCase):
-    with_db = False
+    with_seed = False
 
     def setUp(self):
         load_meaningful_seed()

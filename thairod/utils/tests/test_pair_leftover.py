@@ -3,7 +3,7 @@ from thairod.utils.test_util import TestCase
 
 
 class TestPairLeftOver(TestCase):
-    with_db = False
+    with_seed = False
 
     def test_pair_leftover_more_right(self):
         p, la, lb = pair_leftover([1, 2, 3], [9, 8, 7, 6])
