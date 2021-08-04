@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters, views
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -18,5 +19,5 @@ class CurrentUserAPIView(views.APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_anonymous:
-            return Response({"error": "user is anonymous."})
+            raise NotAuthenticated("user is not authenticated.")
         return Response(CurrentUserSerializer(user).data)
