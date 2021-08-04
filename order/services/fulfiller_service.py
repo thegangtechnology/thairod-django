@@ -5,8 +5,8 @@ StockCount = int
 
 
 class FulFillerService:
-    def fulfil_orders(self):
-        pass
+    def fulfill_orders(self):
+        pass  # future
 
-    def attempt_fulfil(self, order: Order):
-        pass
+    def attempt_fulfill(self, order: Order):
+        pass  # future

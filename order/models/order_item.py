@@ -7,7 +7,7 @@ from shipment.models import Shipment
 
 
 class FulfilmentStatus(models.IntegerChoices):
-    UNFULFILLED = (0, _('UNFULFILLED'))
+    PENDING = (0, _('PENDING'))
     FULFILLED = (1, _('FULFILLED'))
 
 
@@ -16,7 +16,7 @@ class OrderItem(AbstractModel):
     product_variation = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=3)
-    fulfilment_status = models.IntegerField(choices=FulfilmentStatus.choices, default=FulfilmentStatus.UNFULFILLED)
+    fulfilment_status = models.IntegerField(choices=FulfilmentStatus.choices, default=FulfilmentStatus.PENDING)
 
     @classmethod
     def example(cls):

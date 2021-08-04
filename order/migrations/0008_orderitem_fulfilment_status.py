@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='orderitem',
             name='fulfilment_status',
-            field=models.IntegerField(choices=[(0, 'UNFULFILLED'), (1, 'FULFILLED')], default=0),
+            field=models.IntegerField(choices=[(0, 'PENDING'), (1, 'FULFILLED')], default=0),
         ),
     ]
