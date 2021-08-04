@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
-from datetime import datetime
 
 from address.models import Address
 from thairod.settings import SHIPPOP_DEFAULT_COURIER_CODE
@@ -65,7 +65,7 @@ class OrderLineData:
     from_address: AddressData
     to_address: AddressData
     parcel: ParcelData
-    courier_code: str = "THP"
+    courier_code: str = SHIPPOP_DEFAULT_COURIER_CODE
 
     def to_request_dict(self) -> dict:
         return {
@@ -101,7 +101,7 @@ class OrderLineResponse:
     from_address: AddressData
     to_address: AddressData
     courier_tracking_code: str
-    courier_code: str = SHIPPOP_DEFAULT_COURIER_CODE
+    courier_code: str
     parcel: Optional[ParcelData] = None
     weight: Optional[int] = None
     datetime_shipping: Optional[datetime] = None

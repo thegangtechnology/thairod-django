@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase as ATC
 
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderResponse, OrderLineResponse
+from thairod.settings import SHIPPOP_DEFAULT_COURIER_CODE
 from thairod.utils.load_seed import load_seed
 from user.models import User
 
@@ -30,6 +31,7 @@ def mocked_create_order_response() -> OrderResponse:
                 discount=Decimal(10),
                 from_address=None,
                 to_address=None,
+                courier_code=SHIPPOP_DEFAULT_COURIER_CODE,
                 courier_tracking_code='c_track'
             )
         ]
