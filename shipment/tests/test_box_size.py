@@ -7,4 +7,4 @@ class TestBoxSize(TestCase):
 
     def test_default_box_id(self):
         ret = BoxSize.get_default_box_id()
-        self.assertEqual(type(ret), 1)
+        self.assertEqual(type(ret), int)
