@@ -37,7 +37,7 @@ class Shipment(AbstractModel):
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True, blank=True)
-    box_size = models.ForeignKey(BoxSize, null=False, default=BoxSize.get_default_box, on_delete=models.RESTRICT)
+    box_size = models.ForeignKey(BoxSize, null=False, default=BoxSize.get_default_box_id, on_delete=models.RESTRICT)
 
     @classmethod
     def example(cls) -> Shipment:
