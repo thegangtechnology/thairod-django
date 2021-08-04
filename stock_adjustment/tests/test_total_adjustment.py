@@ -38,4 +38,9 @@ class TestTotalAdjustment(TestCase):
         self.assertEqual(stock, 0)
 
     def test_total_adjustment_map(self):
-        pass
+        ta_map = StockAdjustment.total_adjustment_map()
+        self.assertDictEqual(ta_map,
+                             {
+                                 self.seed.product_variations[0].id: 15,
+                                 self.seed.product_variations[1].id: 30,
+                             })

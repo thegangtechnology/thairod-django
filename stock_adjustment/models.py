@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import DefaultDict
 
 from django.db import models
@@ -17,8 +18,8 @@ class StockAdjustment(AbstractModel):
 
     @classmethod
     def total_adjustment_for_id(cls, id: int) -> int:
-        ret = cls.objects.filter(product_variation_id=id)\
-            .values('product_variation_id')\
+        ret = cls.objects.filter(product_variation_id=id) \
+            .values('product_variation_id') \
             .annotate(total_count=Sum('quantity'))
         return 0 if len(ret) == 0 else ret[0]['total_count']
 
@@ -28,4 +29,7 @@ class StockAdjustment(AbstractModel):
 
     @classmethod
     def total_adjustment_map(cls) -> DefaultDict[int, int]:
-        pass
+        res = cls.objects.values('product_variation_id').annotate(total_count=Sum('quantity'))
+        ret = defaultdict(lambda: 0)
+        ret.update({r['product_variation_id']: r['total_count'] for r in res})
+        return ret
