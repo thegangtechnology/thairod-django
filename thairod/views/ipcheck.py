@@ -1,7 +1,6 @@
 import os
-from datetime import datetime, tzinfo
+from datetime import datetime
 
-import pytz
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +11,7 @@ from thairod.utils.html_tools import get_client_ip
 class IPCheckView(APIView):
     permission_classes = [AllowAny]
 
-    def timestamp(self) -> datetime:
+    def timestamp(self) -> float:
         ts = os.path.getmtime(__file__)
         return ts
 

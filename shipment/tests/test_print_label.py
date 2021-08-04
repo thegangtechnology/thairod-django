@@ -10,7 +10,6 @@ from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
 from shipment.views.print_label_views import PrintLabelView
 from thairod.services.shippop.tests import load_test_data
-from thairod.utils.load_seed import load_seed
 from thairod.utils.test_util import TestCase
 
 

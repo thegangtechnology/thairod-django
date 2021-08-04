@@ -164,8 +164,13 @@ class OrderService:
             label_printed=False,
             order=order,
             shippop_purchase_id=None,
-            status=ShipmentStatus.CREATED
+            status=ShipmentStatus.CREATED,
+            box_size=self.determine_box_size(param)
         )
+
+    def determine_box_size(self, param: CreateOrderParameter) -> BoxSize:
+        # Fix this in the future to do something meaningful
+        return BoxSize.get_default_box()
 
     def create_order_items(self, param: CreateOrderParameter,
                            shipment: Shipment) -> List[OrderItem]:
