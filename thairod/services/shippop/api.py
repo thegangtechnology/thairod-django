@@ -21,8 +21,7 @@ class ShippopAPI:
         r = requests.request("POST", f"{self.url}/{path}", json=payload)
         r_json = r.json()
         if not r_json['status']:
-            print(r_json)
-            raise ShippopAPIException(r_json['message'])
+            raise ShippopAPIException(r_json['notice'])
         return r_json
 
     def create_order(self, order_data: OrderData) -> OrderResponse:
