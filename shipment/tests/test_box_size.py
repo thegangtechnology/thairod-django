@@ -3,7 +3,7 @@ from thairod.utils.test_util import TestCase
 
 
 class TestBoxSize(TestCase):
-    with_db = False
+    with_seed = False
 
     def test_default_box_id(self):
         ret = BoxSize.get_default_box_id()

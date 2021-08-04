@@ -3,7 +3,6 @@ from rest_framework import status
 
 class BaseTestSimpleApiMixin:
 
-
     def test_list(self) -> None:
         response = self.client.get(self.list_url, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

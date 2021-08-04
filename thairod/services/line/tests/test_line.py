@@ -4,7 +4,7 @@ from thairod.utils.test_util import TestCase
 
 class TestLine(TestCase):
     patch_external = True
-    with_db = False
+    with_seed = False
 
     def setUp(self) -> None:
         self.uid = 'U5f7f3fc4414c147a0c029e93071d8700'

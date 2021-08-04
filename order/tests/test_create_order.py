@@ -16,7 +16,6 @@ class TestCreateOrder(TestCase):
         param = CreateOrderParameter.example_with_valid_item()
         OrderService().create_order(param)
         new_count = Order.objects.count()
-
         self.assertEqual(old_count + 1, new_count)
 
     def test_parcel_adapter(self):
