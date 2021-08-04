@@ -9,6 +9,7 @@ class BaseTestSimpleApi:
         self.user = User.objects.create(username='forceauth',
                                         email='testpassuser@thegang.tech',
                                         password=password,
+                                        first_name='joe', last_name='don',
                                         is_staff=True, is_superuser=True
                                         )
         self.client.force_authenticate(self.user)
