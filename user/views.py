@@ -18,6 +18,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
 class CurrentUserAPIView(views.APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
+        print(user)
         if user.is_anonymous:
             raise NotAuthenticated("user is not authenticated.")
         return Response(CurrentUserSerializer(user).data)
