@@ -1,4 +1,3 @@
-from django.db import transaction
 from django_seed import Seed
 
 from address.models import Address
@@ -60,15 +59,14 @@ def load_seed():
 
 
 def load_meaningful_seed():
-    with transaction.atomic():
-        seeder = Seed.seeder()
-        seeder.add_entity(Product, 1)
-        seeder.add_entity(ProductImage, 1)
-        seeder.add_entity(ProductVariation, 3)
-        seeder.execute(turn_off_auto_now=False)
+    seeder = Seed.seeder()
+    seeder.add_entity(Product, 1)
+    seeder.add_entity(ProductImage, 1)
+    seeder.add_entity(ProductVariation, 3)
+    seeder.execute(turn_off_auto_now=False)
 
-        warehouse = Warehouse.example()
-        warehouse.address.save()
-        warehouse.save()
-        orders = [OrderService().create_order(CreateOrderParameter.example()) for _ in range(5)]
-        return orders
+    warehouse = Warehouse.example()
+    warehouse.address.save()
+    warehouse.save()
+    orders = [OrderService().create_order(CreateOrderParameter.example_with_valid_item()) for _ in range(5)]
+    return orders
