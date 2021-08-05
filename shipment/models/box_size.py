@@ -3,7 +3,6 @@ from __future__ import annotations
 from django.db import models
 
 from core.models import AbstractModel
-from thairod.settings import DEFAULT_BOX_SIZE
 
 
 class BoxSize(AbstractModel):
@@ -15,8 +14,9 @@ class BoxSize(AbstractModel):
 
     @classmethod
     def get_default_box_id(cls) -> int:
-        return cls.get_default_box().id
+        from shipment.models.default_box_size import DefaultBoxSize
+        return DefaultBoxSize.objects.first().default_box_size.id
 
     @classmethod
     def get_default_box(cls) -> BoxSize:
-        return cls.objects.filter(name=DEFAULT_BOX_SIZE).first()
+        return cls.objects.get(id=cls.get_default_box_id())

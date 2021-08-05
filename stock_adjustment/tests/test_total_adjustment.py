@@ -8,25 +8,26 @@ class TestTotalAdjustment(TestCase):
 
     def setUp(self):
         self.seed = load_realistic_seed()
+        msg = 'feel like it'
         StockAdjustment.objects.create(
             product_variation=self.seed.product_variations[0],
             warehouse=self.seed.warehouses[0],
             quantity=20,
-            reason='feel like it'
+            reason=msg
         )
 
         StockAdjustment.objects.create(
             product_variation=self.seed.product_variations[0],
             warehouse=self.seed.warehouses[0],
             quantity=-5,
-            reason='feel like it'
+            reason=msg
         )
 
         StockAdjustment.objects.create(
             product_variation=self.seed.product_variations[1],
             warehouse=self.seed.warehouses[0],
             quantity=30,
-            reason='feel like it'
+            reason=msg
         )
 
     def test_total_adjustment(self):
