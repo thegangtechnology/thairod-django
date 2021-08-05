@@ -57,7 +57,8 @@ class StockAPI(APIView):
         None, StockResponse,
         operation_description='request for stock information',
         manual_parameters=[
-            Parameter('pv_id', in_='query', type='integer', description='product variation id. Repeatable.', example='1')]
+            Parameter('pv_id', in_='query', type='integer',
+                      description='product variation id. Repeatable.', example='1')]
     )
     def get(self, request: Request):  # TODO: Optimize this for multiple stock
         pv_ids = request.query_params.getlist('pv_id')
