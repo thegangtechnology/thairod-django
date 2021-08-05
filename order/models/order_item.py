@@ -44,25 +44,41 @@ class OrderItem(AbstractModel):
         )
 
     @classmethod
-    def total_fulfilled_for_id(cls, id: int) -> int:
-        qs = cls.objects.filter(fulfilment_status=FulfilmentStatus.FULFILLED,
+    def _total_with_status_for_id(cls, status: FulfilmentStatus, id: int):
+        qs = cls.objects.filter(fulfilment_status=status,
                                 product_variation_id=id) \
             .values('product_variation_id').annotate(total_count=Sum('quantity'))
 
         return qs[0]['total_count'] if len(qs) > 0 else 0
 
     @classmethod
+    def total_pending_for_id(cls, id: int):
+        return cls._total_with_status_for_id(status=FulfilmentStatus.PENDING, id=id)
+
+    @classmethod
+    def total_fulfilled_for_id(cls, id: int) -> int:
+        return cls._total_with_status_for_id(status=FulfilmentStatus.FULFILLED, id=id)
+
+    @classmethod
     def total_fulfilled(cls, product_variation: ProductVariation) -> int:
         return cls.total_fulfilled_for_id(product_variation.id)
 
     @classmethod
-    def total_fulfilled_map(cls) -> DefaultDict[int, int]:
-        qs = cls.objects.filter(fulfilment_status=FulfilmentStatus.FULFILLED) \
+    def _total_map_for_status(cls, status: FulfilmentStatus):
+        qs = cls.objects.filter(fulfilment_status=status) \
             .values('product_variation_id').annotate(total_count=Sum('quantity'))
 
         ret = defaultdict(lambda: 0)
         ret.update({s['product_variation_id']: s['total_count'] for s in qs})
         return ret
+
+    @classmethod
+    def total_fulfilled_map(cls) -> DefaultDict[int, int]:
+        return cls._total_map_for_status(FulfilmentStatus.FULFILLED)
+
+    @classmethod
+    def total_pending_map(cls) -> DefaultDict[int, int]:
+        return cls._total_map_for_status(FulfilmentStatus.PENDING)
 
     @classmethod
     def sorted_pending_order_items(cls) -> QuerySet:

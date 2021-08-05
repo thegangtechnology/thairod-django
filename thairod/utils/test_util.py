@@ -63,7 +63,7 @@ class TestCase(TC):
 class APITestCase(ATC):
     patch_line = True
     patch_shippop = True
-    with_db = True
+    with_seed = True
     login = True
 
     def set_up_user(self, is_staff=True, is_superuser=False):
@@ -82,5 +82,5 @@ class APITestCase(ATC):
             patch_line_bot_api(cls)
         if cls.patch_shippop:
             patch_shippop(cls)
-        if cls.with_db:
+        if cls.with_seed:
             load_seed()

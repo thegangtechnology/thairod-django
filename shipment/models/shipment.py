@@ -13,6 +13,7 @@ from warehouse.models import Warehouse
 class ShipmentStatus(models.TextChoices):
     # Shippop process status
     CREATED = 'CREATED', _('Order for shipment created')
+    FULFILLED = 'FULFILLED', _('Shipment is fulfilled')
     BOOKED = 'BOOKED', _('Book shipment to Shippop')
     # Our delivery status
     CONFIRMED = 'CONFIRMED', _('Confirmed shipment')  # ที่ต้องจัดส่ง

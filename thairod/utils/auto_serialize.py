@@ -1,5 +1,5 @@
 import functools
-from typing import Type, Generic, TypeVar, Dict, Any
+from typing import Type, Generic, TypeVar, Dict, Any, Optional
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.request import Request
@@ -59,8 +59,9 @@ class AutoSerialize:
             return Serializer
 
 
-def swagger_auto_serialize_schema(body_type: Type[AutoSerialize], response_type: Type[AutoSerialize]):
+def swagger_auto_serialize_schema(body_type: Optional[Type[AutoSerialize]], response_type: Type[AutoSerialize], **kwds):
     return swagger_auto_schema(
-        request_body=body_type.serializer(),
-        responses={200: response_type.serializer()}
+        request_body=body_type.serializer() if body_type is not None else None,
+        responses={200: response_type.serializer()},
+        **kwds
     )
