@@ -10,9 +10,46 @@
         }
     </style>
     <style>
+        table.productlist{
+            width: 100%;
+        }
         table.productlist, tr, th, td {
-            border: 2px solid gray;
+            border: 1px solid gray;
             border-collapse:collapse;
+        }
+        table.productlist th {
+            padding: 10px;
+        }
+        table.productlist tr td:nth-child(1) {
+            width: 90px;
+            vertical-align: sub;
+            text-align: center;
+        }
+         table.productlist tr td:nth-child(3) {
+            width: 70px;
+            vertical-align: sub;
+            text-align: center;
+        }
+        .main-title{
+            font-size:18px;
+            margin-bottom: 8px;
+        }
+        .text-description{
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .list-items-6{
+            width: 49%;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .list-items-3{
+            width: 33%;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        pre,p {
+            margin:0.5em 0;
         }
     </style>
     <link type="text/css" href="//www1.shippop.dev/assets/vendor/font-awesome-4.7.0/css/font-awesome.min.css?v=0.01061"

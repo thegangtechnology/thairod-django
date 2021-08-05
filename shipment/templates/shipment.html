@@ -1,17 +1,63 @@
+{% load static %}
 <div class="page landscape sizeA4  ">
     <div class="page-wrapper a4 A4">
-        <div class="page-border">
-            <h1>ไทยรอด</h1>
+        <div class="page-border" style="padding: 16px;">
+            <img class="logo _marginLeft" src="{% static 'shipment/logo-thairod.svg' %}" style="width: 90px;"
+                 alt="logo">
+            <hr>
+            <div class="main-title">
+                <u>ข้อมูลการรักษา</u>
+            </div>
             <ul>
-                <li>แพทย์ผู้ดูแล: {{ shipment.order.orderer_name }}({{ shipment.order.orderer_license }})</li>
-                <li>คนไข้: {{ shipment.order.receiver_address.name }}</li>
-                <li>ที่อยู่ : {{ shipment.order.receiver_address.full_address }}</li>
-                <li>วันที่สั่ง : {{ shipment.order.order_time|date:'Y-m-d H:i' }}</li>
-                <li>หมายเลข Order: {{ shipment.order.id }}</li>
-                <li>หมายเลข Tracking: {{ shipment.tracking_code }} / {{ shipment.courier_tracking_code }}</li>
+                <li class="list-items-6">
+                    <div class="text-title">
+                        คนไข้:
+                    </div>
+                    <div class="text-description">
+                        {{ shipment.order.receiver_address.name }}
+                    </div>
+                </li>
+                <li class="list-items-6">
+                    <div class="text-title">
+                        แพทย์ผู้ดูแล:
+                    </div>
+                    <div class="text-description">
+                        {{ shipment.order.orderer_name }} ({{ shipment.order.orderer_license }})
+                    </div>
+                </li>
+                <li>
+                    <div class="main-title">
+                        <u>ข้อมูลการรักษา</u>
+                    </div>
+                </li>
+                <li class="list-items-3">
+                    <div class="text-title">วันที่สั่ง:</div>
+                    <div class="text-description">
+                        {{ shipment.order.order_time|date:'Y-m-d H:i' }}
+                    </div>
+                </li>
+                <li class="list-items-3">
+                    <div class="text-title">หมายเลข Tracking:</div>
+                    <div class="text-description">
+                        {{ shipment.tracking_code }} / {{ shipment.courier_tracking_code }}
+                    </div>
+                </li>
+                <li class="list-items-3">
+                    <div class="text-title">หมายเลข Order:</div>
+                    <div class="text-description">{{ shipment.order.id }}</div>
+                </li>
+                <li class="list-items-1">
+                    <div class="text-title">ที่อยู่:</div>
+                    <div class="text-description">
+                        {{ shipment.order.receiver_address.full_address }}
+                    </div>
+                </li>
             </ul>
-            <h2>รายการ สิ่งของที่ส่งมา</h2>
+            <div class="main-title" style="margin-top: 18px;">
+                <u>รายละเอียดคำสั่งซื้อ</u>
+            </div>
             <table class="productlist" aria-label="product list">
+                <tbody>
                 <tr>
                     <th id="no">ลำดับที่</th>
                     <th id="description">สิ่งของ</th>
@@ -22,15 +68,14 @@
                         <td>{{ forloop.counter }}</td>
                         <td>
                             <p>{{ item.product_variation.product.name }}</p>
-                            <pre>
-{{ item.product_variation.product.description }}
-                    </pre>
+                            <pre>{{ item.product_variation.product.description }}</pre>
                         </td>
-                        <td> {{ item.quantity }}</td>
+                        <td> {{ item.quantity }} </td>
                     </tr>
                 {% endfor %}
+                </tbody>
             </table>
-            <div>
+            <div style="margin-top: 16px;">
                 ตรวจเช็คโดย
             </div>
         </div>
