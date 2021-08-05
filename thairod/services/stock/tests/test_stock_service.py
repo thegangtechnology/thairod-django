@@ -30,3 +30,13 @@ class TestStockService(TestCase):
                 pending=3
             )
         )
+
+    def test_stock_map(self):
+        stocks = StockService().get_all_stock_map()
+        self.assertEqual(dict(stocks),
+                         {
+                             self.seed.product_variations[0].id: StockInfo(fulfilled=4, procured=30, adjustment=35,
+                                                                           pending=3),
+                             self.seed.product_variations[1].id: StockInfo(fulfilled=2, procured=40, adjustment=10,
+                                                                           pending=1)
+                         })

@@ -9,13 +9,10 @@ from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
 from order.models.order import Order, OrderStatus
 from order.models.order_item import OrderItem
 from product.models import ProductVariation
-from shipment.models import Shipment, TrackingStatus
+from shipment.models import Shipment
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
-from thairod.services.line.line import send_line_tracking_message
-from thairod.services.shippop.api import ShippopAPI
-from thairod.services.shippop.data import OrderData, OrderLineData, AddressData, OrderResponse, ParcelData
-from thairod.settings import SHIPPOP_EMAIL
+from thairod.services.shippop.data import AddressData
 from warehouse.models import Warehouse
 
 
@@ -40,15 +37,9 @@ class OrderService:
             return CreateOrderResponse(success=False)
 
     def create_order_no_callback(self, param) -> RawOrder:
+        from order.services.fulfiller_service import FulFilmentService
         ro = self.create_raw_order(param)
-        shippop_order_response = self.add_order_to_shippop(ro)
-        for oi in ro.shipment.orderitem_set.all():
-            oi.fulfill()
-        ro.shipment.status = ShipmentStatus.FULFILLED
-        ro.shipment.save()
-        self.update_shipment_with_shippop_booking(shippop_order_response, ro.shipment)
-        self.confirm_order_with_shippop(ro)
-        self.update_shipment_with_confirmation(ro.shipment)
+        FulFilmentService().attempt_fulfill_shipment(ro.shipment)
         return ro
 
     def create_raw_order(self, param: CreateOrderParameter) -> RawOrder:
@@ -57,77 +48,6 @@ class OrderService:
         shipment = self.create_shipment(param, order)
         self.create_order_items(param, shipment)
         return RawOrder(order=order, shipment=shipment)
-
-    def add_order_to_shippop(self, ro: RawOrder) -> OrderResponse:
-        shippop_api = ShippopAPI()
-        response = shippop_api.create_order(self.create_order_data(ro.shipment))
-
-        if not response.status:
-            raise ShippopCreateOrderError()
-        return response
-
-    def confirm_order_with_shippop(self, ro: RawOrder):
-        shippop_api = ShippopAPI()
-
-        confirm_success = shippop_api.confirm_order(ro.shipment.shippop_purchase_id)
-        if not confirm_success:
-            raise ShippopConfirmationError()
-
-    def notify_user_with_tracking(self, ro: RawOrder, param: CreateOrderParameter):
-        if param.line_id:
-            send_line_tracking_message(line_uid=param.line_id,
-                                       name=param.patient.name,
-                                       shippop_tracking_code=ro.shipment.tracking_code)
-
-    # TODO: Decouple these
-    def update_shipment_with_confirmation(self, shipment: Shipment):
-        shipment.status = ShipmentStatus.CONFIRMED
-        shipment.save()
-
-    def update_shipment_with_shippop_booking(self, response: OrderResponse,
-                                             shipment: Shipment):
-        self.create_tracking_status(response, shipment)
-        shipment.tracking_code = response.lines[0].tracking_code
-        shipment.shippop_purchase_id = response.purchase_id
-        shipment.courier_tracking_id = response.lines[0].courier_tracking_code
-        shipment.status = ShipmentStatus.BOOKED
-        shipment.save()
-
-    def create_tracking_status(self, response: OrderResponse,
-                               shipment: Shipment) -> TrackingStatus:
-        return TrackingStatus.objects.create(
-            status=response.status,
-            price=response.lines[0].price,
-            discount=response.lines[0].discount,
-            courier_code=response.lines[0].courier_code,
-            shipment=shipment,
-            courier_tracking_code=response.lines[0].tracking_code
-        )
-
-    def create_order_data(self, shipment: Shipment) -> OrderData:
-        return OrderData(
-            email=SHIPPOP_EMAIL,
-            success_url='',
-            fail_url='',
-            data=[
-                OrderLineData(
-                    from_address=AddressData.from_address_model(
-                        shipment.warehouse.address
-                    ),
-                    to_address=AddressData.from_address_model(shipment.order.receiver_address),
-                    parcel=self.parcel_adapter(box_size=shipment.box_size)
-                )
-            ],
-        )
-
-    def parcel_adapter(self, box_size: BoxSize, name="ไทยรอด") -> ParcelData:
-        return ParcelData(
-            name=name,
-            weight=1,
-            width=box_size.width,
-            length=box_size.length,
-            height=box_size.height
-        )
 
     def crate_shippop_address_data(self, param: CreateOrderParameter) -> AddressData:
         return AddressData(
