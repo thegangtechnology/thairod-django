@@ -75,6 +75,10 @@ class TestOrderItemTotal(TestCase):
         })
         self.assertEqual(got[30], 0)
 
+    def test_total_pending(self):
+        total = OrderItem.total_pending_for_id(self.seed.product_variations[0].id)
+        self.assertEqual(total, 10)
+
     def test_sorted_pending_order(self):
         qs: Iterable[OrderItem] = OrderItem.sorted_pending_order_items()
         pending_items = list(qs)

@@ -42,6 +42,10 @@ class OrderService:
     def create_order_no_callback(self, param) -> RawOrder:
         ro = self.create_raw_order(param)
         shippop_order_response = self.add_order_to_shippop(ro)
+        for oi in ro.shipment.orderitem_set.all():
+            oi.fulfill()
+        ro.shipment.status = ShipmentStatus.FULFILLED
+        ro.shipment.save()
         self.update_shipment_with_shippop_booking(shippop_order_response, ro.shipment)
         self.confirm_order_with_shippop(ro)
         self.update_shipment_with_confirmation(ro.shipment)
