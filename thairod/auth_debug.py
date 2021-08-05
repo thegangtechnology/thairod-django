@@ -1,13 +1,17 @@
+from django.http import HttpRequest
 from rest_framework import authentication
 
 from thairod import settings
 
 
 class DebugAuthentication(authentication.BaseAuthentication):
-    def authenticate(self, request):
-        if not settings.DEBUG:
+    def authenticate(self, request: HttpRequest):
+        god_mode = request.headers.get('GOD_MODE') is not None
+
+        if not settings.DEBUG or not god_mode:
             return None
         from user.models import User
+
         user = User.objects.last()
 
         if user is None:

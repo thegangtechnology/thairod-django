@@ -30,3 +30,10 @@ class UserAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         self.assertEqual(response.data['first_name'], 'joe')
         self.assertEqual(response.data['last_name'], 'don')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_anonymous(self):
+        self.client.force_authenticate()
+        response = self.client.get(reverse("current-user"))
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data['detail'], 'user is not authenticated.')
