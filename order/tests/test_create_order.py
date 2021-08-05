@@ -18,6 +18,13 @@ class TestCreateOrder(TestCase):
         new_count = Order.objects.count()
         self.assertEqual(old_count + 1, new_count)
 
+    def test_create_order_correct_data(self):
+        param = CreateOrderParameter.example_with_valid_item()
+        res = OrderService().create_order(param)
+        order = Order.objects.get(pk=res.order_id)
+        self.assertEqual(order.line_id, param.line_id)
+        self.assertEqual(order.telemed_session_id, param.session_id)
+
     def test_parcel_adapter(self):
         box = BoxSize(name="G2", width=1, height=2, length=3)
         parcel = OrderService().parcel_adapter(box, name="test")

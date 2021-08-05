@@ -23,6 +23,8 @@ class Order(AbstractModel):
     # TODO: This looks like we should make a receiver table later? like patient list or sth.
     receiver_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
     cid = models.CharField(max_length=255)
+    line_id = models.CharField(max_length=255, default='', blank=True, null=False)
+    telemed_session_id = models.CharField(max_length=255, default='', blank=True, null=False)
     orderer_name = models.CharField(max_length=255)
     orderer_license = models.CharField(max_length=255)
     order_time = models.DateTimeField(auto_now=True)  # TODO: Is this manual input?
