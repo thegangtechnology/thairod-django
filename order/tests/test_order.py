@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from typing import Iterable
+
+import pytz
 from django.urls import reverse
 
 from address.models import Address
@@ -37,8 +41,7 @@ class TestOrderItemTotal(TestCase):
             order = OrderService().create_raw_order(param)
             if i % 2 == 0:
                 for item in order.shipment.orderitem_set.all():
-                    item.fulfilment_status = FulfilmentStatus.FULFILLED
-                    item.save()
+                    item.fulfill()
 
     def setUp(self):
         seed = load_realistic_seed()
@@ -46,6 +49,15 @@ class TestOrderItemTotal(TestCase):
 
         self.sample_orders(self.seed.product_variations[0].id, 20)
         self.sample_orders(self.seed.product_variations[1].id, 50)
+
+    def test_fulfill(self):
+        item = OrderItem.objects.filter(fulfilment_status=FulfilmentStatus.PENDING).first()
+        self.assertEqual(item.fulfilment_status, FulfilmentStatus.PENDING)
+        item.fulfill()
+        fulfilled_item = OrderItem.objects.get(pk=item.id)
+        self.assertEqual(fulfilled_item.fulfilment_status, FulfilmentStatus.FULFILLED)
+        self.assertGreaterEqual(fulfilled_item.fulfill_datetime,
+                                datetime.now(pytz.utc) - timedelta(seconds=1))
 
     def test_total_fulfilled(self):
         total = OrderItem.total_fulfilled(self.seed.product_variations[0])
@@ -62,3 +74,13 @@ class TestOrderItemTotal(TestCase):
             self.seed.product_variations[1].id: 25,
         })
         self.assertEqual(got[30], 0)
+
+    def test_sorted_pending_order(self):
+        qs: Iterable[OrderItem] = OrderItem.sorted_pending_order_items()
+        pending_items = list(qs)
+        for pending_item in pending_items:
+            self.assertEqual(pending_item.fulfilment_status, FulfilmentStatus.PENDING)
+        self.assertLessEqual(
+            pending_items[0].shipment.order.order_time,
+            pending_items[1].shipment.order.order_time
+        )

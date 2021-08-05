@@ -2,7 +2,8 @@ from collections import defaultdict
 from typing import DefaultDict
 
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, QuerySet
+from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
@@ -17,11 +18,17 @@ class FulfilmentStatus(models.IntegerChoices):
 
 
 class OrderItem(AbstractModel):
-    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, null=True)
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, null=True, db_index=True)
     product_variation = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, null=True, db_index=True)
     quantity = models.IntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=3)
     fulfilment_status = models.IntegerField(choices=FulfilmentStatus.choices, default=FulfilmentStatus.PENDING)
+    fulfill_datetime = models.DateTimeField(default=None, null=True)
+
+    def fulfill(self):
+        OrderItem.objects.filter(id=self.id).update(
+            fulfilment_status=FulfilmentStatus.FULFILLED,
+            fulfill_datetime=Now())
 
     class Meta:
         indexes = [
@@ -56,3 +63,8 @@ class OrderItem(AbstractModel):
         ret = defaultdict(lambda: 0)
         ret.update({s['product_variation_id']: s['total_count'] for s in qs})
         return ret
+
+    @classmethod
+    def sorted_pending_order_items(cls) -> QuerySet:
+        return cls.objects.filter(fulfilment_status=FulfilmentStatus.PENDING) \
+            .order_by('shipment__order__order_time')
