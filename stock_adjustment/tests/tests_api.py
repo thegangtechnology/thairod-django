@@ -4,7 +4,6 @@ from core.tests import BaseTestSimpleApiMixin
 from product.models import ProductVariation
 from stock_adjustment.models import StockAdjustment
 from thairod.utils.test_util import APITestCase
-from user.models import User
 from warehouse.models import Warehouse
 
 
@@ -24,7 +23,3 @@ class StockAdjustmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
             "product_variation": self.product_variation.pk,
             "reason": "random text"
         }
-
-    def test_stock_adjustments_check_auth(self):
-        self.client.force_authenticate(User.objects.none())
-        print(self.client)
