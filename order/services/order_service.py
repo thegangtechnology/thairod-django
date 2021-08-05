@@ -158,7 +158,9 @@ class OrderService:
             receiver_address=address,
             cid=param.patient.cid,
             orderer_name=param.doctor.name,
-            orderer_license=param.doctor.license
+            orderer_license=param.doctor.license,
+            line_id=param.line_id,
+            telemed_session_id=param.session_id
         )
 
     def create_shipment(self, param: CreateOrderParameter, order: Order) -> Shipment:

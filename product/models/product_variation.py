@@ -23,6 +23,8 @@ class ProductVariation(AbstractModel):
     unit = models.CharField(max_length=6,
                             choices=ProductVariationUnit.choices,
                             default=ProductVariationUnit.PIECES)
+    # reject order if ordered previously with the same cid
+    reject_order_on_duplicate_cid = models.BooleanField(default=False)
 
     @classmethod
     def example(cls) -> ProductVariation:

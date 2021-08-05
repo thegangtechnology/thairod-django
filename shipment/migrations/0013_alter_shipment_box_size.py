@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='shipment',
             name='box_size',
-            field=models.ForeignKey(default=shipment.models.box_size.BoxSize.get_default_box_id, null=True, on_delete=django.db.models.deletion.RESTRICT, to='shipment.boxsize'),
+            field=models.ForeignKey(default=1, null=True, on_delete=django.db.models.deletion.RESTRICT, to='shipment.boxsize'),
         ),
     ]

@@ -17,6 +17,7 @@ from shipment.models.box_size import BoxSize
 from stock_adjustment.models import StockAdjustment
 from user.models import User
 from warehouse.models import Warehouse
+from warehouse.models.default_warehouse import DefaultWarehouse
 
 
 def load_seed():
@@ -63,6 +64,9 @@ def load_seed():
     seeder.add_entity(User, 1)
     seeder.add_entity(BatchShipment, 1)
     seeder.execute(turn_off_auto_now=False)
+    DefaultWarehouse.objects.update_or_create(id=1, defaults={
+        'default_warehouse': Warehouse.objects.first()
+    })
 
 
 @dataclass
@@ -83,6 +87,10 @@ class RealisticSeed:
         warehouse.address.save()
         warehouse.save()
         seed.warehouses.append(warehouse)
+
+        DefaultWarehouse.objects.update_or_create(id=1, defaults={
+            'default_warehouse': warehouse
+        })
 
         product = Product.example()
         product.save()
@@ -177,5 +185,8 @@ def load_meaningful_seed():
     warehouse = Warehouse.example()
     warehouse.address.save()
     warehouse.save()
+    DefaultWarehouse.objects.update_or_create(id=1, defaults={
+        'default_warehouse': Warehouse.objects.first()
+    })
     orders = [OrderService().create_order(CreateOrderParameter.example_with_valid_item()) for _ in range(5)]
     return orders
