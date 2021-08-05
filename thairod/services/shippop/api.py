@@ -5,8 +5,6 @@ import requests
 from thairod.services.shippop.data import OrderData, OrderResponse, TrackingData, OrderLineResponse, TrackingState, \
     ParcelData, Pricing
 from thairod.settings import SHIPPOP_API_KEY, SHIPPOP_URL
-
-
 # flake8: noqa
 from thairod.utils.exceptions import ShippopAPIException
 
@@ -21,7 +19,7 @@ class ShippopAPI:
         r = requests.request("POST", f"{self.url}/{path}", json=payload)
         r_json = r.json()
         if not r_json['status']:
-            raise ShippopAPIException(r_json['message'])
+            raise ShippopAPIException(r_json['notice'])
         return r_json
 
     def create_order(self, order_data: OrderData) -> OrderResponse:

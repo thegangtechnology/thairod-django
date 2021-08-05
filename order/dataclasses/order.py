@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from order.dataclasses.cart_item import CartItem
 from order.dataclasses.doctor import Doctor
@@ -22,7 +22,7 @@ class CreateOrderParameter(AutoSerialize):
     items: List[CartItem]
 
     @classmethod
-    def example(cls) -> CreateOrderParameter:
+    def example(cls, items: Optional[List[CartItem]] = None) -> CreateOrderParameter:
         return cls(
             account='frappet',
             doctor=Doctor.example(),
@@ -30,7 +30,7 @@ class CreateOrderParameter(AutoSerialize):
             shipping_address=ShippingAddress.example(),
             line_id="12321",
             session_id="AAABB2134",
-            items=[CartItem.example()])
+            items=[CartItem.example()] if items is None else items)
 
     @classmethod
     def example_with_valid_item(cls):

@@ -24,6 +24,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from thairod.views.ipcheck import IPCheckView
+from thairod.views.stock_api import StockAPI
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -56,5 +57,6 @@ urlpatterns = [
     re_path(r'^docs/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('ping/', IPCheckView.as_view(), name='ip-check')
+    path('ping/', IPCheckView.as_view(), name='ip-check'),
+    path('api/stock/', StockAPI.as_view(), name='get-stock')
 ]

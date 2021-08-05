@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase as ATC
 
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderResponse, OrderLineResponse
+from thairod.settings import SHIPPOP_DEFAULT_COURIER_CODE
 from thairod.utils.load_seed import load_seed
 from user.models import User
 
@@ -30,6 +31,7 @@ def mocked_create_order_response() -> OrderResponse:
                 discount=Decimal(10),
                 from_address=None,
                 to_address=None,
+                courier_code=SHIPPOP_DEFAULT_COURIER_CODE,
                 courier_tracking_code='c_track'
             )
         ]
@@ -47,21 +49,21 @@ def patch_shippop(cls):
 
 class TestCase(TC):
     patch_external = True
-    with_db = True
+    with_seed = True
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         if cls.patch_external:
             patch_line_bot_api(cls)
-        if cls.with_db:
+        if cls.with_seed:
             load_seed()
 
 
 class APITestCase(ATC):
     patch_line = True
     patch_shippop = True
-    with_db = True
+    with_seed = True
     login = True
 
     def set_up_user(self, is_staff=True, is_superuser=False):
@@ -80,5 +82,5 @@ class APITestCase(ATC):
             patch_line_bot_api(cls)
         if cls.patch_shippop:
             patch_shippop(cls)
-        if cls.with_db:
+        if cls.with_seed:
             load_seed()

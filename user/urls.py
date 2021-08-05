@@ -8,4 +8,5 @@ router.register(r'users', views.UserModelViewSet, basename="user")
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('current_user/', views.CurrentUserAPIView.as_view(), name="current-user"),
 ]

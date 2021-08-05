@@ -14,5 +14,9 @@ class BoxSize(AbstractModel):
     rank = models.IntegerField()  # priority when determining appropriate box size
 
     @classmethod
+    def get_default_box_id(cls) -> int:
+        return cls.get_default_box().id
+
+    @classmethod
     def get_default_box(cls) -> BoxSize:
         return cls.objects.filter(name=DEFAULT_BOX_SIZE).first()
