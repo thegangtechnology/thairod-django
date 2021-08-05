@@ -6,7 +6,8 @@ from thairod.utils.test_util import APITestCase
 from user.models import User
 
 
-class UserAPITestCase(APITestCase, BaseTestSimpleApiMixin):
+class UserAPITestCase(APITestCase):
+
 
     def setUp(self):
         self.model = User
