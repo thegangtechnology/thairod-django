@@ -16,7 +16,7 @@ from thairod.utils.decorators import ip_whitelist
 
 
 class CreateOrderFlowsAPI(GenericAPIView):
-    @ip_whitelist(TELEMED_WHITELIST)
+    @ip_whitelist(TELEMED_WHITELIST, allow_all_if_debug=True)
     @swagger_auto_serialize_schema(CreateOrderFlowRequest, OrderFlowResponse)
     def post(self, request: Request) -> Response:
         param = CreateOrderFlowRequest.from_post_request(request)
