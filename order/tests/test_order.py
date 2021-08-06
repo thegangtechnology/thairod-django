@@ -73,7 +73,7 @@ class TestOrderItemTotal(TestCase):
             self.seed.product_variations[0].id: 10,
             self.seed.product_variations[1].id: 25,
         })
-        self.assertEqual(got[30], 0)
+        self.assertEqual(got[99998888], 0)
 
     def test_total_pending(self):
         total = OrderItem.total_pending_for_id(self.seed.product_variations[0].id)
