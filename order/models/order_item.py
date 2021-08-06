@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from typing import DefaultDict
 
@@ -9,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from core.models import AbstractModel
 from product.models import ProductVariation
 from shipment.models import Shipment
+
+logger = logging.getLogger(__name__)
 
 
 class FulfilmentStatus(models.IntegerChoices):
@@ -29,6 +32,7 @@ class OrderItem(AbstractModel):
         OrderItem.objects.filter(id=self.id).update(
             fulfilment_status=FulfilmentStatus.FULFILLED,
             fulfill_datetime=Now())
+        logger.info(f'Fulfill: oi_id: {self.id:d}, pv_id: {self.product_variation_id: d}')
 
     class Meta:
         indexes = [

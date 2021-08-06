@@ -4,6 +4,7 @@ from typing import List
 
 from django.http import HttpResponseForbidden
 
+from thairod.settings import DEBUG
 from thairod.utils.html_tools import get_client_ip
 
 logger = logging.getLogger(__name__)
@@ -25,13 +26,13 @@ def swagger_example(example):
     return decorator
 
 
-def ip_whitelist(ip_list: List[str]):
+def ip_whitelist(ip_list: List[str], allow_all_if_debug=False):
     def decorator(f):
         @functools.wraps(f)
         def ret(self, request, *arg, **kwds):
             ip = get_client_ip(request)
-
-            if ip in ip_list:
+            allow_while_debug = DEBUG and allow_all_if_debug
+            if allow_while_debug or ip in ip_list:
                 return f(self, request, *arg, **kwds)
             else:
                 msg = f'Access Denied for {ip}'

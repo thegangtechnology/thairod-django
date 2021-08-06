@@ -20,3 +20,10 @@ class CartItem(AutoSerialize):
             for item in order.get('items'):
                 lst.append(CartItem(**item))
         return lst
+
+    @classmethod
+    def from_doctor_order_response(cls, order) -> 'List[CartItem]':
+        lst = []
+        for item in order.items:
+            lst.append(CartItem(item_id=item.id, quantity=item.quantity))
+        return lst

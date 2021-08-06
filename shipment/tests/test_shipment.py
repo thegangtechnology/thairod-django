@@ -4,7 +4,8 @@ from rest_framework import status
 from core.tests import BaseTestSimpleApiMixin
 from order.models import Order
 from shipment.models import Shipment, TrackingStatus, BatchShipment
-from thairod.utils.test_util import APITestCase
+from thairod.utils.load_seed import RealisticSeed
+from thairod.utils.test_util import APITestCase, TestCase
 from warehouse.models import Warehouse
 
 
@@ -44,3 +45,17 @@ class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         response = self.client.post(url, {"batch_name": None}, format='json')
         self.assertEqual(response.data, 'Batch Name is None.')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestShipment(TestCase):
+    with_seed = False
+
+    def setUp(self):
+        self.seed = RealisticSeed.load_realistic_seed()
+        self.seed.full_production()
+
+    def test_ready_to_ship(self):
+        shipments = Shipment.ready_to_book_shipments()
+        for shipment in shipments:
+            self.assertTrue(shipment.is_ready_to_book)
+        self.assertEqual(len(shipments), 6)

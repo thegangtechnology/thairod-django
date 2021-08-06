@@ -4,8 +4,6 @@ from django.urls import reverse
 
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
-from shipment.models.box_size import BoxSize
-from thairod.services.shippop.data import ParcelData
 from thairod.utils.test_util import TestCase, APITestCase
 
 
@@ -24,14 +22,6 @@ class TestCreateOrder(TestCase):
         order = Order.objects.get(pk=res.order_id)
         self.assertEqual(order.line_id, param.line_id)
         self.assertEqual(order.telemed_session_id, param.session_id)
-
-    def test_parcel_adapter(self):
-        box = BoxSize(name="G2", width=1, height=2, length=3)
-        parcel = OrderService().parcel_adapter(box, name="test")
-        expect = ParcelData(name="test", width=1, height=2, length=3)
-        self.assertEqual(
-            parcel, expect
-        )
 
 
 class TestCreateOrderAPI(APITestCase):

@@ -1,7 +1,8 @@
 from os.path import join, dirname
+from typing import Optional
 
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
@@ -43,10 +44,16 @@ class PrintLabelView(APIView):
         )
         if not param.shipments:
             return HttpResponseBadRequest('Empty Shipments.')
-        return HttpResponse(self.generate_label(param))
+        label = self.generate_label(param)
+        if label is not None:
+            return HttpResponse(label)
+        else:
+            return HttpResponseNotFound('None of the shipment has valid tracking code')
 
-    def generate_label(self, param: PrintLabelParam) -> str:
-        shipments = Shipment.objects.filter(id__in=param.shipments)
+    def generate_label(self, param: PrintLabelParam) -> Optional[str]:
+        shipments = Shipment.objects.filter(id__in=param.shipments).exclude(tracking_code__isnull=True).all()
+        if len(shipments) == 0:
+            return None
         shippop = ShippopAPI()
         label_html = shippop.print_multiple_labels(tracking_codes=[s.tracking_code for s in shipments])
         labels = split_print_label(label_html)

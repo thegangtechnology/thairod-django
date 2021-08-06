@@ -6,7 +6,7 @@ from thairod.utils.test_util import TestCase
 
 class TestOrderFlowService(TestCase):
 
-    # TODO: More test after this week
+    # TODO: More test
     def test_create_order_flow(self):
         # minimal test because this is supposedly to be for next week
         old_count = OrderFlow.objects.count()
