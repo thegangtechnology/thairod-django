@@ -95,8 +95,8 @@ class OrderService:
         )
 
     def determine_box_size(self, param: CreateOrderParameter) -> BoxSize:
-        # Fix this in the future to do something meaningful
-        return BoxSize.get_default_box()
+        pv_ids = [it.item_id for it in param.items]
+        return BoxSize.determine_box_size_by_pv_ids(pv_ids)
 
     def create_order_items(self, param: CreateOrderParameter,
                            shipment: Shipment) -> List[OrderItem]:

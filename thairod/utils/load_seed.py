@@ -39,7 +39,8 @@ def load_seed():
     })
     seeder.execute(turn_off_auto_now=False)
     seeder.add_entity(ProductVariation, 3, {
-        'product': Product.objects.first()
+        'product': Product.objects.first(),
+        'preferred_box_size': BoxSize.get_default_box()
     })
     seeder.execute(turn_off_auto_now=False)
     seeder.add_entity(OrderItem, 5)
@@ -92,16 +93,21 @@ class RealisticSeed:
             'default_warehouse': warehouse
         })
 
+        a_box = BoxSize.objects.create(name='A', width=16, length=11, height=7, rank=50)
+        aa_box = BoxSize.objects.create(name='AA', width=13, length=17, height=7, rank=20)
+
         product = Product.example()
         product.save()
         seed.products.append(product)
 
         product_variation = ProductVariation.example()
         product_variation.product = product
+        product_variation.preferred_box_size = a_box
         product_variation.save()
 
         product_variation2 = ProductVariation.example()
         product_variation2.product = product
+        product_variation2.preferred_box_size = aa_box
         product_variation2.save()
 
         seed.product_variations.append(product_variation)
@@ -154,14 +160,14 @@ class RealisticSeed:
         }
         for pv_id, quantities in order_map.items():
             for i, quantity in enumerate(quantities):
-                order = self.create_one_order(pv_id, quantity=quantity)
+                cart = CartItem(item_id=pv_id, quantity=quantity)
+                order = self.create_one_order([cart])
                 if i % 2 == 0:
                     for oi in order.shipment.orderitem_set.all():
                         oi.fulfill()
 
-    def create_one_order(self, product_variation_id: int, quantity: int) -> RawOrder:
-        cart = CartItem(item_id=product_variation_id, quantity=quantity)
-        param = CreateOrderParameter.example(items=[cart])
+    def create_one_order(self, cart_items: List[CartItem]) -> RawOrder:
+        param = CreateOrderParameter.example(items=cart_items)
         order = OrderService().create_raw_order(param)
         return order
 
@@ -173,20 +179,3 @@ def load_realistic_seed() -> RealisticSeed:
 
     """
     return RealisticSeed.load_realistic_seed()
-
-
-def load_meaningful_seed():
-    seeder = Seed.seeder()
-    seeder.add_entity(Product, 1)
-    seeder.add_entity(ProductImage, 1)
-    seeder.add_entity(ProductVariation, 3)
-    seeder.execute(turn_off_auto_now=False)
-
-    warehouse = Warehouse.example()
-    warehouse.address.save()
-    warehouse.save()
-    DefaultWarehouse.objects.update_or_create(id=1, defaults={
-        'default_warehouse': Warehouse.objects.first()
-    })
-    orders = [OrderService().create_order(CreateOrderParameter.example_with_valid_item()) for _ in range(5)]
-    return orders
