@@ -65,7 +65,8 @@ class ShippopAPI:
             Type: html, pdf
         """
         resp = self.shippop_request(path="label_tracking_code/",
-                                    payload={"tracking_code": ",".join(tracking_codes), "size": size,
+                                    payload={"tracking_code": ",".join(tracking_codes),
+                                             "size": size,
                                              "type": label_type})
         return resp[label_type]
 

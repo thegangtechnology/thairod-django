@@ -4,8 +4,6 @@ from django.urls import reverse
 
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
-from shipment.models.box_size import BoxSize
-from thairod.services.shippop.data import ParcelData
 from thairod.utils.test_util import TestCase, APITestCase
 
 

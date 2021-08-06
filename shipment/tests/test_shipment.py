@@ -56,4 +56,6 @@ class TestShipment(TestCase):
 
     def test_ready_to_ship(self):
         shipments = Shipment.ready_to_book_shipments()
-        self.assertEqual(len(shipments), 4)
+        for shipment in shipments:
+            self.assertTrue(shipment.is_ready_to_book)
+        self.assertEqual(len(shipments), 6)

@@ -49,7 +49,8 @@ class Shipment(AbstractModel):
         from order.models.order_item import FulfilmentStatus
         has_pending = OrderItem.objects.filter(
             shipment_id=OuterRef('id'),
-        ).exclude(fulfilment_status=FulfilmentStatus.PENDING)
+            fulfilment_status=FulfilmentStatus.PENDING
+        )
         return Shipment.objects.annotate(has_pending=Exists(has_pending))
 
     @classmethod
@@ -69,6 +70,7 @@ class Shipment(AbstractModel):
         qs = cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
                                                cancelled=False,
                                                has_pending=False)
+
         return qs.all()
 
     @property

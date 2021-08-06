@@ -1,9 +1,9 @@
+import logging
 from typing import Iterable, DefaultDict
 
 from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
-from order.services.order_service import OrderService
 from shipment.models import Shipment, TrackingStatus
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
@@ -16,6 +16,8 @@ from thairod.settings import SHIPPOP_EMAIL
 ItemVariationID = int
 StockCount = int
 
+logger = logging.getLogger(__name__)
+
 
 class FulFilmentService:
 
@@ -25,7 +27,6 @@ class FulFilmentService:
             stock = StockService().get_single_stock(oi.product_variation_id)
             if stock.current_total > 0:
                 oi.fulfill()
-
         self.book_and_confirm_shipment(shipment)
 
     def fulfill_pending_order_items(self):
@@ -37,6 +38,7 @@ class FulFilmentService:
 
     def book_and_confirm_all_pending_shipments(self):
         shipments = Shipment.ready_to_book_shipments()
+
         for shipment in shipments:
             self.book_and_confirm_shipment(shipment)
 
@@ -48,7 +50,9 @@ class FulFilmentService:
 
     def book_and_confirm_shipment(self, shipment):
         if not shipment.is_ready_to_book:
+            logger.info(f'Attempt to book and confirm non fulfilled shipment {shipment.id}')
             return
+
         res = self.add_shipment_to_shippop(shipment)
         self.update_shipment_with_shippop_booking(res, shipment)
 
@@ -56,6 +60,7 @@ class FulFilmentService:
         self.update_shipment_with_confirmation(shipment)
 
         self.order_confirmed_call_back(shipment)
+        logger.info(f'Book and Confirm Shipment id: f{shipment.id}')
 
     def order_confirmed_call_back(self, shipment: Shipment):
         self.notify_user_with_tracking(shipment)
