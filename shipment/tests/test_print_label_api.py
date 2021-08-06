@@ -34,3 +34,12 @@ class TestPrintLabelAPI(APITestCase):
         self.set_up_user()
         res = self.client.get(reverse('simple-shipment-list'))
         self.assertEqual(res.status_code, 200)
+
+    def test_print_label_api_not_found(self):
+        self.set_up_user()
+        param = CreateOrderParameter.example_with_valid_item()
+        ros = [OrderService().create_order_no_callback(param) for _ in range(2)]
+        for ro in ros:
+            FulFilmentService().attempt_fulfill_shipment(ro.shipment)
+        res = self.client.get(reverse('print-label'), {"shipments": [999888]})
+        self.assertEqual(res.status_code, 404)

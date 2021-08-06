@@ -54,6 +54,10 @@ class Shipment(AbstractModel):
         return Shipment.objects.annotate(has_pending=Exists(has_pending))
 
     @classmethod
+    def ready_to_ship_shipments(cls) -> QuerySet:
+        return Shipment.objects.filter(status=ShipmentStatus.CONFIRMED)
+
+    @classmethod
     def pending_shipments(cls) -> QuerySet:
         return cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
                                                  cancelled=False,
