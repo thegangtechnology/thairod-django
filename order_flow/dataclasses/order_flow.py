@@ -55,7 +55,6 @@ class OrderFlowResponse(AutoSerialize):
         doctor_order_data = None
         patient_confirmation_data = None
         patient_link_hash_timestamp_data = None
-        # TODO: Refactor to respected class.from_order_flow
         if order_flow.doctor_order:
             is_confirmed = order_flow.patient_link_hash is not None
             doctor_order_data = DoctorOrderResponse.from_doctor_order_dict(doctor_order=dict(**order_flow.doctor_order),
