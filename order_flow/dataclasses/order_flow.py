@@ -3,11 +3,9 @@ from thairod.utils.auto_serialize import AutoSerialize
 from order.dataclasses.doctor import Doctor
 from order.dataclasses.patient import Patient
 from order.dataclasses.shipping_address import ShippingAddress
-from product.models.product_variation import ProductVariationUnit, ProductVariation
-from order.dataclasses.cart_item import CartItem
 from order_flow.models import OrderFlow
-from typing import List, Optional
-from django.db.models import JSONField
+from typing import Optional
+from order_flow.dataclasses.doctor_order import DoctorOrderResponse
 
 
 @dataclass
@@ -28,92 +26,6 @@ class CreateOrderFlowRequest(AutoSerialize):
             shipping_address=ShippingAddress.example(),
             line_id="",
             session_id="AAABB2134")
-
-
-@dataclass
-class DoctorOrder(AutoSerialize):
-    items: List[CartItem]
-
-    @classmethod
-    def example(cls):
-        return cls(
-            items=[CartItem.example()])
-
-
-@dataclass
-class OrderedProductInfo(AutoSerialize):
-    id: int
-    name: str
-    price: int
-    description: str
-    unit: str
-    quantity: int
-
-    @classmethod
-    def from_cart_item(cls, cart_item: CartItem):
-        product_variation = ProductVariation.objects.get(pk=cart_item.item_id)
-        return cls(id=product_variation.id,
-                   name=product_variation.name,
-                   price=product_variation.price,
-                   description=product_variation.description,
-                   unit=product_variation.unit,
-                   quantity=cart_item.quantity
-                   )
-
-    @classmethod
-    def example(cls):
-        return cls(id=1,
-                   name='product 1',
-                   price=10,
-                   description='product 1 description',
-                   unit=ProductVariationUnit.PIECES.value,
-                   quantity=5)
-
-
-@dataclass
-class DoctorOrderResponse(AutoSerialize):
-    items: List[OrderedProductInfo]
-    is_confirmed: bool
-
-    @classmethod
-    def from_doctor_order_dict(cls, doctor_order: dict, is_confirmed: bool = False):
-        items = doctor_order.get('items', None)
-        lst = []
-        if items:
-            for cart_item in items:
-                lst.append(OrderedProductInfo.from_cart_item(cart_item=CartItem(**cart_item)))
-        return cls(is_confirmed=is_confirmed,
-                   items=lst)
-
-    @classmethod
-    def example(cls):
-        return cls(
-            is_confirmed=True,
-            items=[OrderedProductInfo.example()])
-
-
-@dataclass
-class CheckoutDoctorOrderRequest(AutoSerialize):
-    doctor_link_hash: str
-    doctor_order: DoctorOrder
-
-    @classmethod
-    def example(cls):
-        return cls(
-            doctor_link_hash='vKgejBAIPFfd8vgvG45J0nO1Zx6B79c02wa9a8cD5c',
-            doctor_order=DoctorOrder.example())
-
-
-@dataclass
-class PatientConfirmationRequest(AutoSerialize):
-    patient_link_hash: str
-    address: ShippingAddress
-
-    @classmethod
-    def example(cls):
-        return cls(
-            patient_link_hash='vKgejBAIPFfd8vgvG45J0nO1Zx6B79c02wa9a8cD5c',
-            address=ShippingAddress.example())
 
 
 @dataclass
