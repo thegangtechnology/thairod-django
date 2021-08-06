@@ -25,14 +25,6 @@ class TestCreateOrder(TestCase):
         self.assertEqual(order.line_id, param.line_id)
         self.assertEqual(order.telemed_session_id, param.session_id)
 
-    def test_parcel_adapter(self):
-        box = BoxSize(name="G2", width=1, height=2, length=3)
-        parcel = OrderService().parcel_adapter(box, name="test")
-        expect = ParcelData(name="test", width=1, height=2, length=3)
-        self.assertEqual(
-            parcel, expect
-        )
-
 
 class TestCreateOrderAPI(APITestCase):
     def test_create_order_api(self):

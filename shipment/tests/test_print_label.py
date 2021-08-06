@@ -10,12 +10,16 @@ from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
 from shipment.views.print_label_views import PrintLabelView
 from thairod.services.shippop.tests import load_test_data
+from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase
 
 
 class TestPrintLabel(TestCase):
+    with_seed = False
 
     def setUp(self):
+        self.seed = RealisticSeed.load_realistic_seed()
+        self.seed.full_production()
         self.label_html_file = join(dirname(__file__), './ttt.html')
         with open(self.label_html_file) as f:
             self.label_html = f.read()

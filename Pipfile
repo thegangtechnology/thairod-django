@@ -23,6 +23,7 @@ djangorestframework-simplejwt = "*"
 beautifulsoup4 = "*"
 line-bot-sdk = "*"
 django-filter = "*"
+sqlparse = "*"
 
 [dev-packages]
 

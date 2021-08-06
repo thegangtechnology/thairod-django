@@ -2,11 +2,17 @@ from django.urls import reverse
 
 from order.dataclasses.order import CreateOrderParameter
 from order.services.order_service import OrderService
+from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import APITestCase
 
 
 class TestPrintLabelAPI(APITestCase):
     patch_shippop = False
+    with_seed = False
+
+    def setUp(self):
+        self.seed = RealisticSeed.load_realistic_seed()
+        self.seed.full_production()
 
     def test_sample_label(self):
         # note no login
