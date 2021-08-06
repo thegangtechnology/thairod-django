@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterable
 
 from django.db import models
-from django.db.models import OuterRef, Exists
+from django.db.models import OuterRef, Exists, QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
@@ -43,6 +43,21 @@ class Shipment(AbstractModel):
     box_size = models.ForeignKey(BoxSize, null=False, default=BoxSize.get_default_box_id, on_delete=models.RESTRICT)
     cancelled = models.BooleanField(default=False)
 
+    @classmethod
+    def _annotated_shipments(cls):
+        from order.models import OrderItem
+        from order.models.order_item import FulfilmentStatus
+        has_pending = OrderItem.objects.filter(
+            shipment_id=OuterRef('id'),
+        ).exclude(fulfilment_status=FulfilmentStatus.PENDING)
+        return Shipment.objects.annotate(has_pending=Exists(has_pending))
+
+    @classmethod
+    def pending_shipments(cls) -> QuerySet:
+        return cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
+                                                 cancelled=False,
+                                                 has_pending=True)
+
     def cancel_shipment(self):
         from order.models.order_item import FulfilmentStatus
         self.cancelled = True
@@ -51,14 +66,9 @@ class Shipment(AbstractModel):
 
     @classmethod
     def ready_to_book_shipments(cls) -> Iterable[Shipment]:
-        from order.models.order_item import FulfilmentStatus, OrderItem
-
-        has_pending = OrderItem.objects.filter(
-            shipment_id=OuterRef('id'),
-        ).exclude(fulfilment_status=FulfilmentStatus.PENDING)
-        qs = Shipment.objects.annotate(has_pending=Exists(has_pending)).filter(has_pending=False,
-                                                                               status=ShipmentStatus.CREATED,
-                                                                               cancelled=False)
+        qs = cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
+                                               cancelled=False,
+                                               has_pending=False)
         return qs.all()
 
     @property
