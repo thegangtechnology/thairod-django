@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Iterable
+
 from django.db import models
+from django.db.models import OuterRef, Exists, QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
@@ -13,7 +16,6 @@ from warehouse.models import Warehouse
 class ShipmentStatus(models.TextChoices):
     # Shippop process status
     CREATED = 'CREATED', _('Order for shipment created')
-    FULFILLED = 'FULFILLED', _('Shipment is fulfilled')
     BOOKED = 'BOOKED', _('Book shipment to Shippop')
     # Our delivery status
     CONFIRMED = 'CONFIRMED', _('Confirmed shipment')  # ที่ต้องจัดส่ง
@@ -39,6 +41,45 @@ class Shipment(AbstractModel):
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True, blank=True)
     box_size = models.ForeignKey(BoxSize, null=False, default=BoxSize.get_default_box_id, on_delete=models.RESTRICT)
+    cancelled = models.BooleanField(default=False)
+
+    @classmethod
+    def _annotated_shipments(cls):
+        from order.models import OrderItem
+        from order.models.order_item import FulfilmentStatus
+        has_pending = OrderItem.objects.filter(
+            shipment_id=OuterRef('id'),
+        ).exclude(fulfilment_status=FulfilmentStatus.PENDING)
+        return Shipment.objects.annotate(has_pending=Exists(has_pending))
+
+    @classmethod
+    def pending_shipments(cls) -> QuerySet:
+        return cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
+                                                 cancelled=False,
+                                                 has_pending=True)
+
+    def cancel_shipment(self):
+        from order.models.order_item import FulfilmentStatus
+        self.cancelled = True
+        for oi in self.orderitem_set.all():
+            oi.fulfilment_status = FulfilmentStatus.CANCELLED
+
+    @classmethod
+    def ready_to_book_shipments(cls) -> Iterable[Shipment]:
+        qs = cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
+                                               cancelled=False,
+                                               has_pending=False)
+        return qs.all()
+
+    @property
+    def is_ready_to_book(self):
+        return self.status == ShipmentStatus.CREATED and self.has_no_pending
+
+    @property
+    def has_no_pending(self):
+        from order.models.order_item import FulfilmentStatus
+        has_pending = self.orderitem_set.filter(fulfilment_status=FulfilmentStatus.PENDING).exists()
+        return not has_pending
 
     @classmethod
     def example(cls) -> Shipment:

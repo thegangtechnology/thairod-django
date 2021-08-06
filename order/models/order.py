@@ -12,6 +12,7 @@ class OrderStatus(models.TextChoices):
     STARTED = 'STARTED', _('Doctor created')
     CHECKED_OUT = 'CHECKED_OUT', _('Payment is made')
     EXPIRED = 'EXPIRED', _('More than 24 hr. No effect on stock')
+    CANCELLED = 'CANCELLED', _('Cancelled')
 
 
 class Order(AbstractModel):
