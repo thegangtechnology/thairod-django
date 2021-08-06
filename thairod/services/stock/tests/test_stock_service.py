@@ -33,10 +33,10 @@ class TestStockService(TestCase):
 
     def test_stock_map(self):
         stocks = StockService().get_all_stock_map()
-        self.assertEqual(dict(stocks),
-                         {
-                             self.seed.product_variations[0].id: StockInfo(fulfilled=4, procured=30, adjustment=35,
-                                                                           pending=3),
-                             self.seed.product_variations[1].id: StockInfo(fulfilled=2, procured=40, adjustment=10,
-                                                                           pending=1)
-                         })
+        pv_id0 = self.seed.product_variations[0].id
+        pv_id1 = self.seed.product_variations[1].id
+        exp = {
+            pv_id0: StockInfo(fulfilled=4, procured=30, adjustment=35, pending=3),
+            pv_id1: StockInfo(fulfilled=2, procured=40, adjustment=10, pending=1)
+        }
+        self.assertEqual(dict(stocks), exp)

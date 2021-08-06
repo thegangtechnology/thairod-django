@@ -16,6 +16,7 @@ from thairod.utils.test_util import TestCase
 
 class TestPrintLabel(TestCase):
     with_seed = False
+
     def setUp(self):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.full_production()
