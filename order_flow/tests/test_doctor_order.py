@@ -1,7 +1,6 @@
 from order_flow.dataclasses import DoctorOrderResponse
-from thairod.utils.test_util import TestCase
-from order.dataclasses.cart_item import CartItem
 from thairod.utils.load_seed import load_realistic_seed
+from thairod.utils.test_util import TestCase
 
 
 class TestDoctorOrder(TestCase):
