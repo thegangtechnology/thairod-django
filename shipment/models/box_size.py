@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import List
+
 from django.db import models
 
 from core.models import AbstractModel
@@ -11,6 +13,12 @@ class BoxSize(AbstractModel):
     length = models.IntegerField()  # cm
     height = models.IntegerField()  # cm
     rank = models.IntegerField()  # priority when determining appropriate box size
+
+    @classmethod
+    def determine_box_size_by_pv_ids(cls, pv_ids: List[int]) -> BoxSize:
+        from product.models import ProductVariation
+        pv = ProductVariation.objects.filter(id__in=pv_ids).order_by('-preferred_box_size__rank').first()
+        return pv.preferred_box_size
 
     @classmethod
     def get_default_box_id(cls) -> int:
