@@ -1,6 +1,7 @@
 from order_flow.dataclasses import CreateOrderFlowRequest
 from order_flow.models import OrderFlow
 from order_flow.services import OrderFlowService
+from order_flow.dataclasses.order_flow import OrderFlowResponse
 from thairod.utils.test_util import TestCase
 
 
@@ -13,3 +14,6 @@ class TestOrderFlowService(TestCase):
         OrderFlowService().create_order_flow(create_order_flow_request=CreateOrderFlowRequest.example())
         new_count = OrderFlow.objects.count()
         self.assertEqual(old_count + 1, new_count)
+
+    def test_order_flow_to_create_order_flow_request(self):
+        OrderFlowService().construct_create_order_parameter_from_order_flow_response(OrderFlowResponse.example())

@@ -42,9 +42,13 @@ class OrderFlowService:
 
     def construct_create_order_parameter_from_order_flow(self, order_flow: OrderFlow) -> CreateOrderParameter:
         order_flow_response = OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
+        return self.construct_create_order_parameter_from_order_flow_response(order_flow_response=order_flow_response)
+
+    def construct_create_order_parameter_from_order_flow_response(self, order_flow_response: OrderFlowResponse) \
+            -> CreateOrderParameter:
         create_order_parameter = CreateOrderParameter(account=order_flow_response.doctor_info.account,
-                                                      doctor=Doctor(**order_flow_response.doctor_info.doctor),
-                                                      patient=Patient(**order_flow_response.doctor_info.patient),
+                                                      doctor=order_flow_response.doctor_info.doctor,
+                                                      patient=order_flow_response.doctor_info.patient,
                                                       shipping_address=order_flow_response.patient_confirmation,
                                                       line_id=order_flow_response.doctor_info.line_id,
                                                       session_id=order_flow_response.doctor_info.session_id,
