@@ -22,6 +22,7 @@ def patch_line_bot_api(cls):
     line_patch.__enter__()
     cls.addClassCleanup(line_patch.__exit__, None, None, None)
 
+
 def fake_shippop_create_order(self, order_data: OrderData) -> OrderResponse:
     return OrderResponse(
         status=True,

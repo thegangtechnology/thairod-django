@@ -14,7 +14,6 @@ class TestPrintLabelAPI(APITestCase):
     def setUp(self):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.procure_items()
-        #self.seed.full_production()
 
     def test_sample_label(self):
         # note no login
