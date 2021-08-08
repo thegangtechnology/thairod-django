@@ -10,7 +10,7 @@ from order.models.order_item import OrderItem
 from order.serializers import OrderSerializer, OrderItemSerializer
 from order.services.order_service import OrderService
 from thairod.settings import TELEMED_WHITELIST
-from thairod.utils.auto_serialize import swagger_auto_serialize_schema
+from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
 
 
@@ -33,7 +33,7 @@ class CreateOrderAPI(APIView):
 
     # TODO this white list need to be per account
     @ip_whitelist(TELEMED_WHITELIST)
-    @swagger_auto_serialize_schema(CreateOrderParameter, CreateOrderResponse)
+    @swagger_auto_serialize_post_schema(CreateOrderParameter, CreateOrderResponse)
     def post(self, request: Request, format=None) -> Response:
         param = CreateOrderParameter.from_post_request(request)
         service = OrderService()

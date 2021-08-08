@@ -139,15 +139,6 @@ class OrderItem(AbstractModel):
                                          end=created_end)
 
     @classmethod
-    def total_fulfilled_map(cls,
-                            fulfill_begin: Optional[datetime.datetime] = None,
-                            fulfull_end: Optional[datetime.datetime] = None) -> DefaultDict[int, int]:
-        return cls._total_map_for_status(FulfilmentStatus.FULFILLED,
-                                         date_col='fulfill_datetime',
-                                         begin=fulfill_begin,
-                                         end=fulfull_end)
-
-    @classmethod
     def total_ordered_map(cls,
                           created_begin: Optional[datetime.date] = None,
                           created_end: Optional[datetime.date] = None) -> DefaultDict[int, int]:

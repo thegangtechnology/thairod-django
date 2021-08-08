@@ -10,15 +10,20 @@ from typing import DefaultDict, Optional
 from order.models import OrderItem
 from procurement.models import Procurement
 from stock_adjustment.models import StockAdjustment
+from thairod.utils.auto_serialize import AutoSerialize
 
 
 @dataclass
-class StockInfo:
+class StockInfo(AutoSerialize):
     fulfilled: int
     procured: int
     adjustment: int
     ordered: int
     pending: int
+    current_total: Optional[int] = None
+
+    def __post_init__(self):
+        self.current_total = self._current_total()
 
     @classmethod
     def empty(cls) -> StockInfo:
@@ -30,8 +35,17 @@ class StockInfo:
             pending=0
         )
 
-    @property
-    def current_total(self):
+    @classmethod
+    def example(cls) -> StockInfo:
+        return StockInfo(
+            fulfilled=10,
+            procured=30,
+            adjustment=12,
+            ordered=11,
+            pending=5
+        )
+
+    def _current_total(self):
         return self.procured - self.fulfilled + self.adjustment
 
     @classmethod

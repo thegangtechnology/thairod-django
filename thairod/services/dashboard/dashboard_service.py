@@ -4,12 +4,15 @@ from typing import List, Optional
 
 from django.db.models import Func
 from django.db.models import QuerySet
+from django.utils.timezone import now
+from future.backports.datetime import timedelta
 
 from product.models import ProductVariation
 from shipment.models import Shipment
 from shipment.models.shipment import ShipmentStatus
 from thairod import settings
 from thairod.services.stock.stock import StockInfo, StockService
+from thairod.utils.auto_serialize import AutoSerialize
 from thairod.utils.query_util import date_range, to_intervals, round_to_next_nearest_hour
 
 
@@ -19,36 +22,54 @@ class DiffDays(Func):
 
 
 @dataclass
-class ProductVariationSummary:
+class ProductVariationSummary(AutoSerialize):
     pv_id: int
     product_name: str
     pv_name: str
     stock: StockInfo
-    # total_procured: int
-    # total_ordered: int
-    # total_fulfilled: int
-    # total_adjustment: int
-    # total_stock_diff: int = None
-    # total_pending_diff: int = None
-    #
-    # def __post_init__(self):
-    #     self.total_diff = self.total_procured - self.total_fulfilled + self.total_adjustment
-    #     self.total_pending_diff = self.total_ordered - self.total_fulfilled
+
+    @classmethod
+    def example(cls, pv_id: int = 1):
+        return cls(
+            pv_id=pv_id,
+            product_name='product name',
+            pv_name='pv_name',
+            stock=StockInfo.example()
+        )
 
 
 @dataclass
-class DailySummary:
+class DailySummary(AutoSerialize):
     begin: datetime.datetime
     end: datetime.datetime
     total_shipment_created: int  # total shipment created during the time
     total_shipment_confirmed: int  # total confirmed during the time
     product_summaries: List[ProductVariationSummary]
 
+    @classmethod
+    def example(cls, end: Optional[datetime.datetime] = None, begin_is_none: bool = False):
+        end = now() if end is None else end
+        return cls(
+            begin=None if begin_is_none else end - timedelta(days=1),
+            end=end,
+            total_shipment_created=10,
+            total_shipment_confirmed=5,
+            product_summaries=[ProductVariationSummary.example(pv_id=i) for i in range(3)]
+        )
+
 
 @dataclass
-class DashboardSummary:
+class DashboardSummary(AutoSerialize):
     interval_summaries: List[DailySummary]
     cumulative_summaries: List[DailySummary]
+
+    @classmethod
+    def example(cls):
+        dates = date_range(now(), -3)
+        return cls(
+            interval_summaries=[DailySummary.example(end=date) for date in dates],
+            cumulative_summaries=[DailySummary.example(end=date, begin_is_none=True) for date in dates]
+        )
 
 
 class DashboardService:

@@ -37,7 +37,7 @@ class TestSmartEqual(TestCase):
         q = query_util.smart_equal('a', 10)
         self.assertEqual(q.children[0], ('a', 10))
 
-    def test_normal(self):
+    def test_empty(self):
         q = query_util.smart_equal('a', None)
         self.assertEqual(q.children, [])
 

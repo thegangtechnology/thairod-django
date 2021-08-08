@@ -11,13 +11,13 @@ from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRe
     PatientConfirmationRequest, OrderFlowResponse
 from order_flow.services import OrderFlowService
 from thairod.settings import TELEMED_WHITELIST
-from thairod.utils.auto_serialize import swagger_auto_serialize_schema
+from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
 
 
 class CreateOrderFlowsAPI(GenericAPIView):
     @ip_whitelist(TELEMED_WHITELIST, allow_all_if_debug=True)
-    @swagger_auto_serialize_schema(CreateOrderFlowRequest, OrderFlowResponse)
+    @swagger_auto_serialize_post_schema(CreateOrderFlowRequest, OrderFlowResponse)
     def post(self, request: Request) -> Response:
         param = CreateOrderFlowRequest.from_post_request(request)
         service = OrderFlowService()
@@ -44,7 +44,7 @@ class OrderFlowsHashAPI(APIView):
 
 class CheckoutDoctorOrderAPI(GenericAPIView):
 
-    @swagger_auto_serialize_schema(CheckoutDoctorOrderRequest, OrderFlowResponse)
+    @swagger_auto_serialize_post_schema(CheckoutDoctorOrderRequest, OrderFlowResponse)
     def post(self, request: Request) -> Response:
         param = CheckoutDoctorOrderRequest.from_post_request(request)
         service = OrderFlowService()
@@ -53,7 +53,7 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
 
 class PatientConfirmationAPI(GenericAPIView):
 
-    @swagger_auto_serialize_schema(PatientConfirmationRequest, CreateOrderResponse)
+    @swagger_auto_serialize_post_schema(PatientConfirmationRequest, CreateOrderResponse)
     def post(self, request: Request) -> Response:
         param = PatientConfirmationRequest.from_post_request(request)
         service = OrderFlowService()

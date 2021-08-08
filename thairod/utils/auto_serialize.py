@@ -32,7 +32,7 @@ class AutoSerialize:
 
     @classmethod
     def from_get_request(cls: Type[T], request: Request) -> T:
-        return cls.from_data(request.query_params.dict())
+        return cls.from_data(request.query_params.dict())  # List/Repeated isn't supported
 
     @classmethod
     def from_post_request(cls: Type[T], request: Request) -> T:
@@ -59,9 +59,19 @@ class AutoSerialize:
             return Serializer
 
 
-def swagger_auto_serialize_schema(body_type: Optional[Type[AutoSerialize]], response_type: Type[AutoSerialize], **kwds):
+def swagger_auto_serialize_post_schema(body_type: Optional[Type[AutoSerialize]],
+                                       response_type: Type[AutoSerialize], **kwds):
     return swagger_auto_schema(
         request_body=body_type.serializer() if body_type is not None else None,
+        responses={200: response_type.serializer()},
+        **kwds
+    )
+
+
+def swagger_auto_serialize_get_schema(query_type: Optional[Type[AutoSerialize]],
+                                      response_type: Type[AutoSerialize], **kwds):
+    return swagger_auto_schema(
+        query_serializer=query_type.serializer() if query_type is not None else None,
         responses={200: response_type.serializer()},
         **kwds
     )

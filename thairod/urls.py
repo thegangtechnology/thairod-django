@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from thairod.views.dashboard_api import DashboardAPI
 from thairod.views.ipcheck import IPCheckView
 from thairod.views.stock_api import StockAPI
 
@@ -58,5 +59,6 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('ping/', IPCheckView.as_view(), name='ip-check'),
-    path('api/stock/', StockAPI.as_view(), name='get-stock')
+    path('api/stock/', StockAPI.as_view(), name='get-stock'),
+    path('api/dashboard/', DashboardAPI.as_view(), name='dashboard')
 ]
