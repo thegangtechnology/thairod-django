@@ -16,6 +16,7 @@ from datetime import timedelta
 
 import dj_database_url
 import environ
+import pytz
 
 env = environ.Env(
     # set casting, default value
@@ -150,6 +151,7 @@ REST_FRAMEWORK = {
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Bangkok'
+TIME_ZONE_PY = pytz.timezone(TIME_ZONE)
 
 USE_I18N = True
 
@@ -167,7 +169,7 @@ SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
 SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_DEFAULT_COURIER_CODE', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
-
+SHIPPOP_LOT_CUTTING_TIME = 9  # 24 hr format (9 means cut at 9 am everyday)
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', "")
 
 LINE_TRACKING_MESSAGE = """
@@ -186,7 +188,7 @@ SIMPLE_JWT = {
 }
 
 SHELL_PLUS_IMPORTS = [
-    'from thairod.utils.load_seed import load_seed, load_meaningful_seed'
+    'import thairod.utils.load_seed as load_seed'
 ]
 
 CORS_ALLOWED_ORIGINS = [

@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 from bs4 import BeautifulSoup
 
+from order.services.fulfiller_service import FulFilmentService
 from order.views import OrderService, CreateOrderParameter
 from product.models import ProductVariation
 from shipment.dataclasses.print_label import PrintLabelParam
@@ -27,7 +28,7 @@ class TestPrintLabel(TestCase):
 
     def test_split_print_label(self):
         pages = split_print_label(self.label_html)
-        assert len(pages) == 2
+        self.assertEqual(len(pages), 2)
 
     def test_generate_label(self):
         shipments = Shipment.objects.all()
@@ -36,7 +37,16 @@ class TestPrintLabel(TestCase):
             labels=labels, shipments=shipments)
         soup = BeautifulSoup(s, features="html.parser")
         pages = soup.find_all("div", {"class": "page"})
-        assert len(pages) == 4
+        self.assertEqual(len(pages), 4)
+
+
+class TestPrintLabelLive(TestCase):
+    with_seed = False
+    patch_shippop = False
+
+    def setUp(self):
+        self.seed = RealisticSeed.load_realistic_seed()
+        self.seed.procure_items()
 
     def test_print_label_live(self):
         param = CreateOrderParameter.example()
@@ -44,6 +54,8 @@ class TestPrintLabel(TestCase):
         first_order = OrderService().create_order(param)
         second_order = OrderService().create_order(param)
         shipments = Shipment.objects.filter(order_id__in=[first_order.order_id, second_order.order_id])
+        for shipment in shipments:
+            FulFilmentService().attempt_fulfill_shipment(shipment)
         html = PrintLabelView().generate_label(PrintLabelParam(
             shipments=shipments
         ))

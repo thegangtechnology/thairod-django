@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from core.tests import BaseTestSimpleApiMixin
-from order.models import Order
+from order.models import Order, OrderItem
 from shipment.models import Shipment, TrackingStatus, BatchShipment
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import APITestCase, TestCase
@@ -55,7 +55,19 @@ class TestShipment(TestCase):
         self.seed.full_production()
 
     def test_ready_to_ship(self):
+        s = 0
+        for oi in OrderItem.sorted_pending_order_items():
+            s += 1
+            oi.fulfill()
         shipments = Shipment.ready_to_book_shipments()
         for shipment in shipments:
             self.assertTrue(shipment.is_ready_to_book)
-        self.assertEqual(len(shipments), 6)
+        self.assertEqual(len(shipments), s)
+
+    def test_total_shipment_created(self):
+        total = Shipment.total_shipment_created()
+        self.assertEqual(total, 10)
+
+    def test_total_shipment_confirmed(self):
+        total = Shipment.total_shipment_confirmed()
+        self.assertEqual(total, 6)

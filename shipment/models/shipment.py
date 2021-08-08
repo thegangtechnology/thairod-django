@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterable
+import datetime
+from typing import Iterable, Optional
 
 from django.db import models
 from django.db.models import OuterRef, Exists, QuerySet
@@ -10,6 +11,7 @@ from core.models import AbstractModel
 from order.models.order import Order
 from shipment.models import BatchShipment
 from shipment.models.box_size import BoxSize
+from thairod.utils.query_util import smart_range
 from warehouse.models import Warehouse
 
 
@@ -38,6 +40,7 @@ class Shipment(AbstractModel):
     shippop_purchase_id = models.IntegerField(null=True)
     tracking_code = models.CharField(max_length=255, blank=True, null=True)
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
+    shippop_confirm_date_time = models.DateTimeField(null=True, default=None, db_index=True)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)
     batch = models.ForeignKey(BatchShipment, on_delete=models.CASCADE, null=True, blank=True)
     box_size = models.ForeignKey(BoxSize, null=False, default=BoxSize.get_default_box_id, on_delete=models.RESTRICT)
@@ -86,6 +89,23 @@ class Shipment(AbstractModel):
         from order.models.order_item import FulfilmentStatus
         has_pending = self.orderitem_set.filter(fulfilment_status=FulfilmentStatus.PENDING).exists()
         return not has_pending
+
+    @classmethod
+    def total_shipment_created(cls,
+                               begin: Optional[datetime.datetime] = None,
+                               end: Optional[datetime.datetime] = None
+                               ):
+        return Shipment.objects.filter(smart_range('created_date', begin, end)).count()
+
+    @classmethod
+    def total_shipment_confirmed(cls,
+                                 begin: Optional[datetime.date] = None,
+                                 end: Optional[datetime.date] = None
+                                 ):
+        return (Shipment.objects
+                .filter(status=ShipmentStatus.CONFIRMED)
+                .filter(smart_range('shippop_confirm_date_time', begin, end))
+                .count())
 
     @classmethod
     def example(cls) -> Shipment:

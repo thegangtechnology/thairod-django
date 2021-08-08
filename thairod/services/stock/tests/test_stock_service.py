@@ -14,6 +14,7 @@ class TestStockService(TestCase):
         stock = StockInfo(
             fulfilled=20,
             procured=30,
+            ordered=30,
             adjustment=-5,
             pending=10
         )
@@ -26,6 +27,7 @@ class TestStockService(TestCase):
             StockInfo(
                 fulfilled=4,
                 procured=30,
+                ordered=7,
                 adjustment=35,
                 pending=3
             )
@@ -36,7 +38,7 @@ class TestStockService(TestCase):
         pv_id0 = self.seed.product_variations[0].id
         pv_id1 = self.seed.product_variations[1].id
         exp = {
-            pv_id0: StockInfo(fulfilled=4, procured=30, adjustment=35, pending=3),
-            pv_id1: StockInfo(fulfilled=2, procured=40, adjustment=10, pending=1)
+            pv_id0: StockInfo(fulfilled=4, procured=30, adjustment=35, pending=3, ordered=7),
+            pv_id1: StockInfo(fulfilled=2, procured=40, adjustment=10, pending=1, ordered=3)
         }
         self.assertEqual(dict(stocks), exp)

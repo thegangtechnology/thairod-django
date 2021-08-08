@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from order.models.order_item import FulfilmentStatus, OrderItem
 from order.services.fulfiller_service import FulFilmentService
 from shipment.models import Shipment
 from shipment.models.box_size import BoxSize
+from shipment.models.shipment import ShipmentStatus
 from thairod.services.shippop.data import ParcelData
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase
@@ -30,6 +33,9 @@ class TestFulFillerService(TestCase):
         FulFilmentService().attempt_fulfill_shipment(shipment)
         for oi in shipment.orderitem_set.all():
             self.assertEqual(oi.fulfilment_status, FulfilmentStatus.FULFILLED)
+        diff = datetime.now() - shipment.shippop_confirm_date_time
+        self.assertLess(diff.total_seconds(), 10)
+        self.assertEqual(shipment.status, ShipmentStatus.CONFIRMED)
 
     def test_fulfill_pending_order_items(self):
         begin = len(OrderItem.sorted_pending_order_items())
@@ -38,6 +44,8 @@ class TestFulFillerService(TestCase):
         self.assertLess(end, begin)
 
     def test_book_and_confirm_pending_shipments(self):
+        for oi in OrderItem.sorted_pending_order_items():
+            oi.fulfill()
         begin = len(list(Shipment.ready_to_book_shipments()))
         FulFilmentService().book_and_confirm_all_pending_shipments()
         end = len(list(Shipment.ready_to_book_shipments()))

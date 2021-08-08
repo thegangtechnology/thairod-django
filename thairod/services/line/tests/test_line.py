@@ -3,7 +3,7 @@ from thairod.utils.test_util import TestCase
 
 
 class TestLine(TestCase):
-    patch_external = True
+    patch_line = True
     with_seed = False
 
     def setUp(self) -> None:
