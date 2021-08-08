@@ -43,13 +43,18 @@ class CreateOrderParameter(AutoSerialize):
     def is_valid_order(self) -> bool:
         cid = self.patient.cid
         pv_ids = [item.item_id for item in self.items]
-        try_to_order_non_repeatable_item = lambda: (
-            ProductVariation.objects.filter(id__in=pv_ids, product__non_repeatable=True).exists()
-        )
-        used_to_order_box = lambda: (Order.objects
-                                     .filter(cid=cid)
-                                     .filter(shipment__orderitem__product_variation__product__non_repeatable=True)
-                                     .exists())
+
+        def try_to_order_non_repeatable_item():
+            return (ProductVariation.objects
+                    .filter(id__in=pv_ids, product__non_repeatable=True)
+                    .exists())
+
+        def used_to_order_box():
+            return (Order.objects
+                    .filter(cid=cid)
+                    .filter(shipment__orderitem__product_variation__product__non_repeatable=True)
+                    .exists())
+
         return not (try_to_order_non_repeatable_item() and used_to_order_box())
 
 
