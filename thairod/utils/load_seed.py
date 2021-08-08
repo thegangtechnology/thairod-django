@@ -8,6 +8,7 @@ from django_seed import Seed
 from address.models import Address
 from order.dataclasses.cart_item import CartItem
 from order.models import Order, OrderItem
+from order.services.fulfiller_service import FulFilmentService
 from order.services.order_service import RawOrder
 from order.views import OrderService, CreateOrderParameter
 from procurement.models import Procurement
@@ -161,10 +162,9 @@ class RealisticSeed:
         for pv_id, quantities in order_map.items():
             for i, quantity in enumerate(quantities):
                 cart = CartItem(item_id=pv_id, quantity=quantity)
-                order = self.create_one_order([cart])
+                ro = self.create_one_order([cart])
                 if i % 2 == 0:
-                    for oi in order.shipment.orderitem_set.all():
-                        oi.fulfill()
+                    FulFilmentService().attempt_fulfill_shipment(ro.shipment)
 
     def create_one_order(self, cart_items: List[CartItem]) -> RawOrder:
         param = CreateOrderParameter.example(items=cart_items)

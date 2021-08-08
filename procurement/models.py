@@ -1,11 +1,13 @@
+import datetime
 from collections import defaultdict
-from typing import DefaultDict
+from typing import DefaultDict, Optional
 
 from django.db import models
 from django.db.models import Sum
 
 from core.models import AbstractModel
 from product.models import ProductVariation
+from thairod.utils.query_util import smart_range
 from warehouse.models import Warehouse
 
 
@@ -21,18 +23,28 @@ class Procurement(AbstractModel):
         return cls.total_procurement_for_id(product_variation.id)
 
     @classmethod
-    def total_procurement_for_id(cls, product_variation_id: int) -> int:
-        ret = cls.objects.filter(product_variation_id=product_variation_id) \
-            .values('product_variation_id').annotate(item_count=Sum('quantity'))
+    def total_procurement_for_id(cls,
+                                 product_variation_id: int,
+                                 begin: Optional[datetime.datetime] = None,
+                                 end: Optional[datetime.datetime] = None) -> int:
+        ret = (cls.objects
+               .filter(product_variation_id=product_variation_id)
+               .filter(smart_range('timestamp', begin, end))
+               .values('product_variation_id').annotate(item_count=Sum('quantity')))
         return ret[0]['item_count'] if len(ret) > 0 else 0
 
     @classmethod
-    def total_procurement_map(cls) -> DefaultDict[int, int]:
+    def total_procurement_map(cls,
+                              begin: Optional[datetime.datetime] = None,
+                              end: Optional[datetime.datetime] = None) -> DefaultDict[int, int]:
         """
         Returns:
             Dict[item_id, total]
         """
-        res = cls.objects.values('product_variation_id').annotate(item_count=Sum('quantity'))
+        res = (cls.objects
+               .filter(smart_range('timestamp', begin, end))
+               .values('product_variation_id')
+               .annotate(item_count=Sum('quantity')))
         ret = defaultdict(lambda: 0)
         ret.update({s['product_variation_id']: s['item_count'] for s in res})
         return ret

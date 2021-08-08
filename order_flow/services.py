@@ -1,11 +1,10 @@
+from django.utils import timezone
+
+from order.dataclasses.cart_item import CartItem
+from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest
 from order_flow.models import OrderFlow
-from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
-from order.dataclasses.patient import Patient
-from order.dataclasses.doctor import Doctor
-from order.dataclasses.cart_item import CartItem
-from django.utils import timezone
 
 
 class OrderFlowService:
@@ -56,7 +55,7 @@ class OrderFlowService:
                                                           order_flow_response.doctor_order))
         return create_order_parameter
 
-    def save_patient_confirmation_and_make_order(self, patient_confirmation_request: PatientConfirmationRequest)\
+    def save_patient_confirmation_and_make_order(self, patient_confirmation_request: PatientConfirmationRequest) \
             -> CreateOrderResponse:
         self.write_patient_confirmation_to_order_flow(patient_confirmation_request=patient_confirmation_request)
         order_flow = OrderFlow.objects.get(patient_link_hash=patient_confirmation_request.patient_link_hash)

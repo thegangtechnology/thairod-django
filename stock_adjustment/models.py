@@ -1,11 +1,13 @@
+import datetime
 from collections import defaultdict
-from typing import DefaultDict
+from typing import DefaultDict, Optional
 
 from django.db import models
 from django.db.models import Sum
 
 from core.models import AbstractModel
 from product.models import ProductVariation
+from thairod.utils.query_util import smart_range
 from warehouse.models import Warehouse
 
 
@@ -17,10 +19,15 @@ class StockAdjustment(AbstractModel):
     timestamp = models.DateTimeField(auto_now=True)
 
     @classmethod
-    def total_adjustment_for_id(cls, id: int) -> int:
-        ret = cls.objects.filter(product_variation_id=id) \
-            .values('product_variation_id') \
-            .annotate(total_count=Sum('quantity'))
+    def total_adjustment_for_id(cls,
+                                id: int,
+                                begin: Optional[datetime.datetime] = None,
+                                end: Optional[datetime.date] = None) -> int:
+        ret = (cls.objects
+               .filter(product_variation_id=id)
+               .filter(smart_range('timestamp', begin, end))
+               .values('product_variation_id')
+               .annotate(total_count=Sum('quantity')))
         return 0 if len(ret) == 0 else ret[0]['total_count']
 
     @classmethod

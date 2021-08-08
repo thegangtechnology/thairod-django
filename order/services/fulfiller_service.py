@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import Iterable, DefaultDict
 
 from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
@@ -60,7 +61,7 @@ class FulFilmentService:
         self.update_shipment_with_confirmation(shipment)
 
         self.order_confirmed_call_back(shipment)
-        logger.info(f'Book and Confirm Shipment id: f{shipment.id}')
+        logger.info(f'Book and Confirm Shipment id: {shipment.id}')
 
     def order_confirmed_call_back(self, shipment: Shipment):
         self.notify_user_with_tracking(shipment)
@@ -98,6 +99,7 @@ class FulFilmentService:
 
     def update_shipment_with_confirmation(self, shipment: Shipment):
         shipment.status = ShipmentStatus.CONFIRMED
+        shipment.shippop_confirm_date_time = datetime.now()
         shipment.save()
 
     def update_shipment_with_shippop_booking(self, response: OrderResponse,
