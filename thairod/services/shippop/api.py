@@ -64,6 +64,7 @@ class ShippopAPI:
             Return string of HTML. Beware of injection
             Type: html, pdf
         """
+        print(tracking_codes)
         resp = self.shippop_request(path="label_tracking_code/",
                                     payload={"tracking_code": ",".join(tracking_codes),
                                              "size": size,

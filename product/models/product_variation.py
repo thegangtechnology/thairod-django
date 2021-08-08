@@ -30,8 +30,6 @@ class ProductVariation(AbstractModel):
                             default=ProductVariationUnit.PIECES)
     preferred_box_size = models.ForeignKey('shipment.Boxsize', default=get_default_box,
                                            on_delete=PROTECT)
-    # reject order if ordered previously with the same cid
-    reject_order_on_duplicate_cid = models.BooleanField(default=False)
 
     @classmethod
     def example(cls) -> ProductVariation:

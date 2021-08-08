@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from django.db import transaction
+from rest_framework.exceptions import ValidationError
 
 from address.models import Address
 from order.dataclasses.order import CreateOrderParameter, CreateOrderResponse
@@ -36,8 +37,10 @@ class OrderService:
         except (ShippopConfirmationError, ShippopCreateOrderError):
             return CreateOrderResponse(success=False)
 
-    def create_order_no_callback(self, param) -> RawOrder:
+    def create_order_no_callback(self, param: CreateOrderParameter) -> RawOrder:
         from order.services.fulfiller_service import FulFilmentService
+        if not param.is_valid_order():
+            raise ValidationError(detail={'cid': 'this cid has already ordered restricted item'})
         ro = self.create_raw_order(param)
         FulFilmentService().attempt_fulfill_shipment(ro.shipment)
         return ro

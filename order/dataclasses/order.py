@@ -7,6 +7,7 @@ from order.dataclasses.cart_item import CartItem
 from order.dataclasses.doctor import Doctor
 from order.dataclasses.patient import Patient
 from order.dataclasses.shipping_address import ShippingAddress
+from order.models import Order
 from product.models import ProductVariation
 from thairod.utils.auto_serialize import AutoSerialize
 
@@ -38,6 +39,23 @@ class CreateOrderParameter(AutoSerialize):
         for item in ret.items:
             item.item_id = ProductVariation.objects.first().id
         return ret
+
+    def is_valid_order(self) -> bool:
+        cid = self.patient.cid
+        pv_ids = [item.item_id for item in self.items]
+
+        def try_to_order_non_repeatable_item():
+            return (ProductVariation.objects
+                    .filter(id__in=pv_ids, product__non_repeatable=True)
+                    .exists())
+
+        def used_to_order_box():
+            return (Order.objects
+                    .filter(cid=cid)
+                    .filter(shipment__orderitem__product_variation__product__non_repeatable=True)
+                    .exists())
+
+        return not (try_to_order_non_repeatable_item() and used_to_order_box())
 
 
 @dataclass

@@ -61,6 +61,14 @@ class Shipment(AbstractModel):
         return Shipment.objects.filter(status=ShipmentStatus.CONFIRMED)
 
     @classmethod
+    def daily_shipment(cls, date: datetime.date) -> QuerySet:
+        from thairod import settings
+        dt = datetime.datetime(date.year, date.month, date.day, hour=settings.SHIPPOP_LOT_CUTTING_TIME)
+        return Shipment.objects.filter(
+            shippop_confirm_date_time__range=(dt - datetime.timedelta(days=1), dt)
+        )
+
+    @classmethod
     def pending_shipments(cls) -> QuerySet:
         return cls._annotated_shipments().filter(status=ShipmentStatus.CREATED,
                                                  cancelled=False,
