@@ -25,6 +25,10 @@ class AutoSerialize:
         return self.__class__.serializer()(self).data
 
     @classmethod
+    def validate_data(cls, data: Dict[str, Any]):
+        return data
+
+    @classmethod
     def from_data(cls: Type[T], data: Dict[str, Any]) -> T:
         ser = cls.serializer()(data=data)
         ser.is_valid(raise_exception=True)
@@ -46,6 +50,9 @@ class AutoSerialize:
             class Meta:
                 dataclass = cls
                 ref_name = cls.__name__
+
+            def validated(self, data):
+                return cls.validate(data)
 
             @classmethod
             def parse_request(cls, request: Request) -> T:

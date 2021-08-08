@@ -9,7 +9,6 @@ from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
 from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
-from shipment.views.print_label_views import PrintLabelView
 from thairod.services.shippop.tests import load_test_data
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase
@@ -56,7 +55,7 @@ class TestPrintLabelLive(TestCase):
         shipments = Shipment.objects.filter(order_id__in=[first_order.order_id, second_order.order_id])
         for shipment in shipments:
             FulFilmentService().attempt_fulfill_shipment(shipment)
-        html = PrintLabelView().generate_label(PrintLabelParam(
+        html = PrintLabelService().generate_label(PrintLabelParam(
             shipments=shipments
         ))
         soup = BeautifulSoup(html, features="html.parser")
