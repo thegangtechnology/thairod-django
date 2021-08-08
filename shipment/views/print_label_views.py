@@ -1,5 +1,5 @@
+import datetime
 from os.path import join, dirname
-from typing import Optional
 
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
@@ -15,7 +15,6 @@ from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
 from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
-from thairod.services.shippop.api import ShippopAPI
 
 
 class PrintSampleLabelView(APIView):
@@ -33,28 +32,35 @@ class PrintSampleLabelView(APIView):
         return HttpResponse(ret)
 
 
-class PrintLabelView(APIView):
+class PrintOfTheDayView(APIView):
     @swagger_auto_schema(
-        operation_description='Print Shipment Label support multiple label via ?shipments=1&shipments=2&shipments=3',
-        manual_parameters=[Parameter('shipments', in_='query', type='integer', description='shipment id', example='1')]
+        operation_description='Print Shipment Label for the entire day',
+        manual_parameters=[Parameter('date', in_='query', type='date', description='print date', example='2021-08-23')]
     )
-    def get(self, request: Request):
-        param = PrintLabelParam(
-            shipments=request.query_params.getlist('shipments')
-        )
-        if not param.shipments:
-            return HttpResponseBadRequest('Empty Shipments.')
-        label = self.generate_label(param)
+    def get(self, request: Request) -> HttpResponse:
+        date = request.query_params.get('date', datetime.date.today())
+        shipments = Shipment.daily_shipment(date=date).all()
+        param = PrintLabelParam(shipments=[s.id for s in shipments])
+        label = PrintLabelService().generate_label(param)
         if label is not None:
             return HttpResponse(label)
         else:
             return HttpResponseNotFound('None of the shipment has valid tracking code')
 
-    def generate_label(self, param: PrintLabelParam) -> Optional[str]:
-        shipments = Shipment.objects.filter(id__in=param.shipments).exclude(tracking_code__isnull=True).all()
-        if len(shipments) == 0:
-            return None
-        shippop = ShippopAPI()
-        label_html = shippop.print_multiple_labels(tracking_codes=[s.tracking_code for s in shipments])
-        labels = split_print_label(label_html)
-        return PrintLabelService().generate_label_interleave(labels, shipments)
+
+class PrintLabelView(APIView):
+    @swagger_auto_schema(
+        operation_description='Print Shipment Label support multiple label via ?shipments=1&shipments=2&shipments=3',
+        manual_parameters=[Parameter('shipments', in_='query', type='integer', description='shipment id', example='1')]
+    )
+    def get(self, request: Request) -> HttpResponse:
+        param = PrintLabelParam(
+            shipments=request.query_params.getlist('shipments')
+        )
+        if not param.shipments:
+            return HttpResponseBadRequest('Empty Shipments.')
+        label = PrintLabelService().generate_label(param)
+        if label is not None:
+            return HttpResponse(label)
+        else:
+            return HttpResponseNotFound('None of the shipment has valid tracking code')
