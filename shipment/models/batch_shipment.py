@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import datetime
+from typing import Optional
+
 from django.db import models
 from django.utils import timezone
 
@@ -14,13 +17,29 @@ class BatchShipment(AbstractModel):
         return BatchShipment(name='random_batch')
 
     @classmethod
-    def generate_batch_name(cls) -> str:
-        no_batch_create_today = cls.count_create_today()
-        return f"{timezone.now().strftime('%Y-%m-%d')}_{no_batch_create_today + 1}"
+    def _generate_batch_name(cls, print_date: datetime.date, batch_name: str):
+        return f"{print_date.strftime('%Y-%m-%d')}_{batch_name}"
 
     @classmethod
-    def count_create_today(cls) -> int:
-        today = timezone.now().today()
-        return BatchShipment.objects.filter(created_date__year=today.year,
-                                            created_date__month=today.month,
-                                            created_date__day=today.day).count()
+    def generate_auto_batch_name(cls, date: Optional[datetime.datetime] = None):
+        from shipment.services.batch_shipment_service import BatchShipmentService
+        date = timezone.now() if date is None else date
+        d = BatchShipmentService.determine_print_date(date)
+        return cls._generate_batch_name(d, 'auto')
+
+    @classmethod
+    def generate_batch_name(cls, date: Optional[datetime.datetime] = None) -> str:
+        from shipment.services.batch_shipment_service import BatchShipmentService
+        date = timezone.now() if date is None else date
+        batch_no = cls.count_created_today(date) + 1
+        d = BatchShipmentService.determine_print_date(date)
+        return cls._generate_batch_name(d, str(batch_no))
+
+    @classmethod
+    def count_created_today(cls, date: Optional[datetime.datetime] = None) -> int:
+        from shipment.services.batch_shipment_service import BatchShipmentService
+        print_batch = BatchShipmentService.determine_print_datetime(date)
+        date_range = print_batch - datetime.timedelta(days=1), print_batch
+        return (BatchShipment.objects
+                .filter(created_date__range=date_range)
+                .count())
