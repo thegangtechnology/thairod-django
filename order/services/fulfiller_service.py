@@ -1,13 +1,16 @@
 import logging
-from datetime import datetime
 from typing import Iterable, DefaultDict, List
+
+from django.utils import timezone
 
 from order.exceptions import ShippopConfirmationError
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
-from shipment.models import Shipment, TrackingStatus
+from shipment.dataclasses.batch_shipment import AssignBatchToShipmentRequest
+from shipment.models import Shipment, TrackingStatus, BatchShipment
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
+from shipment.services.batch_shipment_service import BatchShipmentService
 from thairod.services.line.line import send_line_tracking_message
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse
@@ -35,7 +38,7 @@ class FulFilmentService:
         stock_map = StockService().get_all_stock_map()
 
         for oi in order_items:
-            success = self._attempt_fulfill_orderitem(oi, stock_map)
+            success = self.attempt_to_fulfill_orderitem(oi, stock_map)
             if success:
                 self.attempt_to_mark_shipment_fulfilled(oi.shipment)
 
@@ -69,12 +72,19 @@ class FulFilmentService:
         self.update_shipment_with_confirmation(shipment)
 
         self.order_confirmed_call_back(shipment)
+        self.put_shipment_in_auto_batch(shipment)
         logger.info(f'Book and Confirm Shipment id: {shipment.id}')
+
+    def put_shipment_in_auto_batch(self, shipment: Shipment):
+        BatchShipmentService.assign_batch_to_shipments(AssignBatchToShipmentRequest(
+            batch_name=BatchShipment.generate_auto_batch_name(),
+            shipments=[shipment.id]
+        ))
 
     def order_confirmed_call_back(self, shipment: Shipment):
         self.notify_user_with_tracking(shipment)
 
-    def _attempt_fulfill_orderitem(self, oi: OrderItem, stock_map: DefaultDict[int, StockInfo]) -> bool:
+    def attempt_to_fulfill_orderitem(self, oi: OrderItem, stock_map: DefaultDict[int, StockInfo]) -> bool:
         pv_id: int = oi.product_variation_id
         if stock_map[pv_id].current_total >= oi.quantity:
             oi.fulfill()
@@ -105,7 +115,7 @@ class FulFilmentService:
 
     def update_shipment_with_confirmation(self, shipment: Shipment):
         shipment.status = ShipmentStatus.CONFIRMED
-        shipment.shippop_confirm_date_time = datetime.now()
+        shipment.shippop_confirm_date_time = timezone.now()
         shipment.save()
 
     def update_shipment_with_shippop_booking(self, response: OrderResponse,

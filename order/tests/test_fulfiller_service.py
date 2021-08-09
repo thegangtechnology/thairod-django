@@ -34,8 +34,10 @@ class TestFulFillerService(TestCase):
         for oi in shipment.orderitem_set.all():
             self.assertEqual(oi.fulfilment_status, FulfilmentStatus.FULFILLED)
         diff = now() - shipment.fulfilled_date
+        shipment.refresh_from_db()
         self.assertLess(diff.total_seconds(), 10)
         self.assertEqual(shipment.status, ShipmentStatus.CONFIRMED)
+        self.assertIn('auto', shipment.batch.name)
 
     def test_fulfill_pending_order_items(self):
         begin = len(OrderItem.sorted_pending_order_items())
