@@ -49,13 +49,10 @@ class CreateOrderParameter(AutoSerialize):
                     .filter(id__in=pv_ids, product__non_repeatable=True)
                     .exists())
 
-        def used_to_order_box():
-            return (Order.objects
-                    .filter(cid=cid)
-                    .filter(shipment__orderitem__product_variation__product__non_repeatable=True)
-                    .exists())
+        def used_to_order_non_repeatable():
+            return Order.used_to_order_non_repeatable(cid)
 
-        return not (try_to_order_non_repeatable_item() and used_to_order_box())
+        return not (try_to_order_non_repeatable_item() and used_to_order_non_repeatable())
 
 
 @dataclass

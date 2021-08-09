@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils.timezone import now
 
 from order.models.order_item import FulfilmentStatus, OrderItem
 from order.services.fulfiller_service import FulFilmentService
@@ -33,7 +33,7 @@ class TestFulFillerService(TestCase):
         FulFilmentService().attempt_fulfill_shipment(shipment)
         for oi in shipment.orderitem_set.all():
             self.assertEqual(oi.fulfilment_status, FulfilmentStatus.FULFILLED)
-        diff = datetime.now() - shipment.shippop_confirm_date_time
+        diff = now() - shipment.fulfilled_date
         self.assertLess(diff.total_seconds(), 10)
         self.assertEqual(shipment.status, ShipmentStatus.CONFIRMED)
 
@@ -43,10 +43,8 @@ class TestFulFillerService(TestCase):
         end = len(OrderItem.sorted_pending_order_items())
         self.assertLess(end, begin)
 
-    def test_book_and_confirm_pending_shipments(self):
-        for oi in OrderItem.sorted_pending_order_items():
-            oi.fulfill()
-        begin = len(list(Shipment.ready_to_book_shipments()))
-        FulFilmentService().book_and_confirm_all_pending_shipments()
-        end = len(list(Shipment.ready_to_book_shipments()))
-        self.assertLess(end, begin)
+    def test_fulfill_shipments_auto_fulfilled(self):
+        begin = Shipment.objects.filter(status=ShipmentStatus.FULFILLED).count()
+        FulFilmentService().fulfill_pending_order_items()
+        end = Shipment.objects.filter(status=ShipmentStatus.FULFILLED).count()
+        self.assertLess(begin, end)

@@ -60,9 +60,10 @@ class TestShipment(TestCase):
             s += 1
             oi.fulfill()
         shipments = Shipment.ready_to_book_shipments()
+
+        self.assertEqual(len(shipments), s)
         for shipment in shipments:
             self.assertTrue(shipment.is_ready_to_book)
-        self.assertEqual(len(shipments), s)
 
     def test_total_shipment_created(self):
         total = Shipment.total_shipment_created()

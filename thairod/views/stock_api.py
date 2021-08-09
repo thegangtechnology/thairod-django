@@ -43,7 +43,6 @@ class StockAPI(APIView):
     )
     def get(self, request: Request):  # TODO: Optimize this for multiple stock
         pv_ids = request.query_params.getlist('pv_id')
-        print(StockAPIGet.request.query_params)
         if not pv_ids:
             return HttpResponseBadRequest('Empty Product Variation ID.')
 

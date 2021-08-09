@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
-from typing import Iterable, DefaultDict
+from typing import Iterable, DefaultDict, List
 
-from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
+from order.exceptions import ShippopConfirmationError
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
 from shipment.models import Shipment, TrackingStatus
@@ -26,22 +26,42 @@ class FulFilmentService:
         # temporary this thing has a race condition on stock checking
         for oi in shipment.orderitem_set.all():
             stock = StockService().get_single_stock(oi.product_variation_id)
-            if stock.current_total > 0:
+            if stock.current_total >= oi.quantity:
                 oi.fulfill()
         self.book_and_confirm_shipment(shipment)
 
     def fulfill_pending_order_items(self):
-        order_items = OrderItem.sorted_pending_order_items()
+        order_items: Iterable[OrderItem] = OrderItem.sorted_pending_order_items()
+        print('aaa', len(order_items))
         stock_map = StockService().get_all_stock_map()
 
         for oi in order_items:
-            self._attempt_fulfill_orderitem(oi, stock_map)
+            success = self._attempt_fulfill_orderitem(oi, stock_map)
+            print('xxx', success)
+            if success:
+                self.attempt_to_mark_shipment_fulfilled(oi.shipment)
+
+    def attempt_to_mark_shipment_fulfilled(self, shipment: Shipment) -> bool:
+        if shipment.is_ready_to_fulfill:
+            shipment.mark_fulfilled()
+            return True
+        else:
+            return False
 
     def book_and_confirm_all_pending_shipments(self):
         shipments = Shipment.ready_to_book_shipments()
-
         for shipment in shipments:
             self.book_and_confirm_shipment(shipment)
+
+    def book_and_confirm(self, shipments: List[Shipment]):
+        for shipment in shipments:
+            if not shipment.is_ready_to_book:
+                logger.info(f'skip booking {shipment.id}. Not ready to book.')
+            else:
+                res = self.add_shipment_to_shippop([shipment])
+                self.update_shipment_with_shippop_booking(res, shipment)
+                self.confirm_shipment_with_shippop(shipment)
+                self.update_shipment_with_confirmation(shipment)
 
     def get_pending_order_items(self) -> Iterable[Order]:
         ret = Order.objects.filter(
@@ -54,7 +74,7 @@ class FulFilmentService:
             logger.info(f'Attempt to book and confirm non fulfilled shipment {shipment.id}')
             return
 
-        res = self.add_shipment_to_shippop(shipment)
+        res = self.add_shipment_to_shippop([shipment])
         self.update_shipment_with_shippop_booking(res, shipment)
 
         self.confirm_shipment_with_shippop(shipment)
@@ -68,19 +88,17 @@ class FulFilmentService:
 
     def _attempt_fulfill_orderitem(self, oi: OrderItem, stock_map: DefaultDict[int, StockInfo]) -> bool:
         pv_id: int = oi.product_variation_id
-        if stock_map[pv_id].current_total > 0:
+        if stock_map[pv_id].current_total >= oi.quantity:
             oi.fulfill()
-            stock_map[pv_id].fulfilled += 1
+            stock_map[pv_id].fulfilled += oi.quantity
             return True
         else:
             return False
 
-    def add_shipment_to_shippop(self, shipment: Shipment) -> OrderResponse:
+    def add_shipment_to_shippop(self, shipments: List[Shipment]):
         shippop_api = ShippopAPI()
-        response = shippop_api.create_order(self.create_order_data(shipment))
-
-        if not response.status:
-            raise ShippopCreateOrderError()
+        response = shippop_api.create_order(self.create_order_data(shipments))
+        # some of them bound to fail
         return response
 
     def confirm_shipment_with_shippop(self, shipment: Shipment):
@@ -122,7 +140,7 @@ class FulFilmentService:
             courier_tracking_code=response.lines[0].tracking_code
         )
 
-    def create_order_data(self, shipment: Shipment) -> OrderData:
+    def create_order_data(self, shipments: List[Shipment]) -> OrderData:
         return OrderData(
             email=SHIPPOP_EMAIL,
             success_url='',
@@ -135,6 +153,7 @@ class FulFilmentService:
                     to_address=AddressData.from_address_model(shipment.order.receiver_address),
                     parcel=self.parcel_adapter(box_size=shipment.box_size)
                 )
+                for shipment in shipments
             ],
         )
 
