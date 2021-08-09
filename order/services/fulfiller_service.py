@@ -32,12 +32,10 @@ class FulFilmentService:
 
     def fulfill_pending_order_items(self):
         order_items: Iterable[OrderItem] = OrderItem.sorted_pending_order_items()
-        print('aaa', len(order_items))
         stock_map = StockService().get_all_stock_map()
 
         for oi in order_items:
             success = self._attempt_fulfill_orderitem(oi, stock_map)
-            print('xxx', success)
             if success:
                 self.attempt_to_mark_shipment_fulfilled(oi.shipment)
 
@@ -52,16 +50,6 @@ class FulFilmentService:
         shipments = Shipment.ready_to_book_shipments()
         for shipment in shipments:
             self.book_and_confirm_shipment(shipment)
-
-    def book_and_confirm(self, shipments: List[Shipment]):
-        for shipment in shipments:
-            if not shipment.is_ready_to_book:
-                logger.info(f'skip booking {shipment.id}. Not ready to book.')
-            else:
-                res = self.add_shipment_to_shippop([shipment])
-                self.update_shipment_with_shippop_booking(res, shipment)
-                self.confirm_shipment_with_shippop(shipment)
-                self.update_shipment_with_confirmation(shipment)
 
     def get_pending_order_items(self) -> Iterable[Order]:
         ret = Order.objects.filter(
