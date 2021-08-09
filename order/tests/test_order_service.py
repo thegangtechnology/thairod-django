@@ -3,11 +3,8 @@ from dataclasses import asdict
 from django.urls import reverse
 from rest_framework.exceptions import ValidationError
 
-from order.dataclasses.cart_item import CartItem
-from order.dataclasses.order import CreateOrderResponse
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
-from product.models import Product, ProductVariation
 from shipment.models.box_size import BoxSize
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase, APITestCase
@@ -37,8 +34,6 @@ class TestOrderService(TestCase):
         param = CreateOrderParameter.example_with_valid_item()
         box = OrderService().determine_box_size(param)
         self.assertEqual(type(box), BoxSize)
-
-
 
     def test_order_restricted_product_twice(self):
         pv = self.seed.make_product(restricted=True)
