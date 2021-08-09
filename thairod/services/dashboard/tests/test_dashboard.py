@@ -33,8 +33,6 @@ class TestDashboard(TestCase):
         begin = end - timedelta(days=1)
         pv_ids = [self.seed.product_variations[0].id, self.seed.product_variations[1].id]
         got = ds.DashboardService().get_daily_summary(begin, end, pv_ids=pv_ids)
-        for shipment in Shipment.objects.all():
-            print(shipment.status, 'aaaaaa')
         self.assertEqual(got.total_shipment_confirmed, 6)
         self.assertEqual(got.total_shipment_created, 10)
         self.assertEqual(got.begin, begin)

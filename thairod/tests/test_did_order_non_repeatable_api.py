@@ -17,14 +17,14 @@ class TestDidOrderNonRepeatable(APITestCase):
         param = DidOrderNonRepeatableParam(
             cid='111'
         )
-        res = DidOrderNonRepeatableAPI.do(param)
+        res = DidOrderNonRepeatableAPI().do(param)
         self.assertTrue(res.did_order_non_repeatable)
 
     def test_do_false(self):
         param = DidOrderNonRepeatableParam(
             cid='222'
         )
-        res = DidOrderNonRepeatableAPI.do(param)
+        res = DidOrderNonRepeatableAPI().do(param)
         self.assertFalse(res.did_order_non_repeatable)
 
     def test_api_true(self):
@@ -33,4 +33,4 @@ class TestDidOrderNonRepeatable(APITestCase):
 
     def test_api_false(self):
         res = self.client.get(reverse('did-order-non-repeatable'), {'cid': '222'})
-        self.assertTrue(res.data['did_order_non_repeatable'])
+        self.assertFalse(res.data['did_order_non_repeatable'])
