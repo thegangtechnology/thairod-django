@@ -21,12 +21,11 @@ class TestDashboard(TestCase):
     def test_get_dash_board_summary(self):
         date = now().replace(hour=8)
         anchor = round_to_next_nearest_hour(date, settings.SHIPPOP_LOT_CUTTING_TIME)
-        got = ds.DashboardService().get_dashboard_summary(date, n_days=3)
-        cums = got.cumulative_summaries
-        self.assertEqual(len(cums), 4)
-        self.assertEqual(cums[0].begin, None)
-        self.assertEqual(cums[0].end, anchor)
-        self.assertEqual(len(got.interval_summaries), 3)
+        got = ds.DashboardService().get_dashboard_summary(date)
+
+        self.assertEqual(got.latest_summary.begin, None)
+        self.assertEqual(got.latest_summary.end, None)
+        self.assertEqual(len(got.interval_summaries), 7)
 
     def test_get_daily_summary(self):
         end = now()

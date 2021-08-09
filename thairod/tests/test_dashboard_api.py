@@ -13,6 +13,6 @@ class TestDashboardAPI(APITestCase):
 
     def test_dashboard_api(self):
         res = self.client.get(path=reverse('dashboard'))
-        self.assertIn('cumulative_summaries', res.data)
-        self.assertEqual(len(res.data['cumulative_summaries']), 4)
-        self.assertEqual(len(res.data['interval_summaries']), 3)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('latest_summary', res.data)
+        self.assertEqual(len(res.data['interval_summaries']), 7)
