@@ -51,9 +51,7 @@ class TestToInterval(TestCase):
             anchor - timedelta(days=1)
         ]
         intervals = query_util.to_intervals(dates)
-        print(intervals)
         exp = [(dates[2], dates[0]), (dates[1], dates[2])]
-        print(exp)
         self.assertListEqual(
             intervals, exp
         )

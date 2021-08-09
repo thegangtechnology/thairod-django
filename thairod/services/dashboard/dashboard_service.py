@@ -131,11 +131,3 @@ class DashboardService:
             pv_name=pv.name,
             stock=stock
         )
-
-# @dataclass
-# class DailySummary:
-#     date: datetime.date
-#     total_order_created: int  # total order created during the time
-#     total_shipment_created: int  # total shipment created during the time
-#     total_shipment_confirmed: int  # total confirmed during the time
-#     product_summary: List[ProductSummary]
