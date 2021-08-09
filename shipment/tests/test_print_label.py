@@ -47,6 +47,7 @@ class TestPrintLabelLive(TestCase):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.procure_items()
 
+
     def test_print_label_live(self):
         param = CreateOrderParameter.example()
         param.items[0].item_id = ProductVariation.objects.first().id

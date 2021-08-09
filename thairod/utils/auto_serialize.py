@@ -76,9 +76,9 @@ def swagger_auto_serialize_post_schema(body_type: Optional[Type[AutoSerialize]],
 
 
 def swagger_auto_serialize_get_schema(query_type: Optional[Type[AutoSerialize]],
-                                      response_type: Type[AutoSerialize], **kwds):
+                                      response_type: Optional[Type[AutoSerialize]] = None, **kwds):
     return swagger_auto_schema(
         query_serializer=query_type.serializer() if query_type is not None else None,
-        responses={200: response_type.serializer()},
+        responses={200: response_type.serializer()} if response_type is not None else None,
         **kwds
     )

@@ -7,6 +7,7 @@ from django_seed import Seed
 
 from address.models import Address
 from order.dataclasses.cart_item import CartItem
+from order.dataclasses.order import CreateOrderResponse
 from order.models import Order, OrderItem
 from order.services.fulfiller_service import FulFilmentService
 from order.services.order_service import RawOrder
@@ -170,6 +171,23 @@ class RealisticSeed:
         param = CreateOrderParameter.example(items=cart_items)
         order = OrderService().create_raw_order(param)
         return order
+
+    def make_product(self, restricted: bool) -> ProductVariation:
+        prod = Product.example()
+        prod.non_repeatable = restricted
+        prod.save()
+
+        pv = ProductVariation.example()
+        pv.product = prod
+        pv.save()
+        return pv
+
+    def order_item(self, pv_id: int, cid: str = '111') -> CreateOrderResponse:
+        param = CreateOrderParameter.example()
+        param.patient.cid = cid
+        param.items = [CartItem(item_id=pv_id, quantity=1)]
+        res = OrderService().create_order(param)
+        return res
 
 
 def load_realistic_seed() -> RealisticSeed:

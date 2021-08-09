@@ -1,5 +1,7 @@
 import datetime
+from dataclasses import dataclass
 from os.path import join, dirname
+from typing import Optional
 
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
@@ -15,6 +17,7 @@ from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
 from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
+from thairod.utils.auto_serialize import swagger_auto_serialize_get_schema, AutoSerialize
 
 
 class PrintSampleLabelView(APIView):
@@ -32,14 +35,21 @@ class PrintSampleLabelView(APIView):
         return HttpResponse(ret)
 
 
+@dataclass
+class PrintOfTheDayParam(AutoSerialize):
+    date: Optional[datetime.date]
+
+
 class PrintOfTheDayView(APIView):
-    @swagger_auto_schema(
+    @swagger_auto_serialize_get_schema(
+        query_type=PrintOfTheDayParam,
         operation_description='Print Shipment Label for the entire day',
         manual_parameters=[Parameter('date', in_='query', type='date', description='print date', example='2021-08-23')]
     )
     def get(self, request: Request) -> HttpResponse:
-        date = request.query_params.get('date', datetime.date.today())
-        shipments = Shipment.daily_shipment(date=date).all()
+        param = PrintOfTheDayParam.from_get_request(request)
+        shipments = Shipment.daily_shipment(date=param.date).all()
+
         param = PrintLabelParam(shipments=[s.id for s in shipments])
         label = PrintLabelService().generate_label(param)
         if label is not None:

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.utils.timezone import now
 
+from shipment.models import Shipment
 from thairod import settings
 from thairod.services.dashboard import dashboard_service as ds
 from thairod.services.stock.stock import StockInfo
@@ -22,8 +23,6 @@ class TestDashboard(TestCase):
         anchor = round_to_next_nearest_hour(date, settings.SHIPPOP_LOT_CUTTING_TIME)
         got = ds.DashboardService().get_dashboard_summary(date, n_days=3)
         cums = got.cumulative_summaries
-        for cum in cums:
-            print(cum.begin, cum.end)
         self.assertEqual(len(cums), 4)
         self.assertEqual(cums[0].begin, None)
         self.assertEqual(cums[0].end, anchor)
@@ -34,6 +33,8 @@ class TestDashboard(TestCase):
         begin = end - timedelta(days=1)
         pv_ids = [self.seed.product_variations[0].id, self.seed.product_variations[1].id]
         got = ds.DashboardService().get_daily_summary(begin, end, pv_ids=pv_ids)
+        for shipment in Shipment.objects.all():
+            print(shipment.status, 'aaaaaa')
         self.assertEqual(got.total_shipment_confirmed, 6)
         self.assertEqual(got.total_shipment_created, 10)
         self.assertEqual(got.begin, begin)

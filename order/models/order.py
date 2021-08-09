@@ -38,3 +38,10 @@ class Order(AbstractModel):
             orderer_name='คุณหมอ คนเก่ง',
             orderer_license='DOCTOR007'
         )
+
+    @classmethod
+    def used_to_order_non_repeatable(cls, cid: str):
+        return (Order.objects
+                .filter(cid=cid)
+                .filter(shipment__orderitem__product_variation__product__non_repeatable=True)
+                .exists())

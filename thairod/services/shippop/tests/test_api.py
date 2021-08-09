@@ -20,7 +20,7 @@ class ShippopAPITest(TestCase):
     def test_create_order(self):
         response = self.shippop_api.create_order(order_data=self.order_data)
         self.assertEqual(type(response), OrderResponse)
-        self.assertEqual(len(response.lines), 1)
+        self.assertEqual(len(response.lines), 3)
 
     def test_confirm_order(self):
         self.assertEqual(self.shippop_api.confirm_order(purchase_id=self.shippop_order.purchase_id), True)
@@ -28,7 +28,7 @@ class ShippopAPITest(TestCase):
     def test_get_order_detail(self):
         response = self.shippop_api.get_order_detail(purchase_id=self.shippop_order.purchase_id)
         self.assertEqual(type(response), OrderResponse)
-        self.assertEqual(len(response.lines), 1)
+        self.assertEqual(len(response.lines), 3)
 
     def test_get_tracking_data(self):
         tracking_code = self.shippop_order.lines[0].tracking_code
