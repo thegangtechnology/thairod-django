@@ -24,8 +24,7 @@ class OrderFlowService:
             if create_order_flow_request.auto_doctor_confirm:
                 checkout_doctor_order_request = CheckoutDoctorOrderRequest(doctor_link_hash=doctor_hash,
                                                                            doctor_order=doctor_order)
-                return self.write_doctor_order_to_order_flow(checkout_doctor_order_request=
-                                                             checkout_doctor_order_request)
+                return self.write_doctor_order_to_order_flow(checkout_doctor_order_request=checkout_doctor_order_request)
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
