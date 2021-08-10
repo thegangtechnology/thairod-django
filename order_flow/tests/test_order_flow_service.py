@@ -1,4 +1,4 @@
-from order_flow.dataclasses import CreateOrderFlowRequest
+from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, DoctorOrder
 from order_flow.models import OrderFlow
 from order_flow.services import OrderFlowService
 from thairod.utils.load_seed import load_realistic_seed
@@ -70,6 +70,27 @@ class TestOrderFlowService(TestCase):
             self.assertEqual(order_flow_response.doctor_order.items[0].quantity, 1)
             self.assertEqual(order_flow_response.doctor_order.items[0].description,
                              self.seed.product_variations[0].description)
+
+    def test_override_initial_order_before_confirm(self):
+        items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
+        order_flow_request = CreateOrderFlowRequest.example(items=items)
+        order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
+        # still initial order
+        self.assertEqual(len(order_flow_response.doctor_order.items), 1)
+        self.assertEqual(order_flow_response.doctor_order.items[0].id, self.seed.product_variations[0].id)
+        # no patient hash yet
+        self.assertTrue(order_flow_response.patient_link_hash is None)
+        new_item = [CartItem(item_id=self.seed.product_variations[1].id, quantity=1)]
+        doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
+                                                     doctor_order=DoctorOrder(items=new_item))
+        response = OrderFlowService().write_doctor_order_to_order_flow(checkout_doctor_order_request=doctor_checkout)
+        # should be new order and patient hash should be created
+        self.assertEqual(response.doctor_link_hash, doctor_checkout.doctor_link_hash)
+        self.assertTrue(response.patient_link_hash is not None)
+        self.assertEqual(response.doctor_order.items[0].id, self.seed.product_variations[1].id)
+        self.assertEqual(order_flow_response.doctor_order.items[0].quantity, 1)
+        self.assertEqual(order_flow_response.doctor_order.items[0].description,
+                         self.seed.product_variations[1].description)
 
     # test create override order when patient hash is create
 
