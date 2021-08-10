@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from thairod.utils.auto_serialize import AutoSerialize
 
 
@@ -19,7 +20,7 @@ class ShippingAddress(AutoSerialize):
             street='99 ถ.ราชดำเนิน',
             sub_district='ราชดำเนิน',
             district='พระนคร',
-            province='กรุงเทพ',
-            zipcode='10400',
+            province='กรุงเทพมหานคร',
+            zipcode='10200',
             note="บ้านอยู่ชั้นสอง"
         )

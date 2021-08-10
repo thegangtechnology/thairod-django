@@ -40,8 +40,8 @@ class ProductVariationSummary(AutoSerialize):
 
 @dataclass
 class DailySummary(AutoSerialize):
-    begin: datetime.datetime
-    end: datetime.datetime
+    begin: Optional[datetime.datetime]
+    end: Optional[datetime.datetime]
     total_shipment_created: int  # total shipment created during the time
     total_shipment_confirmed: int  # total confirmed during the time
     product_summaries: List[ProductVariationSummary]
@@ -60,15 +60,15 @@ class DailySummary(AutoSerialize):
 
 @dataclass
 class DashboardSummary(AutoSerialize):
+    latest_summary: DailySummary
     interval_summaries: List[DailySummary]
-    cumulative_summaries: List[DailySummary]
 
     @classmethod
     def example(cls):
-        dates = date_range(now(), -3)
+        dates = date_range(now(), -7)
         return cls(
             interval_summaries=[DailySummary.example(end=date) for date in dates],
-            cumulative_summaries=[DailySummary.example(end=date, begin_is_none=True) for date in dates]
+            latest_summary=DailySummary.example(end=None, begin_is_none=True)
         )
 
 
@@ -88,7 +88,7 @@ class DashboardService:
 
     def get_dashboard_summary(self,
                               date: datetime.datetime,  # last date
-                              n_days=3):
+                              n_days=7):
         date = round_to_next_nearest_hour(date, hour=settings.SHIPPOP_LOT_CUTTING_TIME)
         dates = date_range(date, -n_days)
         pv_ids = list(x.id for x in ProductVariation.objects.all())
@@ -96,16 +96,14 @@ class DashboardService:
             self.get_daily_summary(begin=begin, end=end, pv_ids=pv_ids)
             for begin, end in to_intervals(dates)
         ]
-        cumulative_summaries = [
-            self.get_daily_summary(begin=None, end=end, pv_ids=pv_ids)
-            for end in dates
-        ]
+        latest_summary = self.get_daily_summary(begin=None, end=None, pv_ids=pv_ids)
+
         return DashboardSummary(
-            interval_summaries=interval_summaries,
-            cumulative_summaries=cumulative_summaries
+            latest_summary=latest_summary,
+            interval_summaries=interval_summaries
         )
 
-    # TODO: optimize this
+        # TODO: optimize this
     def get_daily_summary(self,
                           begin: Optional[datetime.datetime],
                           end: Optional[datetime.datetime],
@@ -131,11 +129,3 @@ class DashboardService:
             pv_name=pv.name,
             stock=stock
         )
-
-# @dataclass
-# class DailySummary:
-#     date: datetime.date
-#     total_order_created: int  # total order created during the time
-#     total_shipment_created: int  # total shipment created during the time
-#     total_shipment_confirmed: int  # total confirmed during the time
-#     product_summary: List[ProductSummary]

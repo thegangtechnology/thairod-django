@@ -8,7 +8,7 @@ def load_test_data():
     to_address = AddressData(name="to testing", address="1231123/456 Testor Tower", district="บางบอน",
                              state="บางขุนเทียน", province="กรุงเทพมหานคร", postcode="10200", tel="0850035533")
 
-    order_lines = [OrderLineData(from_address=from_address, to_address=to_address, parcel=parcel)]
+    order_lines = [OrderLineData(from_address=from_address, to_address=to_address, parcel=parcel)] * 3
 
     order_data = OrderData(email="k.ronnakrit@thegang.tech", success_url="http://shippop.com/?success",
                            fail_url="http://shippop.com/?fail", data=order_lines)

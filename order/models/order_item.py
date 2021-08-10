@@ -35,6 +35,8 @@ class OrderItem(AbstractModel):
             fulfilment_status=FulfilmentStatus.FULFILLED,
             fulfill_datetime=Now())
         logger.info(f'Fulfill: oi_id: {self.id:d}, pv_id: {self.product_variation_id: d}')
+        if self.shipment.is_ready_to_fulfill:
+            self.shipment.mark_fulfilled()
 
     class Meta:
         indexes = [

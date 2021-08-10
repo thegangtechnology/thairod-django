@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Iterable
 
-import pytz
 from django.urls import reverse
+from django.utils import timezone
 
 from address.models import Address
 from core.tests import BaseTestSimpleApiMixin
@@ -57,7 +57,7 @@ class TestOrderItemTotal(TestCase):
         fulfilled_item = OrderItem.objects.get(pk=item.id)
         self.assertEqual(fulfilled_item.fulfilment_status, FulfilmentStatus.FULFILLED)
         self.assertGreaterEqual(fulfilled_item.fulfill_datetime,
-                                datetime.now(pytz.utc) - timedelta(seconds=1))
+                                timezone.now() - timedelta(seconds=1))
 
     def test_total_fulfilled(self):
         total = OrderItem.total_fulfilled(self.seed.product_variations[0])
