@@ -104,7 +104,7 @@ class FulfilmentService:
             return False
         pv_id: int = oi.product_variation_id
         stock = stock_map[pv_id] if stock_map is not None else StockService().get_single_stock(pv_id)
-        if stock._current_total() >= oi.quantity:
+        if stock.current_total() >= oi.quantity:
             oi.fulfill()
             stock.fulfilled += oi.quantity
             return True
