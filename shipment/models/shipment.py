@@ -5,7 +5,6 @@ from typing import Iterable, Optional
 
 from django.db import models
 from django.db.models import OuterRef, Exists, QuerySet
-
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from core.models import AbstractModel
@@ -42,6 +41,7 @@ class Shipment(AbstractModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     shippop_purchase_id = models.IntegerField(null=True)
     tracking_code = models.CharField(max_length=255, blank=True, null=True)
+    courier_code = models.CharField(max_length=255, null=True, blank=True, default=None)
     courier_tracking_code = models.CharField(max_length=255, null=True, blank=True)
     shippop_confirm_date_time = models.DateTimeField(null=True, default=None, db_index=True)
     status = models.CharField(max_length=9, choices=ShipmentStatus.choices, default=ShipmentStatus.CREATED)

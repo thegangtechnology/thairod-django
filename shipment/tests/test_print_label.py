@@ -2,7 +2,7 @@ from os.path import dirname, join
 
 from bs4 import BeautifulSoup
 
-from order.services.fulfiller_service import FulFilmentService
+from order.services.fulfiller_service import FulfilmentService
 from order.views import OrderService, CreateOrderParameter
 from product.models import ProductVariation
 from shipment.dataclasses.print_label import PrintLabelParam
@@ -54,7 +54,7 @@ class TestPrintLabelLive(TestCase):
         second_order = OrderService().create_order(param)
         shipments = Shipment.objects.filter(order_id__in=[first_order.order_id, second_order.order_id])
         for shipment in shipments:
-            FulFilmentService().attempt_fulfill_shipment(shipment)
+            FulfilmentService().attempt_fulfill_shipment(shipment)
         html = PrintLabelService().generate_label(PrintLabelParam(
             shipments=shipments
         ))
