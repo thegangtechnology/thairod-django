@@ -39,7 +39,6 @@ class FulfilmentService:
         # temporary this thing has a race condition on stock checking
         for oi in shipment.orderitem_set.all():
             self.attempt_to_fulfill_orderitem(oi)
-        print('aaa', shipment.id, shipment.is_ready_to_book)
         if shipment.is_ready_to_book:
             return self.book_and_confirm_shipment(shipment)
         else:

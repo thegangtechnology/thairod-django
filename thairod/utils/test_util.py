@@ -1,5 +1,5 @@
 from decimal import Decimal
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import sqlparse
 from django.db.models import QuerySet
@@ -19,8 +19,9 @@ def debug_query(qs: QuerySet) -> str:
 
 def patch_line_bot_api(cls):
     line_patch = patch.object(LineBotApi, 'push_message', return_value=None)
-    line_patch.__enter__()
+    mock = line_patch.__enter__()
     cls.addClassCleanup(line_patch.__exit__, None, None, None)
+    return mock
 
 
 def fake_shippop_create_order(self, order_data: OrderData) -> OrderResponse:
@@ -56,16 +57,22 @@ class TestCase(TC):
     patch_line = True
     patch_shippop = True
     with_seed = True
+    line_mock: MagicMock = None
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         if cls.patch_line:
-            patch_line_bot_api(cls)
+            cls.line_mock = patch_line_bot_api(cls)
         if cls.patch_shippop:
             patch_shippop(cls)
         if cls.with_seed:
             load_seed()
+
+    def _pre_setup(self):
+        super()._pre_setup()
+        if self.line_mock is not None:
+            self.line_mock.reset()
 
 
 class APITestCase(ATC):

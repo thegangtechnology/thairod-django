@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from order.models import Order
 from order.views import OrderService, CreateOrderParameter
+from shipment.models import Shipment
 from shipment.models.box_size import BoxSize
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase, APITestCase
@@ -19,9 +20,29 @@ class TestOrderService(TestCase):
     def test_create_order(self):
         old_count = Order.objects.count()
         param = CreateOrderParameter.example_with_valid_item()
-        OrderService().create_order(param)
+        res = OrderService().create_order(param)
         new_count = Order.objects.count()
         self.assertEqual(old_count + 1, new_count)
+
+    def test_create_order_did_send_line_message(self):
+        param = CreateOrderParameter.example_with_valid_item()
+        self.line_mock.reset_mock()
+        self.seed.procure_item(param.items[0].item_id, 100)
+        res = OrderService().create_order(param)
+        order = Order.objects.get(pk=res.order_id)
+        self.assertEqual(self.line_mock.call_count, 2)  # once for created and once for fulfill
+        lineuid = self.line_mock.call_args_list[0][0][0]
+        msg = self.line_mock.call_args_list[0][0][1].text
+        self.assertEqual(order.line_id, lineuid)
+        self.assertIn(order.receiver_address.name, msg)
+        self.assertIn(str(order.id), msg)
+
+        lineuid = self.line_mock.call_args_list[1][0][0]
+        msg = self.line_mock.call_args_list[1][0][1].text
+        shipment: Shipment = order.shipment_set.first()
+        self.assertEqual(order.line_id, lineuid)
+        self.assertIn(order.receiver_address.name, msg)
+        self.assertIn(shipment.tracking_code, msg)
 
     def test_create_order_correct_data(self):
         param = CreateOrderParameter.example_with_valid_item()

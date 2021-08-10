@@ -30,6 +30,7 @@ class TestFulfilmentService(TestCase):
 
     def test_attempt_fulfill_shipment_on_has_stock(self):
         shipment: Shipment = Shipment.pending_shipments().first()
+        self.line_mock.reset_mock()
         FulfilmentService().attempt_fulfill_shipment(shipment)
         for oi in shipment.orderitem_set.all():
             self.assertEqual(oi.fulfilment_status, FulfilmentStatus.FULFILLED)
@@ -39,6 +40,7 @@ class TestFulfilmentService(TestCase):
         self.assertEqual(shipment.status, ShipmentStatus.CONFIRMED)
         self.assertIn('auto', shipment.batch.name)
         self.assertEqual(shipment.courier_code, 'SPE')
+        self.line_mock.assert_called_once()  # line message sent
 
     def test_attempt_fulfill_shipment_on_no_stock(self):
         pv = self.seed.make_product()
