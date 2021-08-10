@@ -1,8 +1,6 @@
 import logging
 from typing import Iterable, DefaultDict, List
 
-from django.utils import timezone
-
 from order.exceptions import ShippopConfirmationError
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
@@ -16,6 +14,7 @@ from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse
 from thairod.services.stock.stock import StockService, StockInfo
 from thairod.settings import SHIPPOP_EMAIL
+from thairod.utils import tzaware
 
 ItemVariationID = int
 StockCount = int
@@ -115,7 +114,8 @@ class FulFilmentService:
 
     def update_shipment_with_confirmation(self, shipment: Shipment):
         shipment.status = ShipmentStatus.CONFIRMED
-        shipment.shippop_confirm_date_time = timezone.now()
+        shipment.shippop_confirm_date_time = tzaware.now()
+        print('yyyy', tzaware.now(), tzaware.now().tzinfo)
         shipment.save()
 
     def update_shipment_with_shippop_booking(self, response: OrderResponse,

@@ -1,11 +1,10 @@
 import datetime
 from typing import Optional
 
-from django.utils import timezone
-
 from shipment.dataclasses.batch_shipment import AssignBatchToShipmentRequest
 from shipment.models import BatchShipment, Shipment
 from thairod import settings
+from thairod.utils import tzaware
 from thairod.utils.query_util import round_to_next_nearest_hour
 
 
@@ -23,7 +22,7 @@ class BatchShipmentService:
 
     @classmethod
     def determine_print_datetime(cls, date: Optional[datetime.datetime] = None):
-        date = timezone.now() if date is None else date
+        date = tzaware.now() if date is None else date
         return round_to_next_nearest_hour(date, settings.SHIPPOP_LOT_CUTTING_TIME)
 
     @classmethod

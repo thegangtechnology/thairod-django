@@ -1,10 +1,9 @@
 import datetime
 
 from django.test import TestCase
-from django.utils.timezone import now
 from future.backports.datetime import timedelta
 
-from thairod.utils import query_util
+from thairod.utils import query_util, tzaware
 
 
 class TestQueryUtil(TestCase):
@@ -16,18 +15,18 @@ class TestQueryUtil(TestCase):
         self.assertEqual(len(q.children), 0)
 
     def test_begin_only(self):
-        begin = now()
+        begin = tzaware.now()
         q = query_util.smart_range('a', begin, None)
         self.assertEqual(q.children[0], ('a__ge', begin))
 
     def test_end_only(self):
-        end = now()
+        end = tzaware.now()
         q = query_util.smart_range('a', None, end)
         self.assertEqual(q.children[0], ('a__lt', end))
 
     def test_begin_end(self):
-        end = now()
-        begin = now()
+        end = tzaware.now()
+        begin = tzaware.now()
         q = query_util.smart_range('a', begin, end)
         self.assertEqual(q.children[0], ('a__range', (begin, end)))
 

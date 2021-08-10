@@ -49,8 +49,14 @@ class PrintOfTheDayView(APIView):
     def get(self, request: Request) -> HttpResponse:
         param = PrintOfTheDayParam.from_get_request(request)
         shipments = Shipment.daily_shipment(date=param.date).all()
-
+        for s in Shipment.objects.all():
+            print('xxx', s.shippop_confirm_date_time)
+            if s.shippop_confirm_date_time is not None:
+                print(s.shippop_confirm_date_time.tzinfo)
+        print('abbb', param)
+        print('ccc', len(shipments))
         param = PrintLabelParam(shipments=[s.id for s in shipments])
+
         label = PrintLabelService().generate_label(param)
         if label is not None:
             return HttpResponse(label)

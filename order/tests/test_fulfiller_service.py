@@ -1,4 +1,3 @@
-from django.utils.timezone import now
 
 from order.models.order_item import FulfilmentStatus, OrderItem
 from order.services.fulfiller_service import FulFilmentService
@@ -6,6 +5,7 @@ from shipment.models import Shipment
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
 from thairod.services.shippop.data import ParcelData
+from thairod.utils import tzaware
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase
 
@@ -33,7 +33,7 @@ class TestFulFillerService(TestCase):
         FulFilmentService().attempt_fulfill_shipment(shipment)
         for oi in shipment.orderitem_set.all():
             self.assertEqual(oi.fulfilment_status, FulfilmentStatus.FULFILLED)
-        diff = now() - shipment.fulfilled_date
+        diff = tzaware.now() - shipment.fulfilled_date
         shipment.refresh_from_db()
         self.assertLess(diff.total_seconds(), 10)
         self.assertEqual(shipment.status, ShipmentStatus.CONFIRMED)
