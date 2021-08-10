@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from typing import Optional
-
+from django.db.models import QuerySet
 from django.db import models
 from django.utils import timezone
 
@@ -43,3 +43,8 @@ class BatchShipment(AbstractModel):
         return (BatchShipment.objects
                 .filter(created_date__range=date_range)
                 .count())
+
+    # batch that has shipment yet to be deliver
+    @classmethod
+    def get_pending_deliver_batch(cls) -> QuerySet:
+        return cls.objects.filter(shipment__deliver=False).distinct()

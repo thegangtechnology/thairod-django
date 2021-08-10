@@ -3,7 +3,6 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Avg, Count, Q
 from shipment.models import Shipment, BatchShipment, TrackingStatus
 from shipment.serializers import ShipmentSerializer, TrackingStatusSerializer
 from shipment.serializers.shipment_serializer import ShipmentAssignSerializer
@@ -42,20 +41,7 @@ class ShipmentModelViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def stats(self, request):
-        stats = Shipment.objects.all().aggregate(total=Count('id'),
-                                                 not_printed=Count(
-                                                     'id',
-                                                     filter=Q(label_printed=False) & Q(deliver=False)),
-                                                 printed_not_deliver=Count(
-                                                     'id',
-                                                     filter=Q(label_printed=True) & Q(deliver=False)),
-                                                 delivered=Count(
-                                                     'id',
-                                                     filter=Q(label_printed=True) & Q(deliver=True)),
-                                                 assigned=Count('batch'),
-                                                 not_assigned=Count('id',
-                                                                    filter=Q(batch=None))
-                                                 )
+        stats = Shipment.get_shipment_stats()
         return Response(stats)
 
 

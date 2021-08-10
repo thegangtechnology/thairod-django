@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import OuterRef, Exists, QuerySet
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-
+from django.db.models import Count, Q
 from core.models import AbstractModel
 from order.models.order import Order
 from shipment.models import BatchShipment
@@ -142,6 +142,23 @@ class Shipment(AbstractModel):
                 .filter(status=ShipmentStatus.CONFIRMED)
                 .filter(smart_range('shippop_confirm_date_time', begin, end))
                 .count())
+
+    @classmethod
+    def get_shipment_stats(cls) -> QuerySet:
+        return cls.objects.all().aggregate(total=Count('id'),
+                                           not_printed=Count(
+                                               'id',
+                                               filter=Q(label_printed=False) & Q(deliver=False)),
+                                           printed_not_deliver=Count(
+                                               'id',
+                                               filter=Q(label_printed=True) & Q(deliver=False)),
+                                           delivered=Count(
+                                               'id',
+                                               filter=Q(label_printed=True) & Q(deliver=True)),
+                                           assigned=Count('batch'),
+                                           not_assigned=Count('id',
+                                                              filter=Q(batch=None))
+                                           )
 
     @classmethod
     def example(cls) -> Shipment:

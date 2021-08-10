@@ -59,6 +59,6 @@ class BatchShipmentModelViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=['GET'], url_path='pending-deliver')
     def pending_deliver(self, request):
-        pending_deliver_batch_names = BatchShipment.objects.filter(shipment__deliver=False).distinct()
+        pending_deliver_batch_names = BatchShipment.get_pending_deliver_batch()
         serialized_batches = BatchShipmentNameSerializer(pending_deliver_batch_names, many=True)
         return Response(serialized_batches.data)
