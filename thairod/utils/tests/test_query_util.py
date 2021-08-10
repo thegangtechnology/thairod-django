@@ -43,7 +43,7 @@ class TestSmartEqual(TestCase):
 
 class TestToInterval(TestCase):
     def test_to_interval(self):
-        anchor = datetime.datetime(1982, 8, 23)
+        anchor = tzaware.datetime(1982, 8, 23)
         dates = [
             anchor,
             anchor - timedelta(days=2),
@@ -58,17 +58,17 @@ class TestToInterval(TestCase):
 
 class TestDateRange(TestCase):
     def test_date_range_positive(self):
-        anchor = datetime.datetime(1982, 8, 23)
+        anchor = tzaware.datetime(1982, 8, 23)
         got = query_util.date_range(anchor, 3)
-        exp = [datetime.datetime(1982, 8, x) for x in [23, 24, 25, 26]]
+        exp = [tzaware.datetime(1982, 8, x) for x in [23, 24, 25, 26]]
         self.assertListEqual(
             got, exp
         )
 
     def test_date_range_negative(self):
-        anchor = datetime.datetime(1982, 8, 23)
+        anchor = tzaware.datetime(1982, 8, 23)
         got = query_util.date_range(anchor, -3)
-        exp = [datetime.datetime(1982, 8, x) for x in [23, 22, 21, 20]]
+        exp = [tzaware.datetime(1982, 8, x) for x in [23, 22, 21, 20]]
         self.assertListEqual(
             got, exp
         )
@@ -76,21 +76,21 @@ class TestDateRange(TestCase):
 
 class TestReplaceHour(TestCase):
     def test_replace_hour(self):
-        d = datetime.datetime(1982, 8, 23, 10, 11, 12, 13)
+        d = tzaware.datetime(1982, 8, 23, 10, 11, 12, 13)
         got = query_util.replace_hour(d, 9)
-        exp = datetime.datetime(1982, 8, 23, 9, 0, 0, 0)
+        exp = tzaware.datetime(1982, 8, 23, 9, 0, 0, 0)
         self.assertEqual(got, exp)
 
 
 class TestRoundNextNearestHour(TestCase):
     def test_after_time(self):
-        d = datetime.datetime(1982, 8, 23, 10, 11, 12, 13)
+        d = tzaware.datetime(1982, 8, 23, 10, 11, 12, 13)
         got = query_util.round_to_next_nearest_hour(d, 9)
-        exp = datetime.datetime(1982, 8, 24, 9)
+        exp = tzaware.datetime(1982, 8, 24, 9)
         self.assertEqual(got, exp)
 
     def test_before_time(self):
-        d = datetime.datetime(1982, 8, 23, 2, 11, 12, 13)
+        d = tzaware.datetime(1982, 8, 23, 2, 11, 12, 13)
         got = query_util.round_to_next_nearest_hour(d, 9)
-        exp = datetime.datetime(1982, 8, 23, 9)
+        exp = tzaware.datetime(1982, 8, 23, 9)
         self.assertEqual(got, exp)
