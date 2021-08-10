@@ -52,6 +52,18 @@ class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         got = BatchShipment.count_created_today()
         self.assertEqual(got, 2)
 
+    def test_all(self):
+        count = BatchShipment.objects.all().count()
+        url = reverse("batch-shipment-all")
+        response = self.client.get(url, format='json')
+        self.assertEqual(count, len(response.data))
+
+    def test_pending_deliver(self):
+        count = BatchShipment.objects.filter(shipment__deliver=False).distinct().count()
+        url = reverse("batch-shipment-pending-deliver")
+        response = self.client.get(url, format='json')
+        self.assertEqual(count, len(response.data))
+
     def test_assign_batch(self):
         batch_name = "batch_name"
         shipments = [Shipment.objects.first().id]

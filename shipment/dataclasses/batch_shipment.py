@@ -4,7 +4,7 @@ from typing import List
 
 
 @dataclass
-class GeneratedBatchNameResponse(AutoSerialize):
+class BatchNameResponse(AutoSerialize):
     name: str
 
     @classmethod
