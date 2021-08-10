@@ -18,6 +18,7 @@ class OrderFlowService:
         if create_order_flow_request.items:
             doctor_order = DoctorOrder(items=create_order_flow_request.items)
             order_flow.doctor_order = doctor_order.to_data()
+            order_flow.save()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
@@ -30,7 +31,8 @@ class OrderFlowService:
             -> OrderFlowResponse:
         patient_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.get(doctor_link_hash=checkout_doctor_order_request.doctor_link_hash)
-        if order_flow.auto_doctor_confirm or order_flow.patient_link_hash_timestamp:
+        # Order is confirmed. Wait for patient confirmation
+        if order_flow.patient_link_hash_timestamp:
             return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
         order_flow.doctor_order = checkout_doctor_order_request.doctor_order.to_data()
         order_flow.patient_link_hash = patient_hash
