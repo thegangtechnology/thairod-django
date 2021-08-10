@@ -70,7 +70,6 @@ class Shipment(AbstractModel):
         from thairod import settings
         dt = tzaware.datetime(date.year, date.month, date.day)
         dt = replace_hour(dt, settings.SHIPPOP_LOT_CUTTING_TIME)
-        print('ffff', dt.tzinfo)
         return Shipment.objects.filter(
             shippop_confirm_date_time__range=(dt - datetime.timedelta(days=1), dt)
         )

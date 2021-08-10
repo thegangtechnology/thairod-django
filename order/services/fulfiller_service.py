@@ -115,7 +115,6 @@ class FulFilmentService:
     def update_shipment_with_confirmation(self, shipment: Shipment):
         shipment.status = ShipmentStatus.CONFIRMED
         shipment.shippop_confirm_date_time = tzaware.now()
-        print('yyyy', tzaware.now(), tzaware.now().tzinfo)
         shipment.save()
 
     def update_shipment_with_shippop_booking(self, response: OrderResponse,
