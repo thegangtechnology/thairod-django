@@ -46,6 +46,22 @@ class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         self.assertEqual(response.data, 'Batch Name is None.')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_shipment_stats(self):
+        url = reverse("shipment-stats")
+        response = self.client.get(url,  format='json')
+        total = Shipment.objects.all().count()
+        self.assertEqual(total, response.data.get('total', None))
+        not_printed = Shipment.objects.filter(label_printed=False, deliver=False).count()
+        self.assertEqual(not_printed, response.data.get('not_printed', None))
+        printed_not_deliver = Shipment.objects.filter(label_printed=True, deliver=False).count()
+        self.assertEqual(printed_not_deliver, response.data.get('printed_not_deliver', None))
+        delivered = Shipment.objects.filter(label_printed=True, deliver=True).count()
+        self.assertEqual(delivered, response.data.get('delivered', None))
+        assigned = Shipment.objects.filter(batch__isnull=False).count()
+        self.assertEqual(assigned, response.data.get('assigned', None))
+        not_assigned = Shipment.objects.filter(batch__isnull=True).count()
+        self.assertEqual(not_assigned, response.data.get('not_assigned', None))
+
 
 class TestShipment(TestCase):
     with_seed = False
