@@ -1,7 +1,9 @@
-from django.db import models
-from core.models import AbstractModel
-from django.utils import timezone
+import datetime
 import secrets
+
+from django.db import models
+
+from core.models import AbstractModel
 
 
 class OrderFlow(AbstractModel):
@@ -21,7 +23,7 @@ class OrderFlow(AbstractModel):
         secret = secrets.token_urlsafe(nbytes=32)
         return secret
 
-    def is_doctor_link_hash_timestamp_expired(self, timezone_object: timezone) -> bool:
+    def is_doctor_link_hash_timestamp_expired(self, timezone_object: datetime.datetime) -> bool:
         diff = timezone_object - self.doctor_link_hash_timestamp
         diff_in_seconds = diff.total_seconds()
         diff_in_hours = divmod(diff_in_seconds, 3600)[0]

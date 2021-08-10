@@ -4,9 +4,9 @@ import datetime
 from typing import Optional
 
 from django.db import models
-from django.utils import timezone
 
 from core.models import AbstractModel
+from thairod.utils import tzaware
 
 
 class BatchShipment(AbstractModel):
@@ -23,14 +23,14 @@ class BatchShipment(AbstractModel):
     @classmethod
     def generate_auto_batch_name(cls, date: Optional[datetime.datetime] = None):
         from shipment.services.batch_shipment_service import BatchShipmentService
-        date = timezone.now() if date is None else date
+        date = tzaware.now() if date is None else date
         d = BatchShipmentService.determine_print_date(date)
         return cls._generate_batch_name(d, 'auto')
 
     @classmethod
     def generate_batch_name(cls, date: Optional[datetime.datetime] = None) -> str:
         from shipment.services.batch_shipment_service import BatchShipmentService
-        date = timezone.now() if date is None else date
+        date = tzaware.now() if date is None else date
         batch_no = cls.count_created_today(date) + 1
         d = BatchShipmentService.determine_print_date(date)
         return cls._generate_batch_name(d, str(batch_no))

@@ -2,7 +2,6 @@ from datetime import timedelta
 from typing import Iterable
 
 from django.urls import reverse
-from django.utils import timezone
 
 from address.models import Address
 from core.tests import BaseTestSimpleApiMixin
@@ -11,6 +10,7 @@ from order.dataclasses.order import CreateOrderParameter
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
 from order.services.order_service import OrderService
+from thairod.utils import tzaware
 from thairod.utils.load_seed import load_realistic_seed
 from thairod.utils.test_util import APITestCase, TestCase
 
@@ -57,7 +57,7 @@ class TestOrderItemTotal(TestCase):
         fulfilled_item = OrderItem.objects.get(pk=item.id)
         self.assertEqual(fulfilled_item.fulfilment_status, FulfilmentStatus.FULFILLED)
         self.assertGreaterEqual(fulfilled_item.fulfill_datetime,
-                                timezone.now() - timedelta(seconds=1))
+                                tzaware.now() - timedelta(seconds=1))
 
     def test_total_fulfilled(self):
         total = OrderItem.total_fulfilled(self.seed.product_variations[0])
