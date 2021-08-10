@@ -1,5 +1,5 @@
 import functools
-from typing import Type, Generic, TypeVar, Dict, Any, Optional
+from typing import Type, Generic, TypeVar, Dict, Any, Optional, List
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.request import Request
@@ -26,7 +26,22 @@ class AutoSerialize:
 
     @classmethod
     def validate_data(cls, data: Dict[str, Any]):
+        """
+
+        Args:
+            data ():
+
+        Returns:
+            data if valid
+        Raises:
+            ValidationError if not
+        """
         return data
+
+    @classmethod
+    def fields(cls) -> List[str]:
+        """Field to include. If you wish to include a method(no arg) just put it after __all__"""
+        return ['__all__']
 
     @classmethod
     def from_data(cls: Type[T], data: Dict[str, Any]) -> T:
@@ -47,12 +62,14 @@ class AutoSerialize:
     def serializer(cls: Type[T]) -> Type[TGSerializer[T]]:
 
         class Serializer(TGSerializer[cls]):
+
             class Meta:
                 dataclass = cls
                 ref_name = cls.__name__
+                fields = cls.fields()
 
-            def validated(self, data):
-                return cls.validate(data)
+            def validate(self, data):
+                return cls.validate_data(data)
 
             @classmethod
             def parse_request(cls, request: Request) -> T:
