@@ -36,6 +36,12 @@ class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
                                                              created_date__day=today.day).count()
         self.assertEqual(no_batch_create_today, BatchShipment.count_create_today())
 
+    def test_all(self):
+        count = BatchShipment.objects.all().count()
+        url = reverse("batch-shipment-all")
+        response = self.client.get(url, format='json')
+        self.assertEqual(count, len(response.data))
+
     def test_assign_batch(self):
         batch_name = "batch_name"
         shipments = [Shipment.objects.first().id]

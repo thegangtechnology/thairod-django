@@ -10,6 +10,7 @@ from order.dataclasses.order import CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, \
     PatientConfirmationRequest, OrderFlowResponse
 from order_flow.services import OrderFlowService
+from order_flow.models import OrderFlow
 from thairod.settings import TELEMED_WHITELIST
 from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
@@ -34,11 +35,16 @@ class OrderFlowsHashAPI(APIView):
     )
     def get(self, request: Request) -> Response:
         doctor_hash = request.query_params.get('doctor', None)
-        if doctor_hash:
-            return OrderFlowService().get_order_flow_from_doctor_hash(doctor_hash=doctor_hash).to_response()
         patient_hash = request.query_params.get('patient', None)
-        if patient_hash:
-            return OrderFlowService().get_order_flow_from_patient_hash(patient_hash=patient_hash).to_response()
+        if doctor_hash and patient_hash:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if doctor_hash:
+                return OrderFlowService().get_order_flow_from_doctor_hash(doctor_hash=doctor_hash).to_response()
+            if patient_hash:
+                return OrderFlowService().get_order_flow_from_patient_hash(patient_hash=patient_hash).to_response()
+        except OrderFlow.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

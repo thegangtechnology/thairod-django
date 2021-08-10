@@ -8,3 +8,10 @@ class ProductVariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariation
         fields = '__all__'
+
+
+class ProductVariationNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductVariation
+        fields = ('name', 'id', )

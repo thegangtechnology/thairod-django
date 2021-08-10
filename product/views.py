@@ -1,9 +1,11 @@
 from rest_framework import viewsets, filters
-
+from rest_framework.decorators import action
 from product.models import Product, ProductVariation, ProductImage
 from product.serializers.product_image_serializer import ProductImageSerializer
 from product.serializers.product_serializer import ProductSerializer
-from product.serializers.product_variation_serializer import ProductVariationSerializer
+from product.serializers.product_variation_serializer import ProductVariationSerializer, \
+    ProductVariationNameSerializer
+from rest_framework.response import Response
 
 
 class ProductModelViewSet(viewsets.ModelViewSet):
@@ -26,4 +28,8 @@ class ProductVariationModelViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['product__sku', 'product__name', 'product__description', 'name', 'description', 'price']
 
-# TODO: Check for stock API
+    @action(detail=False, methods=['GET'], url_path='all')
+    def all(self, request):
+        all_product_variations = ProductVariation.objects.all()
+        serialized_batches = ProductVariationNameSerializer(all_product_variations, many=True)
+        return Response(serialized_batches.data)

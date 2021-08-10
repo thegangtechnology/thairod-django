@@ -6,3 +6,10 @@ class BatchShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BatchShipment
         fields = '__all__'
+
+
+class BatchShipmentNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BatchShipment
+        fields = ('name', 'id', )
