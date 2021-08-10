@@ -24,8 +24,7 @@ class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         }
 
     def test_generated_batch_name_after(self):
-        date = (tzaware.datetime(2020, 8, 23, settings.SHIPPOP_LOT_CUTTING_TIME)
-                + datetime.timedelta(hours=1))
+        date = (tzaware.datetime(2020, 8, 23, settings.SHIPPOP_LOT_CUTTING_TIME) + datetime.timedelta(hours=1))
         batch_name = BatchShipment.generate_batch_name(date)
         self.assertEqual(batch_name, '2020-08-24_1')
 
