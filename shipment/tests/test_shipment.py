@@ -48,7 +48,7 @@ class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
 
     def test_shipment_stats(self):
         url = reverse("shipment-stats")
-        response = self.client.get(url,  format='json')
+        response = self.client.get(url, format='json')
         total = Shipment.objects.all().count()
         self.assertEqual(total, response.data.get('total', None))
         not_printed = Shipment.objects.filter(label_printed=False, deliver=False).count()

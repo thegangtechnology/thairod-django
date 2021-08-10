@@ -8,6 +8,7 @@ from shipment.serializers import ShipmentSerializer, TrackingStatusSerializer
 from shipment.serializers.shipment_serializer import ShipmentAssignSerializer
 from datetime import datetime
 
+
 class ShipmentModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, ]
     serializer_class = ShipmentSerializer
