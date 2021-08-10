@@ -1,7 +1,7 @@
 from order.dataclasses.cart_item import CartItem
 from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
-    CheckoutDoctorOrderRequest, PatientConfirmationRequest
+    CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
 from order_flow.models import OrderFlow
 from thairod.utils import tzaware
 
@@ -12,7 +12,12 @@ class OrderFlowService:
         doctor_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.create(doctor_link_hash=doctor_hash,
                                               doctor_link_hash_timestamp=tzaware.now(),
-                                              doctor_info=create_order_flow_request.to_data())
+                                              doctor_info=create_order_flow_request.to_data(),
+                                              auto_doctor_confirm=create_order_flow_request.auto_doctor_confirm)
+
+        if create_order_flow_request.items:
+            doctor_order = DoctorOrder(items=create_order_flow_request.items)
+            order_flow.doctor_order = doctor_order.to_data()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
@@ -25,6 +30,8 @@ class OrderFlowService:
             -> OrderFlowResponse:
         patient_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.get(doctor_link_hash=checkout_doctor_order_request.doctor_link_hash)
+        if order_flow.auto_doctor_confirm or order_flow.patient_link_hash_timestamp:
+            return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
         order_flow.doctor_order = checkout_doctor_order_request.doctor_order.to_data()
         order_flow.patient_link_hash = patient_hash
         order_flow.patient_link_hash_timestamp = tzaware.now()

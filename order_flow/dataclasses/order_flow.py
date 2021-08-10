@@ -6,6 +6,8 @@ from order.dataclasses.shipping_address import ShippingAddress
 from order_flow.models import OrderFlow
 from typing import Optional
 from order_flow.dataclasses.doctor_order import DoctorOrderResponse
+from typing import List
+from order.dataclasses.cart_item import CartItem
 
 
 @dataclass
@@ -16,6 +18,8 @@ class CreateOrderFlowRequest(AutoSerialize):
     shipping_address: ShippingAddress
     line_id: str
     session_id: str
+    items: List[CartItem]
+    auto_doctor_confirm: bool
 
     @classmethod
     def example(cls):
@@ -25,7 +29,10 @@ class CreateOrderFlowRequest(AutoSerialize):
             patient=Patient.example(),
             shipping_address=ShippingAddress.example(),
             line_id="",
-            session_id="AAABB2134")
+            session_id="AAABB2134",
+            items=[CartItem.example()],
+            auto_doctor_confirm=False
+        )
 
 
 @dataclass
@@ -37,6 +44,7 @@ class OrderFlowResponse(AutoSerialize):
     patient_link_hash: Optional[str]
     patient_link_hash_timestamp: Optional[str]
     patient_confirmation: Optional[ShippingAddress]
+    auto_doctor_confirm: bool
 
     @classmethod
     def example(cls):
@@ -47,7 +55,9 @@ class OrderFlowResponse(AutoSerialize):
             doctor_order=DoctorOrderResponse.example(),
             patient_link_hash='vsdasadadafrqwJ0nO1Zryeyre9a8cD5c',
             patient_link_hash_timestamp="",
-            patient_confirmation=ShippingAddress.example())
+            patient_confirmation=ShippingAddress.example(),
+            auto_doctor_confirm=False,
+        )
 
     @classmethod
     def from_order_flow_model(cls, order_flow: OrderFlow):
@@ -56,7 +66,7 @@ class OrderFlowResponse(AutoSerialize):
         patient_confirmation_data = None
         patient_link_hash_timestamp_data = None
         if order_flow.doctor_order:
-            is_confirmed = order_flow.patient_link_hash is not None
+            is_confirmed = order_flow.patient_link_hash is not None or order_flow.auto_doctor_confirm
             doctor_order_data = DoctorOrderResponse.from_doctor_order_dict(doctor_order=dict(**order_flow.doctor_order),
                                                                            is_confirmed=is_confirmed)
         if order_flow.patient_confirmation:
@@ -70,5 +80,6 @@ class OrderFlowResponse(AutoSerialize):
             doctor_order=doctor_order_data,
             patient_link_hash=order_flow.patient_link_hash,
             patient_link_hash_timestamp=patient_link_hash_timestamp_data,
-            patient_confirmation=patient_confirmation_data
+            patient_confirmation=patient_confirmation_data,
+            auto_doctor_confirm=order_flow.auto_doctor_confirm
         )

@@ -20,6 +20,10 @@ class BatchShipmentService:
             shipment.batch = batch_shipment
             shipment.save()
 
+    # @classmethod
+    # def unassign_batch_shipments(self):
+    #     pass
+
     @classmethod
     def determine_print_datetime(cls, date: Optional[datetime.datetime] = None):
         date = tzaware.now() if date is None else date

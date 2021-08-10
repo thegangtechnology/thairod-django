@@ -19,7 +19,6 @@ class TestPrintOfTheDayAPI(APITestCase):
             # there is a slight chance this will fail around 9am due to time skip
             seed.full_production()
 
-    @unittest.skip("skip this for now until the test is stable.")
     def _test_print_of_the_day(self, prepare_date: datetime.datetime, print_date: datetime.date):
         self.prepare_seed(prepare_date=prepare_date)
         url = reverse('print-of-the-day')
