@@ -1,7 +1,5 @@
 from datetime import timedelta
 
-
-from shipment.models import Shipment
 from thairod import settings
 from thairod.services.dashboard import dashboard_service as ds
 from thairod.services.stock.stock import StockInfo
@@ -21,7 +19,7 @@ class TestDashboard(TestCase):
     def test_get_dash_board_summary(self):
         date = tzaware.now().replace(hour=8)
         anchor = round_to_next_nearest_hour(date, settings.SHIPPOP_LOT_CUTTING_TIME)
-        got = ds.DashboardService().get_dashboard_summary(date)
+        got = ds.DashboardService().get_dashboard_summary(anchor)
 
         self.assertEqual(got.latest_summary.begin, None)
         self.assertEqual(got.latest_summary.end, None)

@@ -5,7 +5,6 @@ from typing import DefaultDict, Optional
 
 from django.db import models
 from django.db.models import Sum, QuerySet
-from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
