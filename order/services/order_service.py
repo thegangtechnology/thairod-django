@@ -9,10 +9,12 @@ from order.dataclasses.order import CreateOrderParameter, CreateOrderResponse
 from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
 from order.models.order import Order, OrderStatus
 from order.models.order_item import OrderItem
+from order.services.fulfiller_service import FulfilmentService
 from product.models import ProductVariation
 from shipment.models import Shipment
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
+from thairod.services.line.line import send_line_order_created_message
 from thairod.services.shippop.data import AddressData
 from warehouse.models import Warehouse
 
@@ -25,25 +27,31 @@ class RawOrder:
 
 class OrderService:
 
-    def create_order(self, param: CreateOrderParameter) -> CreateOrderResponse:
+    def create_order(self, param: CreateOrderParameter, auto_fulfill=True) -> CreateOrderResponse:
         try:
             with transaction.atomic():
-                ro = self.create_order_no_callback(param)
-                return CreateOrderResponse(success=True,
-                                           order_id=ro.order.id,
-                                           shippop_tracking_code=ro.shipment.tracking_code,
-                                           courier_tracking_code=ro.shipment.courier_tracking_code)
+                ro = self.create_order_no_fulfill(param)
+            self.on_order_created_callback(ro.order)
+            if auto_fulfill:
+                FulfilmentService().attempt_fulfill_shipment(ro.shipment)
+            return CreateOrderResponse(success=True,
+                                       order_id=ro.order.id,
+                                       shippop_tracking_code=ro.shipment.tracking_code,
+                                       courier_tracking_code=ro.shipment.courier_tracking_code)
 
         except (ShippopConfirmationError, ShippopCreateOrderError):
             return CreateOrderResponse(success=False)
 
-    def create_order_no_callback(self, param: CreateOrderParameter) -> RawOrder:
-        from order.services.fulfiller_service import FulFilmentService
+    def create_order_no_fulfill(self, param: CreateOrderParameter) -> RawOrder:
         if not param.is_valid_order():
             raise ValidationError(detail={'cid': 'this cid has already ordered restricted item'})
         ro = self.create_raw_order(param)
-        FulFilmentService().attempt_fulfill_shipment(ro.shipment)
         return ro
+
+    def on_order_created_callback(self, order: Order):
+        send_line_order_created_message(line_uid=order.line_id,
+                                        name=order.receiver_address.name,
+                                        order_id=order.id)
 
     def create_raw_order(self, param: CreateOrderParameter) -> RawOrder:
         address = self.create_address(param)

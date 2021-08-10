@@ -9,7 +9,7 @@ from address.models import Address
 from order.dataclasses.cart_item import CartItem
 from order.dataclasses.order import CreateOrderResponse
 from order.models import Order, OrderItem
-from order.services.fulfiller_service import FulFilmentService
+from order.services.fulfiller_service import FulfilmentService
 from order.services.order_service import RawOrder
 from order.views import OrderService, CreateOrderParameter
 from procurement.models import Procurement
@@ -165,14 +165,14 @@ class RealisticSeed:
                 cart = CartItem(item_id=pv_id, quantity=quantity)
                 ro = self.create_one_order([cart])
                 if i % 2 == 0:
-                    FulFilmentService().attempt_fulfill_shipment(ro.shipment)
+                    FulfilmentService().attempt_fulfill_shipment(ro.shipment)
 
     def create_one_order(self, cart_items: List[CartItem]) -> RawOrder:
         param = CreateOrderParameter.example(items=cart_items)
         order = OrderService().create_raw_order(param)
         return order
 
-    def make_product(self, restricted: bool) -> ProductVariation:
+    def make_product(self, restricted: bool = False) -> ProductVariation:
         prod = Product.example()
         prod.non_repeatable = restricted
         prod.save()
@@ -182,12 +182,25 @@ class RealisticSeed:
         pv.save()
         return pv
 
+    def procure_item(self, pv_id: int, quantity: int = 1) -> Procurement:
+        return Procurement.objects.create(product_variation_id=pv_id,
+                                          quantity=quantity,
+                                          unit_price=0,
+                                          warehouse=self.warehouses[0])
+
     def order_item(self, pv_id: int, cid: str = '111') -> CreateOrderResponse:
         param = CreateOrderParameter.example()
         param.patient.cid = cid
         param.items = [CartItem(item_id=pv_id, quantity=1)]
         res = OrderService().create_order(param)
         return res
+
+    def order_item_no_fulfill(self, pv_id: int, cid: str = '111') -> RawOrder:
+        param = CreateOrderParameter.example()
+        param.patient.cid = cid
+        param.items = [CartItem(item_id=pv_id, quantity=1)]
+        ro = OrderService().create_order_no_fulfill(param)
+        return ro
 
 
 def load_realistic_seed() -> RealisticSeed:
