@@ -9,6 +9,7 @@ from django.urls import reverse
 from rest_framework import status
 import json
 from os.path import join, dirname
+from order_flow.exceptions import OrderAlreadyConfirmedException
 
 
 class TestOrderFlowService(TestCase):
@@ -32,9 +33,10 @@ class TestOrderFlowService(TestCase):
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
             order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             self.assertTrue(order_flow_response.auto_doctor_confirm)
-            self.assertEqual(order_flow_response.patient_link_hash_timestamp, None)
+            self.assertIsNotNone(order_flow_response.patient_link_hash_timestamp)
 
     def test_create_order_flow_with_doctor_not_confirm(self):
         filename = 'create_order_flow_confirm_false.json'
@@ -56,13 +58,13 @@ class TestOrderFlowService(TestCase):
             self.assertEqual(order_flow_response.doctor_order, None)
 
     def test_create_order_flow_with_order(self):
-        filename = 'create_order_flow_confirm_true.json'
+        filename = 'create_order_flow_confirm_false.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
             order_flow_request = CreateOrderFlowRequest(**order_flow_json)
             order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
-            self.assertTrue(order_flow_response.auto_doctor_confirm)
+            self.assertFalse(order_flow_response.auto_doctor_confirm)
             self.assertFalse(order_flow_response.doctor_order.is_confirmed)
             self.assertEqual(order_flow_response.patient_link_hash_timestamp, None)
             self.assertEqual(len(order_flow_response.doctor_order.items), 1)
@@ -92,7 +94,30 @@ class TestOrderFlowService(TestCase):
         self.assertEqual(order_flow_response.doctor_order.items[0].description,
                          self.seed.product_variations[1].description)
 
-    # test create override order when patient hash is create
+    def test_override_doctor_order_after_confirm(self):
+        order_flow_request = CreateOrderFlowRequest.example(items=[])
+        order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
+        # no patient hash yet
+        self.assertTrue(order_flow_response.patient_link_hash is None)
+        new_item = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
+        doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
+                                                     doctor_order=DoctorOrder(items=new_item))
+        response = OrderFlowService().write_doctor_order_to_order_flow(checkout_doctor_order_request=doctor_checkout)
+        # should be new order and patient hash should be created
+        self.assertEqual(response.doctor_link_hash, doctor_checkout.doctor_link_hash)
+        self.assertTrue(response.patient_link_hash is not None)
+        self.assertEqual(response.doctor_order.items[0].id, self.seed.product_variations[0].id)
+        self.assertEqual(response.doctor_order.items[0].quantity, 1)
+        self.assertEqual(response.doctor_order.items[0].description,
+                         self.seed.product_variations[0].description)
+        # if try to override should go boom boom
+        with self.assertRaises(OrderAlreadyConfirmedException):
+            OrderFlowService().write_doctor_order_to_order_flow(
+                checkout_doctor_order_request=doctor_checkout)
+
+    # test confirm patient normal flow
+    def test_confirm_patient(self):
+        pass
 
 
 class TestOrderFlowAPI(APITestCase):

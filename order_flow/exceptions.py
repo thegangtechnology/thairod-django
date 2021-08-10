@@ -1,9 +1,13 @@
-class OrderAlreadyCreatedException(Exception):
-    pass
+class PatientAlreadyConfirmedException(Exception):
+
+    def __init__(self):
+        self.message = 'Patient already confirmed. Cannot confirm again'
 
 
 class OrderAlreadyConfirmedException(Exception):
-    pass
+
+    def __init__(self):
+        self.message = 'Order already confirmed. Cannot make another order of the same request'
 
 
 class HashExpired(Exception):
