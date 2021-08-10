@@ -1,10 +1,9 @@
-from django.utils import timezone
-
 from order.dataclasses.cart_item import CartItem
 from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest
 from order_flow.models import OrderFlow
+from thairod.utils import tzaware
 
 
 class OrderFlowService:
@@ -12,7 +11,7 @@ class OrderFlowService:
     def create_order_flow(self, create_order_flow_request: CreateOrderFlowRequest) -> OrderFlowResponse:
         doctor_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.create(doctor_link_hash=doctor_hash,
-                                              doctor_link_hash_timestamp=timezone.now(),
+                                              doctor_link_hash_timestamp=tzaware.now(),
                                               doctor_info=create_order_flow_request.to_data())
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
@@ -28,7 +27,7 @@ class OrderFlowService:
         order_flow = OrderFlow.objects.get(doctor_link_hash=checkout_doctor_order_request.doctor_link_hash)
         order_flow.doctor_order = checkout_doctor_order_request.doctor_order.to_data()
         order_flow.patient_link_hash = patient_hash
-        order_flow.patient_link_hash_timestamp = timezone.now()
+        order_flow.patient_link_hash_timestamp = tzaware.now()
         order_flow.save()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 

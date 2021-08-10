@@ -5,14 +5,15 @@ from typing import Iterable, Optional
 
 from django.db import models
 from django.db.models import OuterRef, Exists, QuerySet
-from django.utils.timezone import now
+
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from core.models import AbstractModel
 from order.models.order import Order
 from shipment.models import BatchShipment
 from shipment.models.box_size import BoxSize
-from thairod.utils.query_util import smart_range
+from thairod.utils import tzaware
+from thairod.utils.query_util import smart_range, replace_hour
 from warehouse.models import Warehouse
 
 
@@ -67,7 +68,8 @@ class Shipment(AbstractModel):
     @classmethod
     def daily_shipment(cls, date: datetime.date) -> QuerySet:
         from thairod import settings
-        dt = datetime.datetime(date.year, date.month, date.day, hour=settings.SHIPPOP_LOT_CUTTING_TIME)
+        dt = tzaware.datetime(date.year, date.month, date.day)
+        dt = replace_hour(dt, settings.SHIPPOP_LOT_CUTTING_TIME)
         return Shipment.objects.filter(
             shippop_confirm_date_time__range=(dt - datetime.timedelta(days=1), dt)
         )
@@ -86,17 +88,17 @@ class Shipment(AbstractModel):
 
     def mark_fulfilled(self):
         self.status = ShipmentStatus.FULFILLED
-        self.fulfilled_date = now()
+        self.fulfilled_date = tzaware.now()
         self.save()
 
     def mark_booked(self):
         self.status = ShipmentStatus.BOOKED
-        self.booked_date = now()
+        self.booked_date = tzaware.now()
         self.save()
 
     def mark_confirmed(self):
         self.status = ShipmentStatus.CONFIRMED
-        self.shippop_confirm_date_time = now()
+        self.shippop_confirm_date_time = tzaware.now()
         self.save()
 
     @classmethod

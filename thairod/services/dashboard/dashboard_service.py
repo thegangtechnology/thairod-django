@@ -4,7 +4,6 @@ from typing import List, Optional
 
 from django.db.models import Func
 from django.db.models import QuerySet
-from django.utils.timezone import now
 from future.backports.datetime import timedelta
 
 from product.models import ProductVariation
@@ -12,6 +11,7 @@ from shipment.models import Shipment
 from shipment.models.shipment import ShipmentStatus
 from thairod import settings
 from thairod.services.stock.stock import StockInfo, StockService
+from thairod.utils import tzaware
 from thairod.utils.auto_serialize import AutoSerialize
 from thairod.utils.query_util import date_range, to_intervals, round_to_next_nearest_hour
 
@@ -48,7 +48,7 @@ class DailySummary(AutoSerialize):
 
     @classmethod
     def example(cls, end: Optional[datetime.datetime] = None, begin_is_none: bool = False):
-        end = now() if end is None else end
+        end = tzaware.now() if end is None else end
         return cls(
             begin=None if begin_is_none else end - timedelta(days=1),
             end=end,
@@ -65,7 +65,7 @@ class DashboardSummary(AutoSerialize):
 
     @classmethod
     def example(cls):
-        dates = date_range(now(), -7)
+        dates = date_range(tzaware.now(), -7)
         return cls(
             interval_summaries=[DailySummary.example(end=date) for date in dates],
             latest_summary=DailySummary.example(end=None, begin_is_none=True)
@@ -80,9 +80,8 @@ class DashboardService:
     def shipment_of_the_day(self, should_print_date: datetime.date) -> QuerySet:
         d = should_print_date - datetime.timedelta(days=1)
 
-        begin = datetime.datetime(d.year, d.month, d.day,
-                                  hour=settings.SHIPPOP_LOT_CUTTING_TIME,
-                                  tzinfo=settings.TIME_ZONE_PY)
+        begin = tzaware.datetime(d.year, d.month, d.day,
+                                 hour=settings.SHIPPOP_LOT_CUTTING_TIME)
         end = begin + datetime.timedelta(days=1)
         return self.shipment_between_date(begin, end)
 
@@ -104,6 +103,7 @@ class DashboardService:
         )
 
         # TODO: optimize this
+
     def get_daily_summary(self,
                           begin: Optional[datetime.datetime],
                           end: Optional[datetime.datetime],

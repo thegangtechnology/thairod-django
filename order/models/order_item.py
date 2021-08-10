@@ -5,12 +5,12 @@ from typing import DefaultDict, Optional
 
 from django.db import models
 from django.db.models import Sum, QuerySet
-from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
 from product.models import ProductVariation
 from shipment.models import Shipment
+from thairod.utils import tzaware
 from thairod.utils.query_util import smart_range, smart_equal
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class OrderItem(AbstractModel):
     def fulfill(self):
         OrderItem.objects.filter(id=self.id).update(
             fulfilment_status=FulfilmentStatus.FULFILLED,
-            fulfill_datetime=Now())
+            fulfill_datetime=tzaware.now())
         logger.info(f'Fulfill: oi_id: {self.id:d}, pv_id: {self.product_variation_id: d}')
         if self.shipment.is_ready_to_fulfill:
             self.shipment.mark_fulfilled()
