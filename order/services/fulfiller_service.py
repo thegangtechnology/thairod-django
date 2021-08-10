@@ -1,6 +1,8 @@
 import logging
 from typing import Iterable, DefaultDict, List
 
+from django.db import transaction
+
 from order.exceptions import ShippopConfirmationError
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
@@ -11,7 +13,8 @@ from shipment.models.shipment import ShipmentStatus
 from shipment.services.batch_shipment_service import BatchShipmentService
 from thairod.services.line.line import send_line_tracking_message
 from thairod.services.shippop.api import ShippopAPI
-from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse
+from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse, \
+    spe_postal_codes
 from thairod.services.stock.stock import StockService, StockInfo
 from thairod.settings import SHIPPOP_EMAIL
 from thairod.utils import tzaware
@@ -22,15 +25,24 @@ StockCount = int
 logger = logging.getLogger(__name__)
 
 
-class FulFilmentService:
+class FulFilmentException(Exception):
+    pass
 
-    def attempt_fulfill_shipment(self, shipment: Shipment):
+
+class UnsupportedZipCode(FulFilmentException):
+    pass
+
+
+class FulfilmentService:
+
+    def attempt_fulfill_shipment(self, shipment: Shipment) -> bool:
         # temporary this thing has a race condition on stock checking
         for oi in shipment.orderitem_set.all():
-            stock = StockService().get_single_stock(oi.product_variation_id)
-            if stock.current_total >= oi.quantity:
-                oi.fulfill()
-        self.book_and_confirm_shipment(shipment)
+            self.attempt_to_fulfill_orderitem(oi)
+        if shipment.is_ready_to_book:
+            return self.book_and_confirm_shipment(shipment)
+        else:
+            return False
 
     def fulfill_pending_order_items(self):
         order_items: Iterable[OrderItem] = OrderItem.sorted_pending_order_items()
@@ -59,20 +71,24 @@ class FulFilmentService:
         ).order_by('order_time').all()
         return ret
 
-    def book_and_confirm_shipment(self, shipment):
+    def book_and_confirm_shipment(self, shipment) -> bool:
         if not shipment.is_ready_to_book:
             logger.info(f'Attempt to book and confirm non fulfilled shipment {shipment.id}')
-            return
+            return False
+        with transaction.atomic():
+            res = self.book_shipment_with_shippop([shipment])
+            self.update_shipment_with_shippop_booking(res, shipment)
 
-        res = self.add_shipment_to_shippop([shipment])
-        self.update_shipment_with_shippop_booking(res, shipment)
+        with transaction.atomic():
+            self.confirm_shipment_with_shippop(shipment)
+            self.update_shipment_with_confirmation(shipment)
 
-        self.confirm_shipment_with_shippop(shipment)
-        self.update_shipment_with_confirmation(shipment)
+        with transaction.atomic():
+            self.put_shipment_in_auto_batch(shipment)
+            self.order_confirmed_call_back(shipment)
 
-        self.order_confirmed_call_back(shipment)
-        self.put_shipment_in_auto_batch(shipment)
         logger.info(f'Book and Confirm Shipment id: {shipment.id}')
+        return True
 
     def put_shipment_in_auto_batch(self, shipment: Shipment):
         BatchShipmentService.assign_batch_to_shipments(AssignBatchToShipmentRequest(
@@ -83,16 +99,19 @@ class FulFilmentService:
     def order_confirmed_call_back(self, shipment: Shipment):
         self.notify_user_with_tracking(shipment)
 
-    def attempt_to_fulfill_orderitem(self, oi: OrderItem, stock_map: DefaultDict[int, StockInfo]) -> bool:
+    def attempt_to_fulfill_orderitem(self, oi: OrderItem, stock_map: DefaultDict[int, StockInfo] = None) -> bool:
+        if oi.fulfilment_status != FulfilmentStatus.PENDING:
+            return False
         pv_id: int = oi.product_variation_id
-        if stock_map[pv_id].current_total >= oi.quantity:
+        stock = stock_map[pv_id] if stock_map is not None else StockService().get_single_stock(pv_id)
+        if stock.current_total() >= oi.quantity:
             oi.fulfill()
-            stock_map[pv_id].fulfilled += oi.quantity
+            stock.fulfilled += oi.quantity
             return True
         else:
             return False
 
-    def add_shipment_to_shippop(self, shipments: List[Shipment]):
+    def book_shipment_with_shippop(self, shipments: List[Shipment]):
         shippop_api = ShippopAPI()
         response = shippop_api.create_order(self.create_order_data(shipments))
         # some of them bound to fail
@@ -121,6 +140,7 @@ class FulFilmentService:
                                              shipment: Shipment):
         self.create_tracking_status(response, shipment)
         shipment.tracking_code = response.lines[0].tracking_code
+        shipment.courier_code = response.lines[0].courier_code
         shipment.shippop_purchase_id = response.purchase_id
         shipment.courier_tracking_id = response.lines[0].courier_tracking_code
         shipment.status = ShipmentStatus.BOOKED
@@ -144,6 +164,7 @@ class FulFilmentService:
             fail_url='',
             data=[
                 OrderLineData(
+                    courier_code=self.determine_courier_code(shipment),
                     from_address=AddressData.from_address_model(
                         shipment.warehouse.address
                     ),
@@ -153,6 +174,13 @@ class FulFilmentService:
                 for shipment in shipments
             ],
         )
+
+    def determine_courier_code(self, shipment: Shipment):
+        zip_code = shipment.order.receiver_address.postal_code
+        if zip_code in spe_postal_codes:
+            return 'SPE'
+        else:
+            raise UnsupportedZipCode(zip_code)
 
     def parcel_adapter(self, box_size: BoxSize, name="ไทยรอด") -> ParcelData:
         return ParcelData(

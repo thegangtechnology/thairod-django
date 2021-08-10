@@ -1,7 +1,8 @@
-import unittest
 import datetime
+
 import freezegun
 from django.urls import reverse
+
 from thairod import settings
 from thairod.utils import tzaware
 from thairod.utils.load_seed import RealisticSeed

@@ -172,6 +172,12 @@ SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
 SHIPPOP_LOT_CUTTING_TIME = 9  # 24 hr format (9 means cut at 9 am everyday)
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', "")
 
+LINE_ORDER_CREATED_MESSAGE = """
+เรียนคุณ {name}
+คำขอกล่องไทยรอดของท่านได้ถูกบันทึกแล้ว
+หมายเลขคำขอของท่านคือ {order_id}
+"""
+
 LINE_TRACKING_MESSAGE = """
 กล่องไทยรอดกำลังถูกส่งไปให้ คุณ {name}
 โดยท่านสามารถติดตามสถานะได้ที่ {tracking_url}

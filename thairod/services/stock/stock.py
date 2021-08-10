@@ -5,7 +5,7 @@ import itertools
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
-from typing import DefaultDict, Optional
+from typing import DefaultDict, Optional, List
 
 from order.models import OrderItem
 from procurement.models import Procurement
@@ -20,10 +20,6 @@ class StockInfo(AutoSerialize):
     adjustment: int
     ordered: int
     pending: int
-    current_total: Optional[int] = None
-
-    def __post_init__(self):
-        self.current_total = self._current_total()
 
     @classmethod
     def empty(cls) -> StockInfo:
@@ -45,7 +41,11 @@ class StockInfo(AutoSerialize):
             pending=5
         )
 
-    def _current_total(self):
+    @classmethod
+    def fields(cls) -> List[str]:
+        return ['__all__', 'current_total']
+
+    def current_total(self):
         return self.procured - self.fulfilled + self.adjustment
 
     @classmethod

@@ -1,4 +1,8 @@
+from __future__ import annotations
 from dataclasses import dataclass
+from typing import Any, Dict
+
+from rest_framework.exceptions import ValidationError
 
 from thairod.utils.auto_serialize import AutoSerialize
 
@@ -12,6 +16,12 @@ class ShippingAddress(AutoSerialize):
     zipcode: str
     phone_number: str
     note: str
+
+    @classmethod
+    def validate_data(cls, data: ShippingAddress):
+        if len(data.zipcode) != 5 or not data.zipcode.isnumeric():
+            raise ValidationError(detail='Incorrect Postal Code', code='zipcode_error')
+        return data
 
     @classmethod
     def example(cls):
