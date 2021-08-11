@@ -4,9 +4,10 @@ import datetime
 from typing import Iterable, Optional
 
 from django.db import models
+from django.db.models import Count, Q
 from django.db.models import OuterRef, Exists, QuerySet
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Count, Q
+
 from core.models import AbstractModel
 from order.models.order import Order
 from shipment.models import BatchShipment
