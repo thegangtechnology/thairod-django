@@ -37,6 +37,24 @@ class CreateOrderFlowRequest(AutoSerialize):
             auto_doctor_confirm=auto_doctor_confirm
         )
 
+    @classmethod
+    def from_doctor_info(cls, doctor_info_dict):
+        doctor = Doctor(**doctor_info_dict.get('doctor', None))
+        patient = Patient(**doctor_info_dict.get('patient', None))
+        shipping_address = ShippingAddress(**doctor_info_dict.get('shipping_address', None))
+        items = [CartItem(item_id=item.get('item_id', None), quantity=item.get('quantity', 0)) for item in
+                 doctor_info_dict.get('items', [])]
+        return cls(
+            account=doctor_info_dict.get('account', None),
+            doctor=doctor,
+            patient=patient,
+            shipping_address=shipping_address,
+            line_id=doctor_info_dict.get('line_id', None),
+            session_id=doctor_info_dict.get('session_id', None),
+            items=items,
+            auto_doctor_confirm=doctor_info_dict.get('auto_doctor_confirm', None)
+        )
+
 
 @dataclass
 class OrderFlowResponse(AutoSerialize):
@@ -81,7 +99,7 @@ class OrderFlowResponse(AutoSerialize):
         return cls(
             doctor_link_hash=order_flow.doctor_link_hash,
             doctor_link_hash_timestamp=order_flow.doctor_link_hash_timestamp.strftime(datetime_format),
-            doctor_info=CreateOrderFlowRequest(**order_flow.doctor_info),
+            doctor_info=CreateOrderFlowRequest.from_doctor_info(order_flow.doctor_info),
             doctor_order=doctor_order_data,
             patient_link_hash=order_flow.patient_link_hash,
             patient_link_hash_timestamp=patient_link_hash_timestamp_data,

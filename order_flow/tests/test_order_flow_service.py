@@ -1,15 +1,17 @@
-from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, DoctorOrder
+from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, DoctorOrder, \
+    PatientConfirmationRequest
 from order_flow.models import OrderFlow
 from order_flow.services import OrderFlowService
 from thairod.utils.load_seed import load_realistic_seed
 from order_flow.dataclasses.order_flow import OrderFlowResponse
 from thairod.utils.test_util import TestCase, APITestCase
 from order.dataclasses.cart_item import CartItem
+from order.dataclasses.shipping_address import ShippingAddress
 from django.urls import reverse
 from rest_framework import status
 import json
 from os.path import join, dirname
-from order_flow.exceptions import OrderAlreadyConfirmedException
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 
 
 class TestOrderFlowService(TestCase):
@@ -115,9 +117,23 @@ class TestOrderFlowService(TestCase):
             OrderFlowService().write_doctor_order_to_order_flow(
                 checkout_doctor_order_request=doctor_checkout)
 
-    # test confirm patient normal flow
     def test_confirm_patient(self):
-        pass
+        filename = 'create_order_flow_confirm_true.json'
+        with open(join(dirname(__file__), filename), 'r') as json_file:
+            order_flow_json = json.load(json_file)
+            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
+            order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
+            patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,
+                                                              address=ShippingAddress.example())
+            OrderFlowService().save_patient_confirmation_and_make_order(
+                patient_confirmation_request=patient_confirmation)
+            flow = OrderFlow.objects.get(patient_link_hash=order_flow_response.patient_link_hash)
+            self.assertTrue(flow.order_created)
+            # try to make order again should get error
+            with self.assertRaises(PatientAlreadyConfirmedException):
+                OrderFlowService().save_patient_confirmation_and_make_order(
+                    patient_confirmation_request=patient_confirmation)
 
 
 class TestOrderFlowAPI(APITestCase):
