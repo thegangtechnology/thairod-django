@@ -13,7 +13,7 @@ from order_flow.models import OrderFlow
 from thairod.settings import TELEMED_WHITELIST
 from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
-from order_flow.exceptions import OrderAlreadyConfirmedException
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 
 
 class CreateOrderFlowsAPI(GenericAPIView):
@@ -66,4 +66,7 @@ class PatientConfirmationAPI(GenericAPIView):
     def post(self, request: Request) -> Response:
         param = PatientConfirmationRequest.from_post_request(request)
         service = OrderFlowService()
-        return service.save_patient_confirmation_and_make_order(param).to_response()
+        try:
+            return service.save_patient_confirmation_and_make_order(param).to_response()
+        except PatientAlreadyConfirmedException as e:
+            return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
