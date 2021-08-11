@@ -55,3 +55,4 @@ class TestDashboard(TestCase):
             ordered=7,
             pending=3
         ))
+        self.assertTrue(got.unit != '')

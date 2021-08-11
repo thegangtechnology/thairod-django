@@ -26,6 +26,7 @@ class ProductVariationSummary(AutoSerialize):
     pv_id: int
     product_name: str
     pv_name: str
+    unit: str
     stock: StockInfo
 
     @classmethod
@@ -34,6 +35,7 @@ class ProductVariationSummary(AutoSerialize):
             pv_id=pv_id,
             product_name='product name',
             pv_name='pv_name',
+            unit='unit',
             stock=StockInfo.example()
         )
 
@@ -126,6 +128,7 @@ class DashboardService:
         return ProductVariationSummary(
             pv_id=pv_id,
             product_name=pv.product.name,
+            unit=pv.unit,
             pv_name=pv.name,
             stock=stock
         )
