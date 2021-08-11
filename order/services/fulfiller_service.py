@@ -76,7 +76,7 @@ class FulfilmentService:
         for shipment in shipments:
             try:
                 self.book_and_confirm_shipment(shipment)
-            except ShippopAPIException as e:
+            except (ShippopAPIException, UnsupportedZipCode) as e:
                 logger.error(f'Book and Confirm Fail for {shipment.id}')
                 logger.error(e.detail)
 
