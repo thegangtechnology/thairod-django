@@ -10,6 +10,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('order-flows/create-flow/', CreateOrderFlowsAPI.as_view()),
     path('order-flows/hash/', OrderFlowsHashAPI.as_view(), name='order-flows-hash'),
-    path('order-flows/doctor-checkout/', CheckoutDoctorOrderAPI.as_view()),
-    path('order-flows/patient-checkout/', PatientConfirmationAPI.as_view())
+    path('order-flows/doctor-checkout/', CheckoutDoctorOrderAPI.as_view(), name='order-flows-doctor-checkout'),
+    path('order-flows/patient-checkout/', PatientConfirmationAPI.as_view(), name='order-flows-patient-checkout')
 ]

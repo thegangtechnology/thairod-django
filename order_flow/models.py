@@ -17,6 +17,11 @@ class OrderFlow(AbstractModel):
     patient_link_hash_timestamp = models.DateTimeField(null=True, blank=True)
     # confirm address from patient
     patient_confirmation = models.JSONField(null=True, blank=True)
+    # True if doctor doesn't have to confirm order
+    # False otherwise
+    auto_doctor_confirm = models.BooleanField(default=False)
+    # True if order is already created, False otherwise
+    order_created = models.BooleanField(default=False)
 
     @staticmethod
     def generate_hash_secret() -> str:

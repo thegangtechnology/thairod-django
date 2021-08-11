@@ -1,9 +1,10 @@
 from order.dataclasses.cart_item import CartItem
 from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
-    CheckoutDoctorOrderRequest, PatientConfirmationRequest
+    CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
 from order_flow.models import OrderFlow
 from thairod.utils import tzaware
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 
 
 class OrderFlowService:
@@ -12,7 +13,18 @@ class OrderFlowService:
         doctor_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.create(doctor_link_hash=doctor_hash,
                                               doctor_link_hash_timestamp=tzaware.now(),
-                                              doctor_info=create_order_flow_request.to_data())
+                                              doctor_info=create_order_flow_request.to_data(),
+                                              auto_doctor_confirm=create_order_flow_request.auto_doctor_confirm)
+
+        if create_order_flow_request.items:
+            doctor_order = DoctorOrder(items=create_order_flow_request.items)
+            order_flow.doctor_order = doctor_order.to_data()
+            order_flow.save()
+            # doesn't make sense if no items and auto_doctor_confirm True..
+            if create_order_flow_request.auto_doctor_confirm:
+                checkout_doctor_order_request = CheckoutDoctorOrderRequest(doctor_link_hash=doctor_hash,
+                                                                           doctor_order=doctor_order)
+                return self.write_doctor_order_to_order_flow(checkout_doctor_order_request=checkout_doctor_order_request)
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
@@ -25,6 +37,9 @@ class OrderFlowService:
             -> OrderFlowResponse:
         patient_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.get(doctor_link_hash=checkout_doctor_order_request.doctor_link_hash)
+        # Order is confirmed. Wait for patient confirmation
+        if order_flow.patient_link_hash_timestamp:
+            raise OrderAlreadyConfirmedException()
         order_flow.doctor_order = checkout_doctor_order_request.doctor_order.to_data()
         order_flow.patient_link_hash = patient_hash
         order_flow.patient_link_hash_timestamp = tzaware.now()
@@ -34,6 +49,9 @@ class OrderFlowService:
     def write_patient_confirmation_to_order_flow(self, patient_confirmation_request: PatientConfirmationRequest) \
             -> OrderFlowResponse:
         order_flow = OrderFlow.objects.get(patient_link_hash=patient_confirmation_request.patient_link_hash)
+        # patient has confirm and order is already created
+        if order_flow.order_created and order_flow.patient_confirmation:
+            raise PatientAlreadyConfirmedException()
         order_flow.patient_confirmation = patient_confirmation_request.address.to_data()
         order_flow.save()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
@@ -59,4 +77,8 @@ class OrderFlowService:
         self.write_patient_confirmation_to_order_flow(patient_confirmation_request=patient_confirmation_request)
         order_flow = OrderFlow.objects.get(patient_link_hash=patient_confirmation_request.patient_link_hash)
         create_order_param = self.construct_create_order_parameter_from_order_flow(order_flow=order_flow)
-        return OrderService().create_order(param=create_order_param)
+        create_order_response = OrderService().create_order(param=create_order_param)
+        # successfully create order
+        order_flow.order_created = True
+        order_flow.save()
+        return create_order_response
