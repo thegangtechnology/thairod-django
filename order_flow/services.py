@@ -2,9 +2,9 @@ from order.dataclasses.cart_item import CartItem
 from order.services.order_service import CreateOrderParam, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 from order_flow.models import OrderFlow
 from thairod.utils import tzaware
-from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 
 
 class OrderFlowService:
@@ -24,7 +24,8 @@ class OrderFlowService:
             if create_order_flow_request.auto_doctor_confirm:
                 checkout_doctor_order_request = CheckoutDoctorOrderRequest(doctor_link_hash=doctor_hash,
                                                                            doctor_order=doctor_order)
-                return self.write_doctor_order_to_order_flow(checkout_doctor_order_request=checkout_doctor_order_request)
+                return self.write_doctor_order_to_order_flow(
+                    checkout_doctor_order_request=checkout_doctor_order_request)
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
@@ -69,7 +70,7 @@ class OrderFlowService:
                                                   line_id=order_flow_response.doctor_info.line_id,
                                                   session_id=order_flow_response.doctor_info.session_id,
                                                   items=CartItem.from_doctor_order_response(
-                                                          order_flow_response.doctor_order))
+                                                      order_flow_response.doctor_order))
         return create_order_parameter
 
     def save_patient_confirmation_and_make_order(self, patient_confirmation_request: PatientConfirmationRequest) \
