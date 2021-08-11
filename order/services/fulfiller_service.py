@@ -79,7 +79,7 @@ class FulfilmentService:
             except ShippopAPIException as e:
                 logger.error(f'Book and Confirm Fail for {shipment.id}')
                 logger.error(e.detail)
-    
+
     def get_pending_order_items(self) -> Iterable[Order]:
         ret = Order.objects.filter(
             shipment__orderitem__fulfilment_status=FulfilmentStatus.PENDING,
