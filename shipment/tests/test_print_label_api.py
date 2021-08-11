@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from order.dataclasses.order import CreateOrderParameter
+from order.dataclasses.order import CreateOrderParam
 from order.services.fulfiller_service import FulfilmentService
 from order.services.order_service import OrderService
 from thairod.utils.load_seed import RealisticSeed
@@ -23,7 +23,7 @@ class TestPrintLabelAPI(APITestCase):
 
     def test_print_label(self):
         self.set_up_user()
-        param = CreateOrderParameter.example_with_valid_item()
+        param = CreateOrderParam.example_with_valid_item()
         ros = [OrderService().create_order_no_fulfill(param) for _ in range(2)]
         for ro in ros:
             FulfilmentService().attempt_fulfill_shipment(ro.shipment)
@@ -37,7 +37,7 @@ class TestPrintLabelAPI(APITestCase):
 
     def test_print_label_api_not_found(self):
         self.set_up_user()
-        param = CreateOrderParameter.example_with_valid_item()
+        param = CreateOrderParam.example_with_valid_item()
         ros = [OrderService().create_order_no_fulfill(param) for _ in range(2)]
         for ro in ros:
             FulfilmentService().attempt_fulfill_shipment(ro.shipment)

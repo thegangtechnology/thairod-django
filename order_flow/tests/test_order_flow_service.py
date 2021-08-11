@@ -1,4 +1,4 @@
-from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, DoctorOrder, \
+from order_flow.dataclasses import CreateOrderFlowParam, CheckoutDoctorOrderRequest, DoctorOrder, \
     PatientConfirmationRequest
 from order_flow.models import OrderFlow
 from order_flow.services import OrderFlowService
@@ -23,7 +23,7 @@ class TestOrderFlowService(TestCase):
     def test_create_order_flow(self):
         items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
         old_count = OrderFlow.objects.count()
-        OrderFlowService().create_order_flow(create_order_flow_request=CreateOrderFlowRequest.example(items=items))
+        OrderFlowService().create_order_flow(create_order_flow_request=CreateOrderFlowParam.example(items=items))
         new_count = OrderFlow.objects.count()
         self.assertEqual(old_count + 1, new_count)
 
@@ -34,7 +34,7 @@ class TestOrderFlowService(TestCase):
         filename = 'create_order_flow_confirm_true.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
             order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             # auto doctor confirm should be true
@@ -47,7 +47,7 @@ class TestOrderFlowService(TestCase):
         filename = 'create_order_flow_confirm_false.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             self.assertFalse(order_flow_response.auto_doctor_confirm)
             self.assertEqual(order_flow_response.patient_link_hash_timestamp, None)
@@ -56,7 +56,7 @@ class TestOrderFlowService(TestCase):
         filename = 'create_order_flow_no_items.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             self.assertFalse(order_flow_response.auto_doctor_confirm)
             self.assertEqual(order_flow_response.patient_link_hash_timestamp, None)
@@ -66,7 +66,7 @@ class TestOrderFlowService(TestCase):
         filename = 'create_order_flow_confirm_false.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
             order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             self.assertFalse(order_flow_response.auto_doctor_confirm)
@@ -80,7 +80,7 @@ class TestOrderFlowService(TestCase):
 
     def test_override_initial_order_before_confirm(self):
         items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
-        order_flow_request = CreateOrderFlowRequest.example(items=items)
+        order_flow_request = CreateOrderFlowParam.example(items=items)
         order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
         # still initial order
         self.assertEqual(len(order_flow_response.doctor_order.items), 1)
@@ -100,7 +100,7 @@ class TestOrderFlowService(TestCase):
                          self.seed.product_variations[1].description)
 
     def test_override_doctor_order_after_confirm(self):
-        order_flow_request = CreateOrderFlowRequest.example(items=[])
+        order_flow_request = CreateOrderFlowParam.example(items=[])
         order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
         # no patient hash yet
         self.assertTrue(order_flow_response.patient_link_hash is None)
@@ -124,7 +124,7 @@ class TestOrderFlowService(TestCase):
         filename = 'create_order_flow_confirm_true.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
             order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,
@@ -154,7 +154,7 @@ class TestOrderFlowAPI(APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_doctor_confirm_api(self):
-        order_flow_request = CreateOrderFlowRequest.example(items=[])
+        order_flow_request = CreateOrderFlowParam.example(items=[])
         order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
         # no patient hash yet
         self.assertTrue(order_flow_response.patient_link_hash is None)
@@ -173,7 +173,7 @@ class TestOrderFlowAPI(APITestCase):
 
     def test_patient_confirm_api(self):
         items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
-        order_flow_request = CreateOrderFlowRequest.example(items=items, auto_doctor_confirm=True)
+        order_flow_request = CreateOrderFlowParam.example(items=items, auto_doctor_confirm=True)
         order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
         patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,
                                                           address=ShippingAddress.example()).to_data()
@@ -201,7 +201,7 @@ class TestOrderFlowNoMockShippop(TestCase):
         filename = 'create_order_flow_phuket.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
             order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
             order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
             patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,

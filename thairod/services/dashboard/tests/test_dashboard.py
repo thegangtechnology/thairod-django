@@ -1,7 +1,10 @@
 from datetime import timedelta
 
+import freezegun
+
 from thairod import settings
 from thairod.services.dashboard import dashboard_service as ds
+from thairod.services.dashboard.dashboard_service import DashboardService
 from thairod.services.stock.stock import StockInfo
 from thairod.utils import tzaware
 from thairod.utils.load_seed import RealisticSeed
@@ -55,3 +58,44 @@ class TestDashboard(TestCase):
             ordered=7,
             pending=3
         ))
+        self.assertTrue(got.unit != '')
+
+
+class TestDashBoardNumber(TestCase):
+    with_seed = False
+
+    @freezegun.freeze_time(tzaware.datetime(2021, 8, 23, 8))
+    def test_dashboard_no_order(self):
+        seed = RealisticSeed.load_realistic_seed()
+        pv = seed.product_variations[0]
+        seed.procure_item(pv_id=pv.id, quantity=10)
+        ds = DashboardService().get_dashboard_summary(tzaware.datetime(2021, 8, 23, 8),
+                                                      n_days=1)
+        latest_summary = ds.latest_summary
+        self.assertEqual(latest_summary.total_shipment_created, 0)
+        self.assertEqual(latest_summary.total_shipment_confirmed, 0)
+        ps = ds.latest_summary.product_summaries[0]
+        self.assertEqual(ps.pv_id, pv.id)
+        self.assertEqual(ps.stock.procured, 10)
+        self.assertEqual(ps.stock.ordered, 0)
+        self.assertEqual(ps.stock.fulfilled, 0)
+
+    @freezegun.freeze_time(tzaware.datetime(2021, 8, 23, 8))
+    def test_dashboard_some_order(self):
+        seed = RealisticSeed.load_realistic_seed()
+        pv = seed.product_variations[0]
+        # no stock so no fulfill
+        seed.procure_item(pv_id=pv.id, quantity=100)
+        seed.order_item(pv_id=pv.id, cid='111')
+        seed.order_item(pv_id=pv.id, cid='222')
+        seed.order_item_no_fulfill(pv_id=pv.id, cid='333')
+        ds = DashboardService().get_dashboard_summary(tzaware.datetime(2021, 8, 23, 8),
+                                                      n_days=1)
+        latest_summary = ds.latest_summary
+        self.assertEqual(latest_summary.total_shipment_created, 3)
+        self.assertEqual(latest_summary.total_shipment_confirmed, 2)
+        ps = ds.latest_summary.product_summaries[0]
+        self.assertEqual(ps.pv_id, pv.id)
+        self.assertEqual(ps.stock.procured, 100)
+        self.assertEqual(ps.stock.ordered, 3)
+        self.assertEqual(ps.stock.fulfilled, 2)

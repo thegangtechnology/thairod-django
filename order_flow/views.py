@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from order.dataclasses.order import CreateOrderResponse
-from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, \
+from order_flow.dataclasses import CreateOrderFlowParam, CheckoutDoctorOrderRequest, \
     PatientConfirmationRequest, OrderFlowResponse
 from order_flow.services import OrderFlowService
 from order_flow.models import OrderFlow
@@ -18,9 +18,9 @@ from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlready
 
 class CreateOrderFlowsAPI(GenericAPIView):
     @ip_whitelist(TELEMED_WHITELIST, allow_all_if_debug=True)
-    @swagger_auto_serialize_post_schema(CreateOrderFlowRequest, OrderFlowResponse)
+    @swagger_auto_serialize_post_schema(CreateOrderFlowParam, OrderFlowResponse)
     def post(self, request: Request) -> Response:
-        param = CreateOrderFlowRequest.from_post_request(request)
+        param = CreateOrderFlowParam.from_post_request(request)
         service = OrderFlowService()
         return service.create_order_flow(param).to_response()
 

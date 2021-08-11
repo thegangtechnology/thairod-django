@@ -1,6 +1,6 @@
 from order.dataclasses.cart_item import CartItem
-from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
-from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
+from order.services.order_service import CreateOrderParam, OrderService, CreateOrderResponse
+from order_flow.dataclasses import CreateOrderFlowParam, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
 from order_flow.models import OrderFlow
 from thairod.utils import tzaware
@@ -10,7 +10,7 @@ from thairod.services.line import line
 
 class OrderFlowService:
 
-    def create_order_flow(self, create_order_flow_request: CreateOrderFlowRequest) -> OrderFlowResponse:
+    def create_order_flow(self, create_order_flow_request: CreateOrderFlowParam) -> OrderFlowResponse:
         doctor_hash = OrderFlow.generate_hash_secret()
         order_flow = OrderFlow.objects.create(doctor_link_hash=doctor_hash,
                                               doctor_link_hash_timestamp=tzaware.now(),
@@ -25,7 +25,8 @@ class OrderFlowService:
             if create_order_flow_request.auto_doctor_confirm:
                 checkout_doctor_order_request = CheckoutDoctorOrderRequest(doctor_link_hash=doctor_hash,
                                                                            doctor_order=doctor_order)
-                return self.write_doctor_order_and_send_line_msg(checkout_doctor_order_request=checkout_doctor_order_request)
+                return self.write_doctor_order_and_send_line_msg(
+                    checkout_doctor_order_request=checkout_doctor_order_request)
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
@@ -48,7 +49,8 @@ class OrderFlowService:
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def write_doctor_order_and_send_line_msg(self, checkout_doctor_order_request: CheckoutDoctorOrderRequest):
-        order_response = self.write_doctor_order_to_order_flow(checkout_doctor_order_request=checkout_doctor_order_request)
+        order_response = self.write_doctor_order_to_order_flow(
+            checkout_doctor_order_request=checkout_doctor_order_request)
         order_flow = OrderFlow.objects.get(doctor_link_hash=checkout_doctor_order_request.doctor_link_hash)
         self.send_line_confirmation_message(order_flow=order_flow)
         return order_response
@@ -63,20 +65,20 @@ class OrderFlowService:
         order_flow.save()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
-    def construct_create_order_parameter_from_order_flow(self, order_flow: OrderFlow) -> CreateOrderParameter:
+    def construct_create_order_parameter_from_order_flow(self, order_flow: OrderFlow) -> CreateOrderParam:
         order_flow_response = OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
         return self.construct_create_order_parameter_from_order_flow_response(order_flow_response=order_flow_response)
 
     def construct_create_order_parameter_from_order_flow_response(self, order_flow_response: OrderFlowResponse) \
-            -> CreateOrderParameter:
-        create_order_parameter = CreateOrderParameter(account=order_flow_response.doctor_info.account,
-                                                      doctor=order_flow_response.doctor_info.doctor,
-                                                      patient=order_flow_response.doctor_info.patient,
-                                                      shipping_address=order_flow_response.patient_confirmation,
-                                                      line_id=order_flow_response.doctor_info.line_id,
-                                                      session_id=order_flow_response.doctor_info.session_id,
-                                                      items=CartItem.from_doctor_order_response(
-                                                          order_flow_response.doctor_order))
+            -> CreateOrderParam:
+        create_order_parameter = CreateOrderParam(account=order_flow_response.doctor_info.account,
+                                                  doctor=order_flow_response.doctor_info.doctor,
+                                                  patient=order_flow_response.doctor_info.patient,
+                                                  shipping_address=order_flow_response.patient_confirmation,
+                                                  line_id=order_flow_response.doctor_info.line_id,
+                                                  session_id=order_flow_response.doctor_info.session_id,
+                                                  items=CartItem.from_doctor_order_response(
+                                                      order_flow_response.doctor_order))
         return create_order_parameter
 
     def save_patient_confirmation_and_make_order(self, patient_confirmation_request: PatientConfirmationRequest) \

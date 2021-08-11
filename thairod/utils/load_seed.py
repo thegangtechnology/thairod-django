@@ -11,7 +11,7 @@ from order.dataclasses.order import CreateOrderResponse
 from order.models import Order, OrderItem
 from order.services.fulfiller_service import FulfilmentService
 from order.services.order_service import RawOrder
-from order.views import OrderService, CreateOrderParameter
+from order.views import OrderService, CreateOrderParam
 from procurement.models import Procurement
 from product.models import ProductVariation, Product, ProductImage
 from shipment.models import Shipment, TrackingStatus, BatchShipment
@@ -168,7 +168,7 @@ class RealisticSeed:
                     FulfilmentService().attempt_fulfill_shipment(ro.shipment)
 
     def create_one_order(self, cart_items: List[CartItem]) -> RawOrder:
-        param = CreateOrderParameter.example(items=cart_items)
+        param = CreateOrderParam.example(items=cart_items)
         order = OrderService().create_raw_order(param)
         return order
 
@@ -189,14 +189,14 @@ class RealisticSeed:
                                           warehouse=self.warehouses[0])
 
     def order_item(self, pv_id: int, cid: str = '111') -> CreateOrderResponse:
-        param = CreateOrderParameter.example()
+        param = CreateOrderParam.example()
         param.patient.cid = cid
         param.items = [CartItem(item_id=pv_id, quantity=1)]
         res = OrderService().create_order(param)
         return res
 
     def order_item_no_fulfill(self, pv_id: int, cid: str = '111') -> RawOrder:
-        param = CreateOrderParameter.example()
+        param = CreateOrderParam.example()
         param.patient.cid = cid
         param.items = [CartItem(item_id=pv_id, quantity=1)]
         ro = OrderService().create_order_no_fulfill(param)

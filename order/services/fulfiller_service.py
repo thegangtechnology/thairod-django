@@ -18,6 +18,7 @@ from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData
 from thairod.services.stock.stock import StockService, StockInfo
 from thairod.settings import SHIPPOP_EMAIL
 from thairod.utils import tzaware
+from thairod.utils.exceptions import ShippopAPIException
 
 ItemVariationID = int
 StockCount = int
@@ -53,6 +54,16 @@ class FulfilmentService:
             if success:
                 self.attempt_to_mark_shipment_fulfilled(oi.shipment)
 
+    def process_all_orders(self):
+        self.fulfill_pending_order_items()
+        self.mark_all_ready_fulfill_shipment()
+        self.book_and_confirm_all_pending_shipments()
+
+    def mark_all_ready_fulfill_shipment(self):
+        shipments = Shipment.ready_to_fulfill_shipments()
+        for shipment in shipments:
+            self.attempt_to_mark_shipment_fulfilled(shipment)
+
     def attempt_to_mark_shipment_fulfilled(self, shipment: Shipment) -> bool:
         if shipment.is_ready_to_fulfill:
             shipment.mark_fulfilled()
@@ -63,7 +74,11 @@ class FulfilmentService:
     def book_and_confirm_all_pending_shipments(self):
         shipments = Shipment.ready_to_book_shipments()
         for shipment in shipments:
-            self.book_and_confirm_shipment(shipment)
+            try:
+                self.book_and_confirm_shipment(shipment)
+            except ShippopAPIException as e:
+                logger.error(f'Book and Confirm Fail for {shipment.id}')
+                logger.error(e.detail)
 
     def get_pending_order_items(self) -> Iterable[Order]:
         ret = Order.objects.filter(

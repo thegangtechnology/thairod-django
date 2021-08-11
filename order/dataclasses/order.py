@@ -3,17 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from rest_framework.exceptions import ValidationError
+
 from order.dataclasses.cart_item import CartItem
 from order.dataclasses.doctor import Doctor
 from order.dataclasses.patient import Patient
 from order.dataclasses.shipping_address import ShippingAddress
 from order.models import Order
 from product.models import ProductVariation
+from thairod.services.shippop.data import spe_postal_codes
 from thairod.utils.auto_serialize import AutoSerialize
 
 
 @dataclass
-class CreateOrderParameter(AutoSerialize):
+class CreateOrderParam(AutoSerialize):
     account: str
     doctor: Doctor
     patient: Patient
@@ -23,7 +26,21 @@ class CreateOrderParameter(AutoSerialize):
     items: List[CartItem]
 
     @classmethod
-    def example(cls, items: Optional[List[CartItem]] = None) -> CreateOrderParameter:
+    def validate_data(cls, data: CreateOrderParam) -> CreateOrderParam:
+        # validate zipcode in service range
+        if data.shipping_address.zipcode not in spe_postal_codes:
+            raise ValidationError(detail=f'Postcode {data.shipping_address.zipcode} is not in service area.')
+
+        # item
+        for item in data.items:
+            if not ProductVariation.objects.filter(id=item.item_id).exists():
+                raise ValidationError(detail=f'Product with id {item.item_id} does not exists')
+            if item.quantity < 0:
+                raise ValidationError(detail=f'Quantity cannot be negative. ({item.item_id})')
+        return data
+
+    @classmethod
+    def example(cls, items: Optional[List[CartItem]] = None) -> CreateOrderParam:
         return cls(
             account='frappet',
             doctor=Doctor.example(),
