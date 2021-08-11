@@ -20,7 +20,7 @@ class TestOrderService(TestCase):
     def test_create_order(self):
         old_count = Order.objects.count()
         param = CreateOrderParam.example_with_valid_item()
-        res = OrderService().create_order(param)
+        OrderService().create_order(param)
         new_count = Order.objects.count()
         self.assertEqual(old_count + 1, new_count)
 

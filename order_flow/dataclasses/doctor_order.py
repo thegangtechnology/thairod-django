@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from thairod.utils.auto_serialize import AutoSerialize
-from order_flow.dataclasses.ordered_product import OrderedProductInfo
-from order.dataclasses.cart_item import CartItem
 from typing import List
+
+from order.dataclasses.cart_item import CartItem
+from order_flow.dataclasses.ordered_product import OrderedProductInfo
+from thairod.utils.auto_serialize import AutoSerialize
 
 
 @dataclass
