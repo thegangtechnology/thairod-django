@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from order.dataclasses.order import CreateOrderParameter
+from order.dataclasses.order import CreateOrderParam
 from order.services.order_service import OrderService
 from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
@@ -28,7 +28,7 @@ class PrintSampleLabelView(APIView):
             with open(join(dirname(__file__), '../tests/ttt.html')) as f:
                 label_html = f.read()
             labels = split_print_label(label_html)
-            ro = OrderService().create_raw_order(CreateOrderParameter.example_with_valid_item())
+            ro = OrderService().create_raw_order(CreateOrderParam.example_with_valid_item())
             shipments = [ro.shipment] * len(labels)
             ret = PrintLabelService().generate_label_interleave(labels, shipments)
             transaction.set_rollback(True)
