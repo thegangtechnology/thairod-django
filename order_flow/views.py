@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from order.dataclasses.order import CreateOrderResponse
-from order_flow.dataclasses import CreateOrderFlowRequest, CheckoutDoctorOrderRequest, \
+from order_flow.dataclasses import CreateOrderFlowParam, CheckoutDoctorOrderRequest, \
     PatientConfirmationRequest, OrderFlowResponse
 from order_flow.services import OrderFlowService
 from order_flow.models import OrderFlow
@@ -15,12 +15,14 @@ from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 
+HASH_DOES_NOT_EXIST = "Hash not found"
+
 
 class CreateOrderFlowsAPI(GenericAPIView):
     @ip_whitelist(TELEMED_WHITELIST, allow_all_if_debug=True)
-    @swagger_auto_serialize_post_schema(CreateOrderFlowRequest, OrderFlowResponse)
+    @swagger_auto_serialize_post_schema(CreateOrderFlowParam, OrderFlowResponse)
     def post(self, request: Request) -> Response:
-        param = CreateOrderFlowRequest.from_post_request(request)
+        param = CreateOrderFlowParam.from_post_request(request)
         service = OrderFlowService()
         return service.create_order_flow(param).to_response()
 
@@ -44,7 +46,7 @@ class OrderFlowsHashAPI(APIView):
             if patient_hash:
                 return OrderFlowService().get_order_flow_from_patient_hash(patient_hash=patient_hash).to_response()
         except OrderFlow.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -55,9 +57,11 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
         param = CheckoutDoctorOrderRequest.from_post_request(request)
         service = OrderFlowService()
         try:
-            return service.write_doctor_order_to_order_flow(param).to_response()
+            return service.write_doctor_order_and_send_line_msg(param).to_response()
         except OrderAlreadyConfirmedException as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
+        except OrderFlow.DoesNotExist:
+            return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PatientConfirmationAPI(GenericAPIView):
@@ -70,3 +74,5 @@ class PatientConfirmationAPI(GenericAPIView):
             return service.save_patient_confirmation_and_make_order(param).to_response()
         except PatientAlreadyConfirmedException as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
+        except OrderFlow.DoesNotExist:
+            return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)

@@ -183,6 +183,13 @@ LINE_TRACKING_MESSAGE = """
 โดยท่านสามารถติดตามสถานะได้ที่ {tracking_url}
 """.strip()
 
+
+LINE_PATIENT_CONFIRM_MESSAGE = """
+เรียนคุณ {name}
+กรุณายืนยันที่อยู่ในการจัดส่งสำหรับกล่องไทยรอด
+{patient_callback_url}
+""".strip()
+
 try:
     TELEMED_WHITELIST = [ip.strip() for ip in os.environ.get('TELEMED_WHITELIST', "127.0.0.1").split(',')]
 except ValueError:
@@ -225,3 +232,5 @@ LOGGING = {
         },
     },
 }
+
+FRONTEND_URL = "http://localhost:3000/"

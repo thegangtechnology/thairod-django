@@ -1,0 +1,24 @@
+{
+  "account": "frappet",
+  "doctor": {
+    "name": "Kazuya Sojo",
+    "license": "12345678"
+  },
+  "patient": {
+    "name": "Green Covid",
+    "cid": "1234567890123"
+  },
+  "shipping_address": {
+      "street": "อนุภาษภูเก็ตการ",
+      "sub_district": "ตลาดใหญ่",
+      "district": "เมืองภูเก็ต",
+      "province": "ภูเก็ต",
+      "zipcode": 83000,
+      "phone_number": "091-311-1331",
+      "note": "next to 7/11"
+  },
+  "session_id": "abcd_for_callback",
+  "line_id": "or something for lineoa callback",
+  "items": [],
+  "auto_doctor_confirm": false
+}

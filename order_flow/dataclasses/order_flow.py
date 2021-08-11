@@ -3,6 +3,7 @@ from thairod.utils.auto_serialize import AutoSerialize
 from order.dataclasses.doctor import Doctor
 from order.dataclasses.patient import Patient
 from order.dataclasses.shipping_address import ShippingAddress
+from order.dataclasses.order import CreateOrderParam
 from order_flow.models import OrderFlow
 from typing import Optional
 from order_flow.dataclasses.doctor_order import DoctorOrderResponse
@@ -11,27 +12,20 @@ from order.dataclasses.cart_item import CartItem
 
 
 @dataclass
-class CreateOrderFlowRequest(AutoSerialize):
-    account: str
-    doctor: Doctor
-    patient: Patient
-    shipping_address: ShippingAddress
-    line_id: str
-    session_id: str
-    items: List[CartItem]
+class CreateOrderFlowParam(CreateOrderParam):
     auto_doctor_confirm: bool
 
     @classmethod
     def example(cls,
                 items: Optional[List[CartItem]] = None,
                 auto_doctor_confirm: bool = False) \
-            -> 'CreateOrderFlowRequest':
+            -> 'CreateOrderFlowParam':
         return cls(
             account='frappet',
             doctor=Doctor.example(),
             patient=Patient.example(),
             shipping_address=ShippingAddress.example(),
-            line_id="",
+            line_id="line id",
             session_id="AAABB2134",
             items=[CartItem.example()] if items is None else items,
             auto_doctor_confirm=auto_doctor_confirm
@@ -60,7 +54,7 @@ class CreateOrderFlowRequest(AutoSerialize):
 class OrderFlowResponse(AutoSerialize):
     doctor_link_hash: str
     doctor_link_hash_timestamp: str
-    doctor_info: CreateOrderFlowRequest
+    doctor_info: CreateOrderFlowParam
     doctor_order: Optional[DoctorOrderResponse]
     patient_link_hash: Optional[str]
     patient_link_hash_timestamp: Optional[str]
@@ -73,7 +67,7 @@ class OrderFlowResponse(AutoSerialize):
         return cls(
             doctor_link_hash='vKgejBAIPFfd8vgvG45J0nO1Zx6B79c02wa9a8cD5c',
             doctor_link_hash_timestamp="2021-08-10T11:14:48",
-            doctor_info=CreateOrderFlowRequest.example(),
+            doctor_info=CreateOrderFlowParam.example(),
             doctor_order=DoctorOrderResponse.example(),
             patient_link_hash='vsdasadadafrqwJ0nO1Zryeyre9a8cD5c',
             patient_link_hash_timestamp="2021-08-10T11:14:48",
@@ -93,13 +87,13 @@ class OrderFlowResponse(AutoSerialize):
             doctor_order_data = DoctorOrderResponse.from_doctor_order_dict(doctor_order=dict(**order_flow.doctor_order),
                                                                            is_confirmed=is_confirmed)
         if order_flow.patient_confirmation:
-            patient_confirmation_data = ShippingAddress(**order_flow.patient_confirmation)
+            patient_confirmation_data = ShippingAddress.from_data(order_flow.patient_confirmation)
         if order_flow.patient_link_hash_timestamp:
             patient_link_hash_timestamp_data = order_flow.patient_link_hash_timestamp.strftime(datetime_format)
         return cls(
             doctor_link_hash=order_flow.doctor_link_hash,
             doctor_link_hash_timestamp=order_flow.doctor_link_hash_timestamp.strftime(datetime_format),
-            doctor_info=CreateOrderFlowRequest.from_doctor_info(order_flow.doctor_info),
+            doctor_info=CreateOrderFlowParam.from_doctor_info(order_flow.doctor_info),
             doctor_order=doctor_order_data,
             patient_link_hash=order_flow.patient_link_hash,
             patient_link_hash_timestamp=patient_link_hash_timestamp_data,
