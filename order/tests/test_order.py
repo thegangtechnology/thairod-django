@@ -6,7 +6,7 @@ from django.urls import reverse
 from address.models import Address
 from core.tests import BaseTestSimpleApiMixin
 from order.dataclasses.cart_item import CartItem
-from order.dataclasses.order import CreateOrderParameter
+from order.dataclasses.order import CreateOrderParam
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
 from order.services.order_service import OrderService
@@ -37,7 +37,7 @@ class TestOrderItemTotal(TestCase):
     def sample_orders(self, product_variation_id: int, n: int):
         for i in range(n):
             cart = CartItem(item_id=product_variation_id, quantity=1)
-            param = CreateOrderParameter.example(items=[cart])
+            param = CreateOrderParam.example(items=[cart])
             order = OrderService().create_raw_order(param)
             if i % 2 == 0:
                 for item in order.shipment.orderitem_set.all():

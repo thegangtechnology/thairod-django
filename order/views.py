@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from order.dataclasses.order import CreateOrderResponse, CreateOrderParameter
+from order.dataclasses.order import CreateOrderResponse, CreateOrderParam
 from order.models.order import Order
 from order.models.order_item import OrderItem
 from order.serializers import OrderSerializer, OrderItemSerializer
@@ -33,8 +33,8 @@ class CreateOrderAPI(APIView):
 
     # TODO this white list need to be per account
     @ip_whitelist(TELEMED_WHITELIST)
-    @swagger_auto_serialize_post_schema(CreateOrderParameter, CreateOrderResponse)
+    @swagger_auto_serialize_post_schema(CreateOrderParam, CreateOrderResponse)
     def post(self, request: Request, format=None) -> Response:
-        param = CreateOrderParameter.from_post_request(request)
+        param = CreateOrderParam.from_post_request(request)
         service = OrderService()
         return service.create_order(param).to_response()

@@ -1,5 +1,5 @@
 from order.dataclasses.cart_item import CartItem
-from order.services.order_service import CreateOrderParameter, OrderService, CreateOrderResponse
+from order.services.order_service import CreateOrderParam, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowRequest, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
 from order_flow.models import OrderFlow
@@ -56,19 +56,19 @@ class OrderFlowService:
         order_flow.save()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
-    def construct_create_order_parameter_from_order_flow(self, order_flow: OrderFlow) -> CreateOrderParameter:
+    def construct_create_order_parameter_from_order_flow(self, order_flow: OrderFlow) -> CreateOrderParam:
         order_flow_response = OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
         return self.construct_create_order_parameter_from_order_flow_response(order_flow_response=order_flow_response)
 
     def construct_create_order_parameter_from_order_flow_response(self, order_flow_response: OrderFlowResponse) \
-            -> CreateOrderParameter:
-        create_order_parameter = CreateOrderParameter(account=order_flow_response.doctor_info.account,
-                                                      doctor=order_flow_response.doctor_info.doctor,
-                                                      patient=order_flow_response.doctor_info.patient,
-                                                      shipping_address=order_flow_response.patient_confirmation,
-                                                      line_id=order_flow_response.doctor_info.line_id,
-                                                      session_id=order_flow_response.doctor_info.session_id,
-                                                      items=CartItem.from_doctor_order_response(
+            -> CreateOrderParam:
+        create_order_parameter = CreateOrderParam(account=order_flow_response.doctor_info.account,
+                                                  doctor=order_flow_response.doctor_info.doctor,
+                                                  patient=order_flow_response.doctor_info.patient,
+                                                  shipping_address=order_flow_response.patient_confirmation,
+                                                  line_id=order_flow_response.doctor_info.line_id,
+                                                  session_id=order_flow_response.doctor_info.session_id,
+                                                  items=CartItem.from_doctor_order_response(
                                                           order_flow_response.doctor_order))
         return create_order_parameter
 

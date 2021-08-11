@@ -3,7 +3,7 @@ from os.path import dirname, join
 from bs4 import BeautifulSoup
 
 from order.services.fulfiller_service import FulfilmentService
-from order.views import OrderService, CreateOrderParameter
+from order.views import OrderService, CreateOrderParam
 from product.models import ProductVariation
 from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
@@ -48,7 +48,7 @@ class TestPrintLabelLive(TestCase):
         self.seed.procure_items()
 
     def test_print_label_live(self):
-        param = CreateOrderParameter.example()
+        param = CreateOrderParam.example()
         param.items[0].item_id = ProductVariation.objects.first().id
         first_order = OrderService().create_order(param)
         second_order = OrderService().create_order(param)
