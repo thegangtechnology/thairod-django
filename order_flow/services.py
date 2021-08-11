@@ -94,7 +94,7 @@ class OrderFlowService:
         return create_order_response
 
     def send_line_confirmation_message(self, order_flow: OrderFlow) -> None:
-        line_uid = order_flow.doctor_order.get('line_id')
+        line_uid = order_flow.doctor_info.get('line_id')
         patient_name = order_flow.doctor_info.get('patient').get('name')
         patient_hash = order_flow.patient_link_hash
         line.send_line_patient_address_confirmation_message(line_uid=line_uid,

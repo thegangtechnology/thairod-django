@@ -15,6 +15,8 @@ from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 
+HASH_DOES_NOT_EXIST = "Hash not found"
+
 
 class CreateOrderFlowsAPI(GenericAPIView):
     @ip_whitelist(TELEMED_WHITELIST, allow_all_if_debug=True)
@@ -44,7 +46,7 @@ class OrderFlowsHashAPI(APIView):
             if patient_hash:
                 return OrderFlowService().get_order_flow_from_patient_hash(patient_hash=patient_hash).to_response()
         except OrderFlow.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -58,6 +60,8 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
             return service.write_doctor_order_and_send_line_msg(param).to_response()
         except OrderAlreadyConfirmedException as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
+        except OrderFlow.DoesNotExist:
+            return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PatientConfirmationAPI(GenericAPIView):
@@ -70,3 +74,5 @@ class PatientConfirmationAPI(GenericAPIView):
             return service.save_patient_confirmation_and_make_order(param).to_response()
         except PatientAlreadyConfirmedException as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
+        except OrderFlow.DoesNotExist:
+            return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)

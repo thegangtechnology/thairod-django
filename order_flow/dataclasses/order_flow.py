@@ -25,7 +25,7 @@ class CreateOrderFlowParam(CreateOrderParam):
             doctor=Doctor.example(),
             patient=Patient.example(),
             shipping_address=ShippingAddress.example(),
-            line_id="",
+            line_id="line id",
             session_id="AAABB2134",
             items=[CartItem.example()] if items is None else items,
             auto_doctor_confirm=auto_doctor_confirm

@@ -4,14 +4,14 @@ from order_flow.models import OrderFlow
 from order_flow.services import OrderFlowService
 from thairod.utils.load_seed import load_realistic_seed
 from order_flow.dataclasses.order_flow import OrderFlowResponse
-from thairod.utils.test_util import TestCase, APITestCase
+from thairod.utils.test_util import TestCase
 from order.dataclasses.cart_item import CartItem
 from order.dataclasses.shipping_address import ShippingAddress
-from django.urls import reverse
-from rest_framework import status
 import json
 from os.path import join, dirname
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
+from rest_framework.exceptions import ValidationError
+from thairod.settings import FRONTEND_URL
 
 
 class TestOrderFlowService(TestCase):
@@ -90,7 +90,7 @@ class TestOrderFlowService(TestCase):
         new_item = [CartItem(item_id=self.seed.product_variations[1].id, quantity=1)]
         doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
                                                      doctor_order=DoctorOrder(items=new_item))
-        response = OrderFlowService().write_doctor_order_to_order_flow(checkout_doctor_order_request=doctor_checkout)
+        response = OrderFlowService().write_doctor_order_and_send_line_msg(checkout_doctor_order_request=doctor_checkout)
         # should be new order and patient hash should be created
         self.assertEqual(response.doctor_link_hash, doctor_checkout.doctor_link_hash)
         self.assertTrue(response.patient_link_hash is not None)
@@ -107,7 +107,7 @@ class TestOrderFlowService(TestCase):
         new_item = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
         doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
                                                      doctor_order=DoctorOrder(items=new_item))
-        response = OrderFlowService().write_doctor_order_to_order_flow(checkout_doctor_order_request=doctor_checkout)
+        response = OrderFlowService().write_doctor_order_and_send_line_msg(checkout_doctor_order_request=doctor_checkout)
         # should be new order and patient hash should be created
         self.assertEqual(response.doctor_link_hash, doctor_checkout.doctor_link_hash)
         self.assertTrue(response.patient_link_hash is not None)
@@ -117,7 +117,7 @@ class TestOrderFlowService(TestCase):
                          self.seed.product_variations[0].description)
         # if try to override should go boom boom
         with self.assertRaises(OrderAlreadyConfirmedException):
-            OrderFlowService().write_doctor_order_to_order_flow(
+            OrderFlowService().write_doctor_order_and_send_line_msg(
                 checkout_doctor_order_request=doctor_checkout)
 
     def test_confirm_patient(self):
@@ -138,79 +138,27 @@ class TestOrderFlowService(TestCase):
                 OrderFlowService().save_patient_confirmation_and_make_order(
                     patient_confirmation_request=patient_confirmation)
 
-
-class TestOrderFlowAPI(APITestCase):
-
-    def setUp(self):
-        seed = load_realistic_seed()
-        self.seed = seed
-
-    def test_invalid_query(self):
-        url = reverse("order-flows-hash")
-        response = self.client.get(url, {'doctor': 'a'}, format='json')
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        url = reverse("order-flows-hash")
-        response = self.client.get(url, {'patient': 'b'}, format='json')
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-
-    def test_doctor_confirm_api(self):
-        order_flow_request = CreateOrderFlowParam.example(items=[])
-        order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
-        # no patient hash yet
-        self.assertTrue(order_flow_response.patient_link_hash is None)
-        new_item = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
-        doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
-                                                     doctor_order=DoctorOrder(items=new_item)).to_data()
-        url = reverse("order-flows-doctor-checkout")
-        response = self.client.post(url, doctor_checkout, format='json')
-        # should be new order and patient hash should be created
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('doctor_link_hash'), doctor_checkout.get('doctor_link_hash'))
-        self.assertTrue(response.data.get('patient_link_hash') is not None)
-        # try again should be 400
-        response = self.client.post(url, doctor_checkout, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_patient_confirm_api(self):
-        items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
-        order_flow_request = CreateOrderFlowParam.example(items=items, auto_doctor_confirm=True)
-        order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
-        patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,
-                                                          address=ShippingAddress.example()).to_data()
-        url = reverse("order-flows-patient-checkout")
-        response = self.client.post(url, patient_confirmation, format='json')
-        # 200
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        flow = OrderFlow.objects.get(patient_link_hash=order_flow_response.patient_link_hash)
-        # order created
-        self.assertTrue(flow.order_created)
-        # bad request, already create for this order.
-        url = reverse("order-flows-patient-checkout")
-        response = self.client.post(url, patient_confirmation, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-class TestOrderFlowNoMockShippop(TestCase):
-    patch_shippop = False
-
-    def setUp(self):
-        seed = load_realistic_seed()
-        self.seed = seed
-
-    def test_confirm_patient_no_mock_shippop(self):
+    def test_invalid_service_area(self):
         filename = 'create_order_flow_phuket.json'
         with open(join(dirname(__file__), filename), 'r') as json_file:
             order_flow_json = json.load(json_file)
-            order_flow_request = CreateOrderFlowParam.from_data(order_flow_json)
-            order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
-            order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
-            patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,
-                                                              address=order_flow_response.doctor_info.shipping_address)
-            OrderFlowService().save_patient_confirmation_and_make_order(
-                patient_confirmation_request=patient_confirmation)
-            flow = OrderFlow.objects.get(patient_link_hash=order_flow_response.patient_link_hash)
-            self.assertTrue(flow.order_created)
-            # try to make order again should get error
-            with self.assertRaises(PatientAlreadyConfirmedException):
-                OrderFlowService().save_patient_confirmation_and_make_order(
-                    patient_confirmation_request=patient_confirmation)
+            with self.assertRaises(ValidationError):
+                CreateOrderFlowParam.from_data(order_flow_json)
+
+    def test_confirm_doctor_order_did_send_line_message(self):
+        items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
+        order_flow_request = CreateOrderFlowParam.example(items=items)
+        order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
+        self.line_mock.reset_mock()
+        self.seed.procure_item(order_flow_request.items[0].item_id, 100)
+        doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
+                                                     doctor_order=DoctorOrder(items=items))
+        resp = OrderFlowService().write_doctor_order_and_send_line_msg(checkout_doctor_order_request=doctor_checkout)
+        self.assertEqual(self.line_mock.call_count, 1)  # once for call back address
+        lineuid = self.line_mock.call_args_list[0][0][0]
+        msg = self.line_mock.call_args_list[0][0][1].text
+        self.assertEqual(order_flow_request.line_id, lineuid)
+        self.assertIn(order_flow_request.patient.name, msg)
+        # contains patient hash for link
+        callback_url = f"{FRONTEND_URL}checkout?patient={resp.patient_link_hash}"
+        self.assertIn(callback_url, msg)
