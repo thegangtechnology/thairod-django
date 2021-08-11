@@ -15,10 +15,11 @@ from thairod.utils.auto_serialize import AutoSerialize
 
 @dataclass
 class StockInfo(AutoSerialize):
-    fulfilled: int
-    procured: int
+    fulfilled: int  # number of order item fulfilled
+    procured: int  # number procured
     adjustment: int
     ordered: int
+    to_be_shipped: int
     pending: int
 
     @classmethod
@@ -28,6 +29,7 @@ class StockInfo(AutoSerialize):
             procured=0,
             adjustment=0,
             ordered=0,
+            to_be_shipped=0,
             pending=0
         )
 
@@ -38,6 +40,7 @@ class StockInfo(AutoSerialize):
             procured=30,
             adjustment=12,
             ordered=11,
+            to_be_shipped=3,
             pending=5
         )
 
@@ -56,6 +59,7 @@ class StockInfo(AutoSerialize):
             fulfilled=OrderItem.total_fulfilled_for_id(product_variation_id, begin, end),
             procured=Procurement.total_procurement_for_id(product_variation_id, begin, end),
             ordered=OrderItem.total_ordered_for_id(product_variation_id, begin, end),
+            to_be_shipped=OrderItem.total_ready_to_ship(product_variation_id, begin, end),
             adjustment=StockAdjustment.total_adjustment_for_id(product_variation_id, begin, end),
             pending=OrderItem.total_pending_for_id(product_variation_id, begin, end)
         )
@@ -75,17 +79,20 @@ class StockService:
         procured_map = Procurement.total_procurement_map()
         adjustment_map = StockAdjustment.total_adjustment_map()
         ordered_map = OrderItem.total_ordered_map()
+        to_be_shipped_map = OrderItem.total_ready_to_ship_map()
         key_set = set()
         ret = defaultdict(StockInfo.empty)
         for key in itertools.chain(fulfilled_map.keys(), procured_map.keys(),
-                                   adjustment_map.keys(), pending_map.keys()):
+                                   adjustment_map.keys(), pending_map.keys(),
+                                   to_be_shipped_map.keys()):
             if key not in key_set:
                 ret[key] = StockInfo(
                     procured=procured_map[key],
                     fulfilled=fulfilled_map[key],
                     ordered=ordered_map[key],
                     adjustment=adjustment_map[key],
-                    pending=pending_map[key]
+                    to_be_shipped=to_be_shipped_map[key],
+                    pending=pending_map[key],
                 )
                 key_set.add(key)
         return ret

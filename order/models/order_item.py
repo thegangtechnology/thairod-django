@@ -107,6 +107,30 @@ class OrderItem(AbstractModel):
         return cls.total_fulfilled_for_id(product_variation.id, **kwds)
 
     @classmethod
+    def total_ready_to_ship(cls, pv_id: int, begin: datetime.datetime, end: datetime.datetime) -> int:
+        from shipment.models.shipment import ShipmentStatus
+        return (OrderItem.objects
+                .filter(product_variation_id=pv_id)
+                .filter(shipment__status=ShipmentStatus.CONFIRMED)
+                .exclude(shipment__cancelled=True)
+                .filter(smart_range('shipment__shippop_confirm_date_time', begin, end))
+                .count())
+
+    @classmethod
+    def total_ready_to_ship_map(clsc,
+                                begin: Optional[datetime.datetime] = None,
+                                end: Optional[datetime.datetime] = None) -> DefaultDict[int, int]:
+        from shipment.models.shipment import ShipmentStatus
+        qs = (OrderItem.objects
+              .filter(shipment__status=ShipmentStatus.CONFIRMED)
+              .exclude(shipment__cancelled=True)
+              .filter(smart_range('shipment__shippop_confirm_date_time', begin, end))
+              .values('product_variation_id').annotate(total_count=Sum('quantity')))
+        ret = defaultdict(lambda: 0)
+        ret.update({s['product_variation_id']: s['total_count'] for s in qs})
+        return ret
+
+    @classmethod
     def _total_map_for_status(cls,
                               status: Optional[FulfilmentStatus],
                               date_col: str,

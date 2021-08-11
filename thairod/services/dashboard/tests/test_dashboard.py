@@ -55,6 +55,7 @@ class TestDashboard(TestCase):
             fulfilled=4,
             procured=30,
             adjustment=35,
+            to_be_shipped=4,
             ordered=7,
             pending=3
         ))
