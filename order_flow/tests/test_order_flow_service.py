@@ -184,7 +184,6 @@ class TestOrderFlowAPI(APITestCase):
         flow = OrderFlow.objects.get(patient_link_hash=order_flow_response.patient_link_hash)
         # order created
         self.assertTrue(flow.order_created)
-        
         # bad request, already create for this order.
         url = reverse("order-flows-patient-checkout")
         response = self.client.post(url, patient_confirmation, format='json')
