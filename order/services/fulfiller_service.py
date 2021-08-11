@@ -53,6 +53,16 @@ class FulfilmentService:
             if success:
                 self.attempt_to_mark_shipment_fulfilled(oi.shipment)
 
+    def process_all_orders(self):
+        self.fulfill_pending_order_items()
+        self.mark_all_ready_fulfill_shipment()
+        self.book_and_confirm_all_pending_shipments()
+
+    def mark_all_ready_fulfill_shipment(self):
+        shipments = Shipment.ready_to_fulfill_shipments()
+        for shipment in shipments:
+            self.attempt_to_mark_shipment_fulfilled(shipment)
+
     def attempt_to_mark_shipment_fulfilled(self, shipment: Shipment) -> bool:
         if shipment.is_ready_to_fulfill:
             shipment.mark_fulfilled()

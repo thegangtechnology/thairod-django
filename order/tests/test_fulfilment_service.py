@@ -70,3 +70,12 @@ class TestFulfilmentService(TestCase):
         FulfilmentService().fulfill_pending_order_items()
         end = Shipment.objects.filter(status=ShipmentStatus.FULFILLED).count()
         self.assertLess(begin, end)
+
+    def test_process_all_orders(self):
+        fulfilled_oi_before = OrderItem.objects.exclude(fulfilment_status=FulfilmentStatus.PENDING).count()
+        fulfilled_shipment_before = Shipment.objects.exclude(status=ShipmentStatus.CREATED).count()
+        FulfilmentService().process_all_orders()
+        fulfilled_oi_after = OrderItem.objects.exclude(fulfilment_status=FulfilmentStatus.PENDING).count()
+        fulfilled_shipment_after = Shipment.objects.exclude(status=ShipmentStatus.CREATED).count()
+        self.assertGreater(fulfilled_oi_after, fulfilled_oi_before)
+        self.assertGreater(fulfilled_shipment_after, fulfilled_shipment_before)
