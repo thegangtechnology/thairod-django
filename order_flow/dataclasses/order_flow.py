@@ -3,6 +3,7 @@ from thairod.utils.auto_serialize import AutoSerialize
 from order.dataclasses.doctor import Doctor
 from order.dataclasses.patient import Patient
 from order.dataclasses.shipping_address import ShippingAddress
+from order.dataclasses.order import CreateOrderParameter
 from order_flow.models import OrderFlow
 from typing import Optional
 from order_flow.dataclasses.doctor_order import DoctorOrderResponse
@@ -11,14 +12,7 @@ from order.dataclasses.cart_item import CartItem
 
 
 @dataclass
-class CreateOrderFlowRequest(AutoSerialize):
-    account: str
-    doctor: Doctor
-    patient: Patient
-    shipping_address: ShippingAddress
-    line_id: str
-    session_id: str
-    items: List[CartItem]
+class CreateOrderFlowRequest(CreateOrderParameter):
     auto_doctor_confirm: bool
 
     @classmethod

@@ -55,7 +55,7 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
         param = CheckoutDoctorOrderRequest.from_post_request(request)
         service = OrderFlowService()
         try:
-            return service.write_doctor_order_to_order_flow(param).to_response()
+            return service.write_doctor_order_and_send_line_msg(param).to_response()
         except OrderAlreadyConfirmedException as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
 

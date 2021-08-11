@@ -7,3 +7,5 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://mall.thairod.care',
 ]
+
+FRONTEND_URL = "https://mall.thairod.care/"

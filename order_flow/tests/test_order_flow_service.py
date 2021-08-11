@@ -188,3 +188,29 @@ class TestOrderFlowAPI(APITestCase):
         url = reverse("order-flows-patient-checkout")
         response = self.client.post(url, patient_confirmation, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestOrderFlowNoMockShippop(TestCase):
+    patch_shippop = False
+
+    def setUp(self):
+        seed = load_realistic_seed()
+        self.seed = seed
+
+    def test_confirm_patient_no_mock_shippop(self):
+        filename = 'create_order_flow_phuket.json'
+        with open(join(dirname(__file__), filename), 'r') as json_file:
+            order_flow_json = json.load(json_file)
+            order_flow_request = CreateOrderFlowRequest(**order_flow_json)
+            order_flow_request.items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
+            order_flow_response = OrderFlowService().create_order_flow(create_order_flow_request=order_flow_request)
+            patient_confirmation = PatientConfirmationRequest(patient_link_hash=order_flow_response.patient_link_hash,
+                                                              address=order_flow_response.doctor_info.shipping_address)
+            OrderFlowService().save_patient_confirmation_and_make_order(
+                patient_confirmation_request=patient_confirmation)
+            flow = OrderFlow.objects.get(patient_link_hash=order_flow_response.patient_link_hash)
+            self.assertTrue(flow.order_created)
+            # try to make order again should get error
+            with self.assertRaises(PatientAlreadyConfirmedException):
+                OrderFlowService().save_patient_confirmation_and_make_order(
+                    patient_confirmation_request=patient_confirmation)
