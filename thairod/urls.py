@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from thairod.settings import DEBUG
 from thairod.views.dashboard_api import DashboardAPI
 from thairod.views.ipcheck import IPCheckView
 from thairod.views.ordered_non_repeatable import DidOrderNonRepeatableAPI
@@ -53,11 +54,6 @@ urlpatterns = [
     path('api/', include('stock_adjustment.urls')),
     path('api/', include('warehouse.urls')),
     path('api/', include('user.urls')),
-    re_path(r'^docs/open_api(?P<format>\.json|\.yaml)$',
-            schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    re_path(r'^docs/open_api/$', schema_view.with_ui('swagger',
-                                                     cache_timeout=0), name='schema-swagger-ui'),
-    re_path(r'^docs/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('ping/', IPCheckView.as_view(), name='ip-check'),
@@ -66,3 +62,12 @@ urlpatterns = [
     path('api/did-order-non-repeatable/', DidOrderNonRepeatableAPI.as_view(), name='did-order-non-repeatable'),
     path('api/quick-snapshot/', QuickSnapshotView.as_view(), name='quick-snapshot')
 ]
+
+if DEBUG:
+    urlpatterns += [
+        re_path(r'^docs/open_api(?P<format>\.json|\.yaml)$',
+                schema_view.without_ui(cache_timeout=0), name='schema-json'),
+        re_path(r'^docs/open_api/$', schema_view.with_ui('swagger',
+                                                         cache_timeout=0), name='schema-swagger-ui'),
+        re_path(r'^docs/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    ]
