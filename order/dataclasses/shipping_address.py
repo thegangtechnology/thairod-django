@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 from rest_framework.exceptions import ValidationError
 
@@ -15,7 +16,7 @@ class ShippingAddress(AutoSerialize):
     province: str
     zipcode: str
     phone_number: str
-    note: str
+    note: Optional[str]
 
     @classmethod
     def validate_data(cls, data: ShippingAddress):

@@ -117,7 +117,7 @@ class OrderItem(AbstractModel):
                 .count())
 
     @classmethod
-    def total_ready_to_ship_map(clsc,
+    def total_ready_to_ship_map(cls,
                                 begin: Optional[datetime.datetime] = None,
                                 end: Optional[datetime.datetime] = None) -> DefaultDict[int, int]:
         from shipment.models.shipment import ShipmentStatus

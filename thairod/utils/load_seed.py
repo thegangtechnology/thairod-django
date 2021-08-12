@@ -12,6 +12,8 @@ from order.models import Order, OrderItem
 from order.services.fulfiller_service import FulfilmentService
 from order.services.order_service import RawOrder
 from order.views import OrderService, CreateOrderParam
+from order_flow.dataclasses import CreateOrderFlowParam
+from order_flow.services import OrderFlowService
 from procurement.models import Procurement
 from product.models import ProductVariation, Product, ProductImage
 from shipment.models import Shipment, TrackingStatus, BatchShipment
@@ -114,12 +116,20 @@ class RealisticSeed:
 
         seed.product_variations.append(product_variation)
         seed.product_variations.append(product_variation2)
+
         return seed
 
     def full_production(self):
         self.procure_items()
         self.some_adjustment()
         self.some_order()
+        self.some_order_flows()
+
+    def some_order_flows(self):
+        for _ in range(3):
+            OrderFlowService().create_order_flow(CreateOrderFlowParam.example(
+                [CartItem(item_id=self.product_variations[0].id, quantity=1)]
+            ))
 
     def procure_items(self) -> List[Procurement]:
         p_map = {

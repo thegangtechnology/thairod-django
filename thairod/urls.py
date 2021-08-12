@@ -26,6 +26,7 @@ from rest_framework_simplejwt.views import (
 from thairod.views.dashboard_api import DashboardAPI
 from thairod.views.ipcheck import IPCheckView
 from thairod.views.ordered_non_repeatable import DidOrderNonRepeatableAPI
+from thairod.views.quick_snapshot_api import QuickSnapshotView
 from thairod.views.stock_api import StockAPI
 
 schema_view = get_schema_view(
@@ -62,5 +63,6 @@ urlpatterns = [
     path('ping/', IPCheckView.as_view(), name='ip-check'),
     path('api/stock/', StockAPI.as_view(), name='get-stock'),
     path('api/dashboard/', DashboardAPI.as_view(), name='dashboard'),
-    path('api/did-order-non-repeatable/', DidOrderNonRepeatableAPI.as_view(), name='did-order-non-repeatable')
+    path('api/did-order-non-repeatable/', DidOrderNonRepeatableAPI.as_view(), name='did-order-non-repeatable'),
+    path('api/quick-snapshot/', QuickSnapshotView.as_view(), name='quick-snapshot')
 ]
