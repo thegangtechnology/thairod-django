@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 from unittest.mock import patch, MagicMock
 
 import sqlparse
@@ -57,7 +58,7 @@ class TestCase(TC):
     patch_line = True
     patch_shippop = True
     with_seed = True
-    line_mock: MagicMock = None
+    line_mock: Optional[MagicMock] = None
 
     @classmethod
     def setUpClass(cls):
