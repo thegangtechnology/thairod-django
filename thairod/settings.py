@@ -176,18 +176,17 @@ LINE_ORDER_CREATED_MESSAGE = """
 เรียนคุณ {name}
 คำขอกล่องไทยรอดของท่านได้ถูกบันทึกแล้ว
 หมายเลขคำขอของท่านคือ {order_id}
-"""
+""".strip()
 
 LINE_TRACKING_MESSAGE = """
 กล่องไทยรอดกำลังถูกส่งไปให้ คุณ {name}
 โดยท่านสามารถติดตามสถานะได้ที่ {tracking_url}
 """.strip()
 
-
 LINE_PATIENT_CONFIRM_MESSAGE = """
 เรียนคุณ {name}
 กรุณายืนยันที่อยู่ในการจัดส่งสำหรับกล่องไทยรอด
-{patient_callback_url}
+{patient_confirmation_url}
 """.strip()
 
 try:
@@ -234,3 +233,8 @@ LOGGING = {
 }
 
 FRONTEND_URL = "http://localhost:3000/"
+
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'rpc')
+
+TEST_RUNNER = 'thairod.utils.test_util.ThairodTestRunner'

@@ -25,6 +25,7 @@ line-bot-sdk = "*"
 django-filter = "*"
 sqlparse = "*"
 freezegun = "*"
+celery = "*"
 
 [dev-packages]
 

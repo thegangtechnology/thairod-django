@@ -24,6 +24,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from thairod.settings import DEBUG
+from thairod.views.async_test import AsyncView
 from thairod.views.dashboard_api import DashboardAPI
 from thairod.views.ipcheck import IPCheckView
 from thairod.views.ordered_non_repeatable import DidOrderNonRepeatableAPI
@@ -57,6 +58,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('ping/', IPCheckView.as_view(), name='ip-check'),
+    path('async/', AsyncView.as_view(), name='async'),
     path('api/stock/', StockAPI.as_view(), name='get-stock'),
     path('api/dashboard/', DashboardAPI.as_view(), name='dashboard'),
     path('api/did-order-non-repeatable/', DidOrderNonRepeatableAPI.as_view(), name='did-order-non-repeatable'),
