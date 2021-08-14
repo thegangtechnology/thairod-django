@@ -1,12 +1,12 @@
 import datetime
 
 import freezegun
+from django.conf import settings
 from django.urls import reverse
 
 from core.tests import BaseTestSimpleApiMixin
 from shipment.models import BatchShipment, Shipment
 from shipment.services.batch_shipment_service import BatchShipmentService
-from thairod import settings
 from thairod.utils import tzaware
 from thairod.utils.test_util import APITestCase, TestCase
 

@@ -9,7 +9,7 @@ from future.backports.datetime import timedelta
 from product.models import ProductVariation
 from shipment.models import Shipment
 from shipment.models.shipment import ShipmentStatus
-from thairod import settings
+from django.conf import settings
 from thairod.services.stock.stock import StockInfo, StockService
 from thairod.utils import tzaware
 from thairod.utils.auto_serialize import AutoSerialize

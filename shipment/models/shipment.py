@@ -68,7 +68,7 @@ class Shipment(AbstractModel):
 
     @classmethod
     def daily_shipment(cls, date: datetime.date) -> QuerySet:
-        from thairod import settings
+        from django.conf import settings
         dt = tzaware.datetime(date.year, date.month, date.day)
         dt = replace_hour(dt, settings.SHIPPOP_LOT_CUTTING_TIME)
         return Shipment.objects.filter(
