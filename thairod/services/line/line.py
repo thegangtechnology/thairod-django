@@ -34,8 +34,7 @@ def send_line_order_created_message(line_uid: str, name: str, order_id: int):
 
 
 def send_line_patient_address_confirmation_message(line_uid: str, patient_name: str,
-                                                   patient_hash: str):
-    patient_callback_url = f"{FRONTEND_URL}checkout?patient={patient_hash}"
+                                                   patient_confirmation_url: str):
     msg = LINE_PATIENT_CONFIRM_MESSAGE.format(name=patient_name,
-                                              patient_callback_url=patient_callback_url)
+                                              patient_confirmation_url=patient_confirmation_url)
     return send_line_message(line_uid, msg)

@@ -36,17 +36,6 @@ class OrderFlow(AbstractModel):
         # the link is expired
         return diff_in_hours >= 2
 
-    # def is_patient_link_hash_timestamp_expired(self, timezone_object: timezone) -> bool:
-    #     diff = timezone_object - self.patient_link_hash_timestamp
-    #     diff_in_seconds = diff.total_seconds()
-    #     diff_in_hours = divmod(diff_in_seconds, 3600)[0]
-    #     # if the difference is more than 24 hour
-    #     # the link is expired
-    #     return diff_in_hours >= 24
-    #
-    # def calc_is_expired(self, diff: timezone, expire_in: int) -> bool:
-    #     diff_in_seconds = diff.total_seconds()
-    #     diff_in_hours = divmod(diff_in_seconds, 3600)[0]
-    #     # if the difference is more than 24 hour
-    #     # the link is expired
-    #     return diff_in_hours >= expire_in
+    def patient_confirmation_url(self) -> str:
+        from order_flow.services import OrderFlowService
+        return OrderFlowService().patient_confirmation_url_from_hash(self.patient_link_hash)

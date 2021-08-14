@@ -3,11 +3,15 @@ from typing import Optional
 from unittest.mock import patch, MagicMock
 
 import sqlparse
+from celery.contrib.testing.worker import start_worker
 from django.db.models import QuerySet
 from django.test import TestCase as TC
+from django.test import override_settings
+from django.test.runner import DiscoverRunner
 from linebot import LineBotApi
 from rest_framework.test import APITestCase as ATC
 
+from thairod.celery import app
 from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import OrderResponse, OrderLineResponse, OrderData
 from thairod.utils.load_seed import load_seed
@@ -54,6 +58,35 @@ def patch_shippop(cls):
     cls.addClassCleanup(confirm_order.__exit__, None, None, None)
 
 
+def setup_celery_worker(cls):
+    worker = start_worker(app, perform_ping_check=False)
+    worker.__enter__()
+    cls.addClassCleanup(lambda: worker.__exit__(None, None, None))
+
+
+def setup_eager_celery(cls):
+    ovs = override_settings(CELERY_TASK_ALWAYS_EAGER=True,
+                            CELERGY_TASK_EAGER_PROPAGATES=True)
+    ovs.__enter__()
+    cls.addClassCleanup(lambda: ovs.__exit__(None, None, None))
+
+
+def pre_setup(cls):
+    if cls.with_bg_worker:
+        setup_celery_worker(cls)
+    else:
+        setup_eager_celery(cls)
+
+
+def post_setup(cls):
+    if cls.patch_line:
+        cls.line_mock = patch_line_bot_api(cls)
+    if cls.patch_shippop:
+        patch_shippop(cls)
+    if cls.with_seed:
+        load_seed()
+
+
 class TestCase(TC):
     patch_line = True
     patch_shippop = True
@@ -63,12 +96,7 @@ class TestCase(TC):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if cls.patch_line:
-            cls.line_mock = patch_line_bot_api(cls)
-        if cls.patch_shippop:
-            patch_shippop(cls)
-        if cls.with_seed:
-            load_seed()
+        post_setup(cls)
 
     def _pre_setup(self):
         super()._pre_setup()
@@ -94,9 +122,19 @@ class APITestCase(ATC):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if cls.patch_line:
-            patch_line_bot_api(cls)
-        if cls.patch_shippop:
-            patch_shippop(cls)
-        if cls.with_seed:
-            load_seed()
+        post_setup(cls)
+
+
+class ThairodTestRunner(DiscoverRunner):
+    def setup_databases(self, **kwargs):
+        self.ovs = override_settings(CELERY_BROKER_URL='memory://localhost',
+                                     CELERY_RESULT_BACKEND='rpc')
+        self.ovs.__enter__()
+        self.worker = start_worker(app, perform_ping_check=False)
+        self.worker.__enter__()
+        return super().setup_databases(**kwargs)
+
+    def teardown_databases(self, old_config, **kwargs):
+        super().teardown_databases(old_config, **kwargs)
+        self.worker.__exit__(None, None, None)
+        self.ovs.__exit__(None, None, None)

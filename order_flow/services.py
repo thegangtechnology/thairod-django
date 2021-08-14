@@ -2,10 +2,11 @@ from order.dataclasses.cart_item import CartItem
 from order.services.order_service import CreateOrderParam, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowParam, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
-from order_flow.models import OrderFlow
-from thairod.utils import tzaware
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
+from order_flow.models import OrderFlow
 from thairod.services.line import line
+from thairod.settings import FRONTEND_URL
+from thairod.utils import tzaware
 
 
 class OrderFlowService:
@@ -96,7 +97,11 @@ class OrderFlowService:
     def send_line_confirmation_message(self, order_flow: OrderFlow) -> None:
         line_uid = order_flow.doctor_info.get('line_id')
         patient_name = order_flow.doctor_info.get('patient').get('name')
-        patient_hash = order_flow.patient_link_hash
+        patient_confirmation_url = order_flow.patient_confirmation_url()
         line.send_line_patient_address_confirmation_message(line_uid=line_uid,
                                                             patient_name=patient_name,
-                                                            patient_hash=patient_hash)
+                                                            patient_confirmation_url=patient_confirmation_url)
+
+    def patient_confirmation_url_from_hash(self, patient_hash: str):
+        patient_callback_url = f"{FRONTEND_URL}checkout?patient={patient_hash}"
+        return patient_callback_url
