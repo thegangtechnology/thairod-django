@@ -10,7 +10,7 @@ from order_flow.dataclasses import CreateOrderFlowParam, CheckoutDoctorOrderRequ
     PatientConfirmationRequest, OrderFlowResponse
 from order_flow.services import OrderFlowService
 from order_flow.models import OrderFlow
-from thairod.settings import TELEMED_WHITELIST
+from django.conf import settings
 from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
@@ -19,7 +19,7 @@ HASH_DOES_NOT_EXIST = "Hash not found"
 
 
 class CreateOrderFlowsAPI(GenericAPIView):
-    @ip_whitelist(TELEMED_WHITELIST, allow_all_if_debug=True)
+    @ip_whitelist(settings.TELEMED_WHITELIST, allow_all_if_debug=True)
     @swagger_auto_serialize_post_schema(CreateOrderFlowParam, OrderFlowResponse)
     def post(self, request: Request) -> Response:
         param = CreateOrderFlowParam.from_post_request(request)

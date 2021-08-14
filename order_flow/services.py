@@ -5,7 +5,7 @@ from order_flow.dataclasses import CreateOrderFlowParam, OrderFlowResponse, \
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 from order_flow.models import OrderFlow
 from thairod.services.line import line
-from thairod.settings import FRONTEND_URL
+from django.conf import settings
 from thairod.utils import tzaware
 
 
@@ -103,5 +103,5 @@ class OrderFlowService:
                                                             patient_confirmation_url=patient_confirmation_url)
 
     def patient_confirmation_url_from_hash(self, patient_hash: str):
-        patient_callback_url = f"{FRONTEND_URL}checkout?patient={patient_hash}"
+        patient_callback_url = f"{settings.FRONTEND_URL}checkout?patient={patient_hash}"
         return patient_callback_url

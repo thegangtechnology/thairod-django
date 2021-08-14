@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import List, Optional
 
 from address.models import Address
-from thairod.settings import SHIPPOP_DEFAULT_COURIER_CODE
+from django.conf import settings
 
 
 # flake8: noqa
@@ -65,7 +65,7 @@ class OrderLineData:
     from_address: AddressData
     to_address: AddressData
     parcel: ParcelData
-    courier_code: str = SHIPPOP_DEFAULT_COURIER_CODE
+    courier_code: str = settings.SHIPPOP_DEFAULT_COURIER_CODE
 
     def to_request_dict(self) -> dict:
         return {

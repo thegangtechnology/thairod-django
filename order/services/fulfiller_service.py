@@ -16,7 +16,7 @@ from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse, \
     spe_postal_codes
 from thairod.services.stock.stock import StockService, StockInfo
-from thairod.settings import SHIPPOP_EMAIL
+from django.conf import settings
 from thairod.utils import tzaware
 from thairod.utils.exceptions import ShippopAPIException
 
@@ -174,7 +174,7 @@ class FulfilmentService:
 
     def create_order_data(self, shipments: List[Shipment]) -> OrderData:
         return OrderData(
-            email=SHIPPOP_EMAIL,
+            email=settings.SHIPPOP_EMAIL,
             success_url='',
             fail_url='',
             data=[

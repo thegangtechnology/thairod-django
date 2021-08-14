@@ -23,7 +23,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from thairod.settings import DEBUG
+from django.conf import settings
 from thairod.views.async_test import AsyncView
 from thairod.views.dashboard_api import DashboardAPI
 from thairod.views.ipcheck import IPCheckView
@@ -65,7 +65,7 @@ urlpatterns = [
     path('api/quick-snapshot/', QuickSnapshotView.as_view(), name='quick-snapshot')
 ]
 
-if DEBUG:
+if settings.DEBUG:
     urlpatterns += [
         re_path(r'^docs/open_api(?P<format>\.json|\.yaml)$',
                 schema_view.without_ui(cache_timeout=0), name='schema-json'),

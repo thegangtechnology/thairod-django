@@ -1,17 +1,19 @@
+import json
+from os.path import join, dirname
+
+from django.conf import settings
+from rest_framework.exceptions import ValidationError
+
+from order.dataclasses.cart_item import CartItem
+from order.dataclasses.shipping_address import ShippingAddress
 from order_flow.dataclasses import CreateOrderFlowParam, CheckoutDoctorOrderRequest, DoctorOrder, \
     PatientConfirmationRequest
+from order_flow.dataclasses.order_flow import OrderFlowResponse
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
 from order_flow.models import OrderFlow
 from order_flow.services import OrderFlowService
 from thairod.utils.load_seed import load_realistic_seed
-from order_flow.dataclasses.order_flow import OrderFlowResponse
 from thairod.utils.test_util import TestCase
-from order.dataclasses.cart_item import CartItem
-from order.dataclasses.shipping_address import ShippingAddress
-import json
-from os.path import join, dirname
-from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
-from rest_framework.exceptions import ValidationError
-from thairod.settings import FRONTEND_URL
 
 
 class TestOrderFlowService(TestCase):
@@ -90,7 +92,8 @@ class TestOrderFlowService(TestCase):
         new_item = [CartItem(item_id=self.seed.product_variations[1].id, quantity=1)]
         doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
                                                      doctor_order=DoctorOrder(items=new_item))
-        response = OrderFlowService().write_doctor_order_and_send_line_msg(checkout_doctor_order_request=doctor_checkout)
+        response = OrderFlowService().write_doctor_order_and_send_line_msg(
+            checkout_doctor_order_request=doctor_checkout)
         # should be new order and patient hash should be created
         self.assertEqual(response.doctor_link_hash, doctor_checkout.doctor_link_hash)
         self.assertTrue(response.patient_link_hash is not None)
@@ -107,7 +110,8 @@ class TestOrderFlowService(TestCase):
         new_item = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
         doctor_checkout = CheckoutDoctorOrderRequest(doctor_link_hash=order_flow_response.doctor_link_hash,
                                                      doctor_order=DoctorOrder(items=new_item))
-        response = OrderFlowService().write_doctor_order_and_send_line_msg(checkout_doctor_order_request=doctor_checkout)
+        response = OrderFlowService().write_doctor_order_and_send_line_msg(
+            checkout_doctor_order_request=doctor_checkout)
         # should be new order and patient hash should be created
         self.assertEqual(response.doctor_link_hash, doctor_checkout.doctor_link_hash)
         self.assertTrue(response.patient_link_hash is not None)
@@ -160,5 +164,5 @@ class TestOrderFlowService(TestCase):
         self.assertEqual(order_flow_request.line_id, lineuid)
         self.assertIn(order_flow_request.patient.name, msg)
         # contains patient hash for link
-        callback_url = f"{FRONTEND_URL}checkout?patient={resp.patient_link_hash}"
+        callback_url = f"{settings.FRONTEND_URL}checkout?patient={resp.patient_link_hash}"
         self.assertIn(callback_url, msg)
