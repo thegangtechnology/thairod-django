@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from rest_framework.exceptions import ValidationError
@@ -16,7 +16,7 @@ class ShippingAddress(AutoSerialize):
     province: str
     zipcode: str
     phone_number: str
-    note: Optional[str]
+    note: Optional[str] = field(metadata={'serializer_kwargs': {'allow_blank': True}})
 
     @classmethod
     def validate_data(cls, data: ShippingAddress):
