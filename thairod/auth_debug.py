@@ -1,7 +1,7 @@
+from django.conf import settings
 from django.http import HttpRequest
 from rest_framework import authentication
 
-from thairod import settings
 from user.models import User
 
 

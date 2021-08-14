@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import freezegun
 
-from thairod import settings
+from django.conf import settings
 from thairod.services.dashboard import dashboard_service as ds
 from thairod.services.dashboard.dashboard_service import DashboardService
 from thairod.services.stock.stock import StockInfo

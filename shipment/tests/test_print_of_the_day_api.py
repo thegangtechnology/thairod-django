@@ -3,7 +3,7 @@ import datetime
 import freezegun
 from django.urls import reverse
 
-from thairod import settings
+from django.conf import settings
 from thairod.utils import tzaware
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.query_util import round_to_next_nearest_hour

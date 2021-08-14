@@ -3,7 +3,7 @@ from typing import Optional
 
 from shipment.dataclasses.batch_shipment import AssignBatchToShipmentRequest
 from shipment.models import BatchShipment, Shipment
-from thairod import settings
+from django.conf import settings
 from thairod.utils import tzaware
 from thairod.utils.query_util import round_to_next_nearest_hour
 
