@@ -21,13 +21,15 @@ class OrderFlowSnapshotInfo(AutoSerialize):
     cid: str
     created: datetime.datetime
     order_created: bool
+    confirm_url: str
 
     @classmethod
     def from_order_flow(cls, order_flow: OrderFlow) -> OrderFlowSnapshotInfo:
         return OrderFlowSnapshotInfo(
             created=order_flow.doctor_link_hash_timestamp,
             cid=sensor_cid(order_flow.doctor_info.get('patient', {'cid': None}).get('cid', None)),
-            order_created=order_flow.order_created
+            order_created=order_flow.order_created,
+            confirm_url=order_flow.patient_confirmation_url()
         )
 
 
