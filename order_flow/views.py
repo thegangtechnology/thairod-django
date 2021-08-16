@@ -14,11 +14,13 @@ from django.conf import settings
 from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
 from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
-
+from rest_framework.permissions import AllowAny
 HASH_DOES_NOT_EXIST = "Hash not found"
 
 
 class CreateOrderFlowsAPI(GenericAPIView):
+    permission_classes = [AllowAny]
+
     @ip_whitelist(settings.TELEMED_WHITELIST, allow_all_if_debug=True)
     @swagger_auto_serialize_post_schema(CreateOrderFlowParam, OrderFlowResponse)
     def post(self, request: Request) -> Response:
@@ -28,6 +30,7 @@ class CreateOrderFlowsAPI(GenericAPIView):
 
 
 class OrderFlowsHashAPI(APIView):
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -51,6 +54,7 @@ class OrderFlowsHashAPI(APIView):
 
 
 class CheckoutDoctorOrderAPI(GenericAPIView):
+    permission_classes = [AllowAny]
 
     @swagger_auto_serialize_post_schema(CheckoutDoctorOrderRequest, OrderFlowResponse)
     def post(self, request: Request) -> Response:
@@ -65,6 +69,7 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
 
 
 class PatientConfirmationAPI(GenericAPIView):
+    permission_classes = [AllowAny]
 
     @swagger_auto_serialize_post_schema(PatientConfirmationRequest, CreateOrderResponse)
     def post(self, request: Request) -> Response:

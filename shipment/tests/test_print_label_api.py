@@ -14,15 +14,16 @@ class TestPrintLabelAPI(APITestCase):
     def setUp(self):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.procure_items()
+        self.set_up_user()
 
     def test_sample_label(self):
         # note no login
+        self.client.logout()
         url = reverse('sample-label')
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
 
     def test_print_label(self):
-        self.set_up_user()
         param = CreateOrderParam.example_with_valid_item()
         ros = [OrderService().create_order_no_fulfill(param) for _ in range(2)]
         for ro in ros:
@@ -31,12 +32,10 @@ class TestPrintLabelAPI(APITestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_simple_shipment_list(self):
-        self.set_up_user()
         res = self.client.get(reverse('simple-shipment-list'))
         self.assertEqual(res.status_code, 200)
 
     def test_print_label_api_not_found(self):
-        self.set_up_user()
         param = CreateOrderParam.example_with_valid_item()
         ros = [OrderService().create_order_no_fulfill(param) for _ in range(2)]
         for ro in ros:

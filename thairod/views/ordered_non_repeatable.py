@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.permissions import AllowAny
 from order.models import Order
 from thairod.utils.auto_serialize import swagger_auto_serialize_get_schema, AutoSerialize
 
@@ -25,6 +25,8 @@ class DidOrderNonRepeatableResponse(AutoSerialize):
 
 
 class DidOrderNonRepeatableAPI(APIView):
+    permission_classes = [AllowAny]
+
     @swagger_auto_serialize_get_schema(
         query_type=DidOrderNonRepeatableParam,
         response_type=DidOrderNonRepeatableResponse

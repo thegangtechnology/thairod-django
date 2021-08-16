@@ -14,6 +14,9 @@ class TestPrintOfTheDayAPI(APITestCase):
     with_seed = False
     patch_shippop = False
 
+    def setUp(self):
+        self.set_up_user()
+
     def prepare_seed(self, prepare_date: datetime.datetime):
         with freezegun.freeze_time(prepare_date):
             seed = RealisticSeed.load_realistic_seed()

@@ -1,7 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from shipment.models import Shipment, BatchShipment, TrackingStatus
 from shipment.serializers import ShipmentSerializer, TrackingStatusSerializer
@@ -10,7 +9,6 @@ from datetime import datetime
 
 
 class ShipmentModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ]
     serializer_class = ShipmentSerializer
     queryset = Shipment.objects.all()
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
@@ -56,7 +54,6 @@ class ShipmentModelViewSet(viewsets.ModelViewSet):
 
 
 class TrackingStatusModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ]
     serializer_class = TrackingStatusSerializer
     queryset = TrackingStatus.objects.all()
     filter_backends = [filters.SearchFilter]

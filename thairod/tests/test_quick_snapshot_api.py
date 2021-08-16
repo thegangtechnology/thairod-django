@@ -10,9 +10,9 @@ class TestQuickSnapshotAPI(APITestCase):
     def setUp(self):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.full_production()
+        self.set_up_user()
 
     def test_quick_snapshot_api(self):
-        url = reverse('quick-snapshot')
         res = self.client.get(path=reverse('quick-snapshot'))
         self.assertEqual(res.status_code, 200)
         self.assertIn('orders', res.data)

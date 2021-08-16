@@ -23,3 +23,4 @@ class OrderItemAPITestCase(BaseTestSimpleApiMixin, APITestCase):
             "total_price": 1234.567,
             "order_by": "id",
         }
+        self.set_up_user()

@@ -2,7 +2,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from drf_yasg import openapi
 from shipment.dataclasses.batch_shipment import BatchNameResponse, AssignBatchToShipmentRequest
@@ -13,7 +12,6 @@ from shipment.services.batch_shipment_service import BatchShipmentService
 
 
 class BatchShipmentModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated, ]
     serializer_class = BatchShipmentSerializer
     queryset = BatchShipment.objects.all()
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
