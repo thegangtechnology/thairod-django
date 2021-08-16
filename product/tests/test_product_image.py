@@ -1,11 +1,11 @@
 from django.urls import reverse
 
-from core.tests import BaseTestSimpleApiMixin
+from core.tests import BaseTestSimpleApiMixin, BaseTestReadOnlySimpleApiMixin
 from product.models import Product, ProductImage
 from thairod.utils.test_util import APITestCase
 
 
-class ProductImageAPITestCase(APITestCase, BaseTestSimpleApiMixin):
+class ProductImageAPITestCase(APITestCase, BaseTestSimpleApiMixin, BaseTestReadOnlySimpleApiMixin):
 
     def setUp(self):
         self.model = Product
@@ -17,3 +17,4 @@ class ProductImageAPITestCase(APITestCase, BaseTestSimpleApiMixin):
             "order_index": 1,
             "path": "www.example.com",
         }
+        self.set_up_user()

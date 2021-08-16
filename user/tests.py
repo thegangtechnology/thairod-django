@@ -34,4 +34,3 @@ class UserAPITestCase(APITestCase):
         self.client.force_authenticate()
         response = self.client.get(reverse("current-user"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(response.data['detail'], 'user is not authenticated.')

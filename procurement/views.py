@@ -1,6 +1,4 @@
 from rest_framework import viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
-
 from procurement.serializers import ProcurementSerializer
 from procurement.models import Procurement
 from rest_framework.exceptions import ValidationError
@@ -16,7 +14,6 @@ class ProcurementViewSet(mixins.CreateModelMixin,
                          viewsets.GenericViewSet):
     serializer_class = ProcurementSerializer
     queryset = Procurement.objects.all()
-    permission_classes = [IsAuthenticated, ]
 
     def create(self, request, *args, **kwargs):
         # Check warehouse

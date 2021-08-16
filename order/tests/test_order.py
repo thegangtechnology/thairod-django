@@ -29,6 +29,7 @@ class OrderAPITestCase(BaseTestSimpleApiMixin, APITestCase):
             "orderer_name": 'piti',
             "orderer_license": 'sun',
         }
+        self.set_up_user()
 
 
 class TestOrderItemTotal(TestCase):

@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 
-from core.tests import BaseTestSimpleApiMixin
+from core.tests import BaseTestSimpleApiMixin, BaseTestReadOnlySimpleApiMixin
 from order.models import Order, OrderItem
 from shipment.models import Shipment, TrackingStatus, BatchShipment
 from thairod.utils.load_seed import RealisticSeed
@@ -9,7 +9,7 @@ from thairod.utils.test_util import APITestCase, TestCase
 from warehouse.models import Warehouse
 
 
-class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
+class ShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin, BaseTestReadOnlySimpleApiMixin):
 
     def setUp(self):
         self.set_up_user()
