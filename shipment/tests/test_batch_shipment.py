@@ -70,7 +70,7 @@ class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         request = {"batch_name": batch_name, "shipments": shipments}
         url = reverse("batch-shipment-assign-batch")
         response = self.client.post(url, request, format='json')
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         shipment = Shipment.objects.first()
         self.assertEqual(batch_name, shipment.batch.name)
 
@@ -80,9 +80,9 @@ class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         shipment.save()
         shipments = [Shipment.objects.first().id]
         request = {"shipments": shipments}
-        url = reverse("batch-shipment-assign-batch")
+        url = reverse("batch-shipment-unassign-batch")
         response = self.client.post(url, request, format='json')
-        self.assertTrue(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         shipment = Shipment.objects.first()
         self.assertEqual(None, shipment.batch)
 
