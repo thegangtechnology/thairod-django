@@ -2,7 +2,7 @@ from order.dataclasses.cart_item import CartItem
 from order.services.order_service import CreateOrderParam, OrderService, CreateOrderResponse
 from order_flow.dataclasses import CreateOrderFlowParam, OrderFlowResponse, \
     CheckoutDoctorOrderRequest, PatientConfirmationRequest, DoctorOrder
-from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException, HashExpired
 from order_flow.models import OrderFlow
 from thairod.services.line import line
 from django.conf import settings
@@ -31,10 +31,20 @@ class OrderFlowService:
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)
 
     def get_order_flow_from_doctor_hash(self, doctor_hash: str) -> OrderFlowResponse:
-        return OrderFlowResponse.from_order_flow_model(OrderFlow.objects.get(doctor_link_hash=doctor_hash))
+        order_flow = OrderFlow.objects.get(doctor_link_hash=doctor_hash)
+        # Raise error if either hash is expired
+        if order_flow.is_doctor_link_hash_timestamp_expired(tzaware.now()) \
+                or order_flow.is_patient_link_hash_timestamp_expired(tzaware.now()):
+            raise HashExpired()
+        return OrderFlowResponse.from_order_flow_model(order_flow)
 
     def get_order_flow_from_patient_hash(self, patient_hash: str) -> OrderFlowResponse:
-        return OrderFlowResponse.from_order_flow_model(OrderFlow.objects.get(patient_link_hash=patient_hash))
+        order_flow = OrderFlow.objects.get(patient_link_hash=patient_hash)
+        # Raise error if either hash is expired
+        if order_flow.is_patient_link_hash_timestamp_expired(tzaware.now()) or \
+                order_flow.is_doctor_link_hash_timestamp_expired(tzaware.now()):
+            raise HashExpired()
+        return OrderFlowResponse.from_order_flow_model(order_flow)
 
     def write_doctor_order_to_order_flow(self, checkout_doctor_order_request: CheckoutDoctorOrderRequest) \
             -> OrderFlowResponse:
@@ -43,6 +53,9 @@ class OrderFlowService:
         # Order is confirmed. Wait for patient confirmation
         if order_flow.patient_link_hash_timestamp:
             raise OrderAlreadyConfirmedException()
+        # Raise error if trying to write order while doctor hash is expired
+        if order_flow.is_doctor_link_hash_timestamp_expired(tzaware.now()):
+            raise HashExpired()
         order_flow.doctor_order = checkout_doctor_order_request.doctor_order.to_data()
         order_flow.patient_link_hash = patient_hash
         order_flow.patient_link_hash_timestamp = tzaware.now()
@@ -62,6 +75,9 @@ class OrderFlowService:
         # patient has confirm and order is already created
         if order_flow.order_created and order_flow.patient_confirmation:
             raise PatientAlreadyConfirmedException()
+        # Raise error if trying to confirm patient address while patient hash is expired
+        if order_flow.is_patient_link_hash_timestamp_expired(tzaware.now()):
+            raise HashExpired()
         order_flow.patient_confirmation = patient_confirmation_request.address.to_data()
         order_flow.save()
         return OrderFlowResponse.from_order_flow_model(order_flow=order_flow)

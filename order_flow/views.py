@@ -13,7 +13,7 @@ from order_flow.models import OrderFlow
 from django.conf import settings
 from thairod.utils.auto_serialize import swagger_auto_serialize_post_schema
 from thairod.utils.decorators import ip_whitelist
-from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException
+from order_flow.exceptions import OrderAlreadyConfirmedException, PatientAlreadyConfirmedException, HashExpired
 from rest_framework.permissions import AllowAny
 HASH_DOES_NOT_EXIST = "Hash not found"
 
@@ -50,6 +50,8 @@ class OrderFlowsHashAPI(APIView):
                 return OrderFlowService().get_order_flow_from_patient_hash(patient_hash=patient_hash).to_response()
         except OrderFlow.DoesNotExist:
             return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
+        except HashExpired as e:
+            return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -62,7 +64,7 @@ class CheckoutDoctorOrderAPI(GenericAPIView):
         service = OrderFlowService()
         try:
             return service.write_doctor_order_and_send_line_msg(param).to_response()
-        except OrderAlreadyConfirmedException as e:
+        except (OrderAlreadyConfirmedException, HashExpired) as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
         except OrderFlow.DoesNotExist:
             return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
@@ -77,7 +79,7 @@ class PatientConfirmationAPI(GenericAPIView):
         service = OrderFlowService()
         try:
             return service.save_patient_confirmation_and_make_order(param).to_response()
-        except PatientAlreadyConfirmedException as e:
+        except (PatientAlreadyConfirmedException, HashExpired) as e:
             return Response(data=e.message, status=status.HTTP_400_BAD_REQUEST)
         except OrderFlow.DoesNotExist:
             return Response(data=HASH_DOES_NOT_EXIST, status=status.HTTP_400_BAD_REQUEST)
