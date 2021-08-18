@@ -94,8 +94,8 @@ class OrderFlowResponse(AutoSerialize):
                 .astimezone(settings.TIME_ZONE_PY).strftime(datetime_format)
         return cls(
             doctor_link_hash=order_flow.doctor_link_hash,
-            doctor_link_hash_timestamp=order_flow.doctor_link_hash_timestamp
-                .astimezone(settings.TIME_ZONE_PY).strftime(datetime_format),
+            doctor_link_hash_timestamp=order_flow.doctor_link_hash_timestamp.astimezone(
+                settings.TIME_ZONE_PY).strftime(datetime_format),
             doctor_info=CreateOrderFlowParam.from_doctor_info(order_flow.doctor_info),
             doctor_order=doctor_order_data,
             patient_link_hash=order_flow.patient_link_hash,
