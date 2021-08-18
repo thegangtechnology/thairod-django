@@ -1,8 +1,6 @@
 import datetime
 import secrets
-
 from django.db import models
-
 from core.models import AbstractModel
 
 
@@ -29,12 +27,20 @@ class OrderFlow(AbstractModel):
         return secret
 
     def is_doctor_link_hash_timestamp_expired(self, timezone_object: datetime.datetime) -> bool:
+        from django.conf import settings
+        if not self.doctor_link_hash_timestamp:
+            return False
         diff = timezone_object - self.doctor_link_hash_timestamp
         diff_in_seconds = diff.total_seconds()
-        diff_in_hours = divmod(diff_in_seconds, 3600)[0]
-        # if the difference is more than 2 hour
-        # the link is expired
-        return diff_in_hours >= 2
+        return diff_in_seconds >= settings.DOCTOR_HASH_EXPIRATION_SECONDS
+
+    def is_patient_link_hash_timestamp_expired(self, timezone_object: datetime.datetime) -> bool:
+        from django.conf import settings
+        if self.patient_link_hash_timestamp:
+            return False
+        diff = timezone_object - self.patient_link_hash_timestamp
+        diff_in_seconds = diff.total_seconds()
+        return diff_in_seconds >= settings.PATIENT_HASH_EXPIRATION_SECONDS
 
     def patient_confirmation_url(self) -> str:
         from order_flow.services import OrderFlowService

@@ -236,6 +236,8 @@ LOGGING = {
 }
 
 FRONTEND_URL = "http://localhost:3000/"
+DOCTOR_HASH_EXPIRATION_SECONDS = 2 * 60 * 60  # 2 hours
+PATIENT_HASH_EXPIRATION_SECONDS = 24 * 60 * 60  # 24 hours
 
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'rpc')
