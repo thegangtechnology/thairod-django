@@ -38,6 +38,11 @@ class BatchShipmentModelViewSet(viewsets.ModelViewSet):
             assign_batch_to_shipment_param)
         return Response()
 
+    @swagger_auto_schema(
+        operation_description='unassign batch given shipments',
+        request_body=UnassignBatchToShipmentParam.serializer(),
+        responses={200: ''}
+    )
     @action(detail=False, methods=['POST'], url_path='unassign')
     def unassign_batch(self, request):
         unassign_batch_to_shipment_param = UnassignBatchToShipmentParam.from_post_request(request=request)
