@@ -12,6 +12,8 @@ from shipment.utils.print_label_util import split_print_label
 from thairod.services.shippop.tests import load_test_data
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase
+from django.conf import settings
+from unittest import skipIf
 
 
 class TestPrintLabel(TestCase):
@@ -47,6 +49,7 @@ class TestPrintLabelLive(TestCase):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.procure_items()
 
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     def test_print_label_live(self):
         param = CreateOrderParam.example()
         param.items[0].item_id = ProductVariation.objects.first().id

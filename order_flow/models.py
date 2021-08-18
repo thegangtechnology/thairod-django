@@ -36,7 +36,7 @@ class OrderFlow(AbstractModel):
 
     def is_patient_link_hash_timestamp_expired(self, timezone_object: datetime.datetime) -> bool:
         from django.conf import settings
-        if self.patient_link_hash_timestamp:
+        if not self.patient_link_hash_timestamp:
             return False
         diff = timezone_object - self.patient_link_hash_timestamp
         diff_in_seconds = diff.total_seconds()

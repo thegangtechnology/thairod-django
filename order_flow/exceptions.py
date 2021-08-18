@@ -11,4 +11,6 @@ class OrderAlreadyConfirmedException(Exception):
 
 
 class HashExpired(Exception):
-    pass
+
+    def __init__(self):
+        self.message = 'Hash is already expired'

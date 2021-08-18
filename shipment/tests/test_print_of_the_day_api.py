@@ -2,12 +2,12 @@ import datetime
 
 import freezegun
 from django.urls import reverse
-
-from django.conf import settings
 from thairod.utils import tzaware
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.query_util import round_to_next_nearest_hour
 from thairod.utils.test_util import APITestCase
+from unittest import skipIf
+from django.conf import settings
 
 
 class TestPrintOfTheDayAPI(APITestCase):
@@ -29,24 +29,28 @@ class TestPrintOfTheDayAPI(APITestCase):
         res = self.client.get(url, {'date': print_date})
         return res
 
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     def test_print_of_the_day_before(self):
         prepare_date = tzaware.datetime(2021, 8, 4, 21)
         print_date = datetime.date(2021, 8, 5)
         res = self._test_print_of_the_day(prepare_date, print_date)
         self.assertEqual(res.status_code, 200)
 
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     def test_print_of_the_day_same_day_before(self):
         prepare_date = tzaware.datetime(2021, 8, 5, 6)
         print_date = datetime.date(2021, 8, 5)
         res = self._test_print_of_the_day(prepare_date, print_date)
         self.assertEqual(res.status_code, 200)
 
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     def test_print_of_the_day_after(self):
         prepare_date = tzaware.datetime(2021, 8, 5, 6)
         print_date = datetime.date(2021, 8, 6)
         res = self._test_print_of_the_day(prepare_date, print_date)
         self.assertEqual(res.status_code, 404)
 
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     @freezegun.freeze_time(tzaware.datetime(2021, 8, 5, 8))
     def test_print_of_the_day_no_date_before(self):
         self.prepare_seed(prepare_date=tzaware.datetime(2021, 8, 5, 8))
@@ -56,6 +60,7 @@ class TestPrintOfTheDayAPI(APITestCase):
         res = self.client.get(url, {'date': date})
         self.assertEqual(res.status_code, 200)  # depending on time of day
 
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     @freezegun.freeze_time(tzaware.datetime(2021, 8, 6, 10))
     def test_print_of_the_day_no_date_after(self):
         self.prepare_seed(prepare_date=tzaware.datetime(2021, 8, 5, 8))
