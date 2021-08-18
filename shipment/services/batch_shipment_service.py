@@ -1,7 +1,8 @@
 import datetime
 from typing import Optional
 
-from shipment.dataclasses.batch_shipment import AssignBatchToShipmentRequest
+from shipment.dataclasses.batch_shipment import AssignBatchToShipmentParam, \
+    UnassignBatchToShipmentParam
 from shipment.models import BatchShipment, Shipment
 from django.conf import settings
 from thairod.utils import tzaware
@@ -12,17 +13,21 @@ class BatchShipmentService:
 
     @classmethod
     def assign_batch_to_shipments(cls,
-                                  assign_batch_to_shipment_request: AssignBatchToShipmentRequest) -> None:
-        param = assign_batch_to_shipment_request
+                                  assign_batch_to_shipment_param: AssignBatchToShipmentParam) -> None:
+        param = assign_batch_to_shipment_param
         batch_shipment, _ = BatchShipment.objects.get_or_create(name=param.batch_name)
         shipments = Shipment.objects.filter(id__in=param.shipments)
         for shipment in shipments:
             shipment.batch = batch_shipment
             shipment.save()
 
-    # @classmethod
-    # def unassign_batch_shipments(self):
-    #     pass
+    @classmethod
+    def unassign_batch_shipments(cls, unassign_batch_to_shipment_param: UnassignBatchToShipmentParam) -> None:
+        param = unassign_batch_to_shipment_param
+        shipments = Shipment.objects.filter(id__in=param.shipments)
+        for shipment in shipments:
+            shipment.batch = None
+            shipment.save()
 
     @classmethod
     def determine_print_datetime(cls, date: Optional[datetime.datetime] = None):

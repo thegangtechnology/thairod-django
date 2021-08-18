@@ -9,6 +9,7 @@ from typing import Optional
 from order_flow.dataclasses.doctor_order import DoctorOrderResponse
 from typing import List
 from order.dataclasses.cart_item import CartItem
+from django.conf import settings
 
 
 @dataclass
@@ -89,10 +90,12 @@ class OrderFlowResponse(AutoSerialize):
         if order_flow.patient_confirmation:
             patient_confirmation_data = ShippingAddress.from_data(order_flow.patient_confirmation)
         if order_flow.patient_link_hash_timestamp:
-            patient_link_hash_timestamp_data = order_flow.patient_link_hash_timestamp.strftime(datetime_format)
+            patient_link_hash_timestamp_data = order_flow.patient_link_hash_timestamp\
+                .astimezone(settings.TIME_ZONE_PY).strftime(datetime_format)
         return cls(
             doctor_link_hash=order_flow.doctor_link_hash,
-            doctor_link_hash_timestamp=order_flow.doctor_link_hash_timestamp.strftime(datetime_format),
+            doctor_link_hash_timestamp=order_flow.doctor_link_hash_timestamp.astimezone(
+                settings.TIME_ZONE_PY).strftime(datetime_format),
             doctor_info=CreateOrderFlowParam.from_doctor_info(order_flow.doctor_info),
             doctor_order=doctor_order_data,
             patient_link_hash=order_flow.patient_link_hash,

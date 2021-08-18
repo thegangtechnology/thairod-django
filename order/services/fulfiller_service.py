@@ -6,7 +6,7 @@ from django.db import transaction
 from order.exceptions import ShippopConfirmationError
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
-from shipment.dataclasses.batch_shipment import AssignBatchToShipmentRequest
+from shipment.dataclasses.batch_shipment import AssignBatchToShipmentParam
 from shipment.models import Shipment, TrackingStatus, BatchShipment
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
@@ -106,7 +106,7 @@ class FulfilmentService:
         return True
 
     def put_shipment_in_auto_batch(self, shipment: Shipment):
-        BatchShipmentService.assign_batch_to_shipments(AssignBatchToShipmentRequest(
+        BatchShipmentService.assign_batch_to_shipments(AssignBatchToShipmentParam(
             batch_name=BatchShipment.generate_auto_batch_name(),
             shipments=[shipment.id]
         ))
