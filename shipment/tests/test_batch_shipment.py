@@ -74,6 +74,18 @@ class BatchShipmentAPITestCase(APITestCase, BaseTestSimpleApiMixin):
         shipment = Shipment.objects.first()
         self.assertEqual(batch_name, shipment.batch.name)
 
+    def test_unassign_batch(self):
+        shipment = Shipment.objects.first()
+        shipment.batch = BatchShipment.objects.first()
+        shipment.save()
+        shipments = [Shipment.objects.first().id]
+        request = {"shipments": shipments}
+        url = reverse("batch-shipment-assign-batch")
+        response = self.client.post(url, request, format='json')
+        self.assertTrue(response.status_code, 200)
+        shipment = Shipment.objects.first()
+        self.assertEqual(None, shipment.batch)
+
 
 class TestBatchShipmentService(TestCase):
     with_seed = False
