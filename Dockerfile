@@ -11,7 +11,6 @@ RUN set -ex \
     ' \
     && deps=' \
     libexpat1 \
-    python-pygraphviz \
     postgresql-client \
     ca-certificates \
     git \
