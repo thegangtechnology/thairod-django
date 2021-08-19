@@ -1,5 +1,5 @@
 # Please DJANGO_SETTINGS_MODULE to environement setting
-FROM python:3.9-slim
+FROM python:3.9-slim-buster
 LABEL INCREMENTMEWHENSTUCK=1
 ENV PYTHONUNBUFFERED 1
 
