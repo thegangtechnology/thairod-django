@@ -20,6 +20,13 @@ class TestOrderFlowAPI(APITestCase):
         seed = load_realistic_seed()
         self.seed = seed
 
+    def test_create_order_flow(self):
+        order_flow_request = CreateOrderFlowParam.example(items=[]).to_data()
+        url = reverse("order-flows-create")
+        response = self.client.post(url, order_flow_request, format='json')
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertTrue(f'{settings.FRONTEND_URL}product/?doctor=' in response.data.get('hash_url'))
+
     def test_invalid_query(self):
         url = reverse("order-flows-hash")
         response = self.client.get(url, {'doctor': 'a'}, format='json')
