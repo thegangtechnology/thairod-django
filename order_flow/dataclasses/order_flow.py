@@ -13,6 +13,25 @@ from django.conf import settings
 
 
 @dataclass
+class CreateOrderFlowResponse(AutoSerialize):
+    doctor_link_hash: str
+    hash_url: str
+
+    @classmethod
+    def from_doctor_link_hash(cls, doctor_link_hash: str) -> 'CreateOrderFlowResponse':
+        return cls(doctor_link_hash=doctor_link_hash,
+                   hash_url=cls.make_url(doctor_link_hash=doctor_link_hash))
+
+    @classmethod
+    def make_url(cls, doctor_link_hash: str) -> str:
+        return f'{settings.FRONTEND_URL}product/?doctor={doctor_link_hash}'
+
+    @classmethod
+    def example(cls) -> 'CreateOrderFlowResponse':
+        return cls.from_doctor_link_hash(doctor_link_hash='hash_example')
+
+
+@dataclass
 class CreateOrderFlowParam(CreateOrderParam):
     auto_doctor_confirm: bool
 

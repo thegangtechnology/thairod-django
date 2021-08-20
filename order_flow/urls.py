@@ -9,7 +9,7 @@ router = DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('order-flows/create-flow/', csrf_exempt(CreateOrderFlowsAPI.as_view())),
+    path('order-flows/create-flow/', csrf_exempt(CreateOrderFlowsAPI.as_view()), name='order-flows-create'),
     path('order-flows/hash/', OrderFlowsHashAPI.as_view(), name='order-flows-hash'),
     path('order-flows/doctor-checkout/', CheckoutDoctorOrderAPI.as_view(), name='order-flows-doctor-checkout'),
     path('order-flows/patient-checkout/', PatientConfirmationAPI.as_view(), name='order-flows-patient-checkout')
