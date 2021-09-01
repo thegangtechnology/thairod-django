@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import List, Optional
 
 from address.models import Address
-from thairod.settings import SHIPPOP_DEFAULT_COURIER_CODE
+from django.conf import settings
 
 
 # flake8: noqa
@@ -65,7 +65,7 @@ class OrderLineData:
     from_address: AddressData
     to_address: AddressData
     parcel: ParcelData
-    courier_code: str = SHIPPOP_DEFAULT_COURIER_CODE
+    courier_code: str = settings.SHIPPOP_DEFAULT_COURIER_CODE
 
     def to_request_dict(self) -> dict:
         return {
@@ -186,3 +186,94 @@ class Pricing:
     courier_name: str
     pick_up_fee: Optional[Decimal] = None
     notice: Optional[str] = None
+
+
+spe_postal_codes = [
+    '10100',
+    '10100',
+    '10110',
+    '10110',
+    '10120',
+    '10120',
+    '10120',
+    '10200',
+    '10240',
+    '10240',
+    '10250',
+    '10250',
+    '10260',
+    '10260',
+    '10300',
+    '10310',
+    '10310',
+    '10330',
+    '10400',
+    '10400',
+    '10400',
+    '10500',
+    '10510',
+    '10510',
+    '10520',
+    '10530',
+    '10140',
+    '10140',
+    '10150',
+    '10150',
+    '10150',
+    '10160',
+    '10160',
+    '10160',
+    '10170',
+    '10170',
+    '10600',
+    '10600',
+    '10600',
+    '10700',
+    '10700',
+    '10210',
+    '10210',
+    '10220',
+    '10220',
+    '10230',
+    '10230',
+    '10230',
+    '10800',
+    '10900',
+    '10510',
+    '10270',
+    '10280',
+    '10540',
+    '10543',
+    '10540',
+    '10550',
+    '10560',
+    '10570',
+    '10290',
+    '10130',
+    '73000',
+    '73140',
+    '73120',
+    '73150',
+    '73130',
+    '73110',
+    '73170',
+    '73210',
+    '74130',
+    '74000',
+    '74110',
+    '74120',
+    '11000',
+    '11120',
+    '11130',
+    '11140',
+    '11110',
+    '11150',
+    '12000',
+    '12110',
+    '12120',
+    '12140',
+    '12130',
+    '12150',
+    '12160',
+    '12170',
+]

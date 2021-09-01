@@ -10,6 +10,7 @@ class TestStockAPI(APITestCase):
     def setUp(self):
         self.seed = RealisticSeed.load_realistic_seed()
         self.seed.full_production()
+        self.set_up_user()
 
     def test_stock_api(self):
         res = self.client.get(reverse('get-stock'),

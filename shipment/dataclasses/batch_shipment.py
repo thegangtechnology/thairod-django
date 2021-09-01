@@ -4,7 +4,7 @@ from typing import List
 
 
 @dataclass
-class GeneratedBatchNameResponse(AutoSerialize):
+class BatchNameResponse(AutoSerialize):
     name: str
 
     @classmethod
@@ -13,7 +13,7 @@ class GeneratedBatchNameResponse(AutoSerialize):
 
 
 @dataclass
-class AssignBatchToShipmentRequest(AutoSerialize):
+class AssignBatchToShipmentParam(AutoSerialize):
     batch_name: str
     shipments: List[int]
 
@@ -21,3 +21,12 @@ class AssignBatchToShipmentRequest(AutoSerialize):
     def example(cls):
         return cls(batch_name="2021-07-29_1",
                    shipments=[1, 2, 3, 4])
+
+
+@dataclass
+class UnassignBatchToShipmentParam(AutoSerialize):
+    shipments: List[int]
+
+    @classmethod
+    def example(cls):
+        return cls(shipments=[1, 2, 3, 4])

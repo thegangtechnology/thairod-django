@@ -14,10 +14,12 @@ class TestStockService(TestCase):
         stock = StockInfo(
             fulfilled=20,
             procured=30,
+            ordered=30,
             adjustment=-5,
+            to_be_shipped=10,
             pending=10
         )
-        self.assertEqual(stock.current_total, 5)
+        self.assertEqual(stock.current_total(), 5)
 
     def test_stock_service(self):
         stock = StockService().get_single_stock(self.seed.product_variations[0].id)
@@ -26,6 +28,8 @@ class TestStockService(TestCase):
             StockInfo(
                 fulfilled=4,
                 procured=30,
+                ordered=7,
+                to_be_shipped=4,
                 adjustment=35,
                 pending=3
             )
@@ -36,7 +40,32 @@ class TestStockService(TestCase):
         pv_id0 = self.seed.product_variations[0].id
         pv_id1 = self.seed.product_variations[1].id
         exp = {
-            pv_id0: StockInfo(fulfilled=4, procured=30, adjustment=35, pending=3),
-            pv_id1: StockInfo(fulfilled=2, procured=40, adjustment=10, pending=1)
+            pv_id0: StockInfo(
+                fulfilled=4,
+                procured=30,
+                adjustment=35,
+                pending=3,
+                to_be_shipped=4,
+                ordered=7),
+            pv_id1: StockInfo(
+                fulfilled=2,
+                procured=40,
+                adjustment=10,
+                to_be_shipped=2,
+                pending=1,
+                ordered=3)
         }
         self.assertEqual(dict(stocks), exp)
+
+    def test_stock_info_serialize_has_current_total(self):
+        serializer = StockInfo.serializer()
+        stock = StockInfo(
+            fulfilled=4,
+            procured=30,
+            ordered=7,
+            to_be_shipped=4,
+            adjustment=35,
+            pending=3
+        )
+        data = serializer(stock).data
+        self.assertIn('current_total', data)

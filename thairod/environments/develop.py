@@ -7,3 +7,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://mall.dev.thairod.care",
     "https://mall.dev.thairod.care",
 ]
+
+FRONTEND_URL = "https://mall.dev.thairod.care/"
+
+CELERY_BROKER_URL = 'amqp://rabbitmq'

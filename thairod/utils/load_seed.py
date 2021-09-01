@@ -7,9 +7,13 @@ from django_seed import Seed
 
 from address.models import Address
 from order.dataclasses.cart_item import CartItem
+from order.dataclasses.order import CreateOrderResponse
 from order.models import Order, OrderItem
+from order.services.fulfiller_service import FulfilmentService
 from order.services.order_service import RawOrder
-from order.views import OrderService, CreateOrderParameter
+from order.views import OrderService, CreateOrderParam
+from order_flow.dataclasses import CreateOrderFlowParam
+from order_flow.services import OrderFlowService
 from procurement.models import Procurement
 from product.models import ProductVariation, Product, ProductImage
 from shipment.models import Shipment, TrackingStatus, BatchShipment
@@ -39,7 +43,8 @@ def load_seed():
     })
     seeder.execute(turn_off_auto_now=False)
     seeder.add_entity(ProductVariation, 3, {
-        'product': Product.objects.first()
+        'product': Product.objects.first(),
+        'preferred_box_size': BoxSize.get_default_box()
     })
     seeder.execute(turn_off_auto_now=False)
     seeder.add_entity(OrderItem, 5)
@@ -92,26 +97,39 @@ class RealisticSeed:
             'default_warehouse': warehouse
         })
 
+        a_box = BoxSize.objects.create(name='A', width=16, length=11, height=7, rank=50)
+        aa_box = BoxSize.objects.create(name='AA', width=13, length=17, height=7, rank=20)
+
         product = Product.example()
         product.save()
         seed.products.append(product)
 
         product_variation = ProductVariation.example()
         product_variation.product = product
+        product_variation.preferred_box_size = a_box
         product_variation.save()
 
         product_variation2 = ProductVariation.example()
         product_variation2.product = product
+        product_variation2.preferred_box_size = aa_box
         product_variation2.save()
 
         seed.product_variations.append(product_variation)
         seed.product_variations.append(product_variation2)
+
         return seed
 
     def full_production(self):
         self.procure_items()
         self.some_adjustment()
         self.some_order()
+        self.some_order_flows()
+
+    def some_order_flows(self):
+        for _ in range(3):
+            OrderFlowService().create_order_flow(CreateOrderFlowParam.example(
+                [CartItem(item_id=self.product_variations[0].id, quantity=1)]
+            ))
 
     def procure_items(self) -> List[Procurement]:
         p_map = {
@@ -154,16 +172,45 @@ class RealisticSeed:
         }
         for pv_id, quantities in order_map.items():
             for i, quantity in enumerate(quantities):
-                order = self.create_one_order(pv_id, quantity=quantity)
+                cart = CartItem(item_id=pv_id, quantity=quantity)
+                ro = self.create_one_order([cart])
                 if i % 2 == 0:
-                    for oi in order.shipment.orderitem_set.all():
-                        oi.fulfill()
+                    FulfilmentService().attempt_fulfill_shipment(ro.shipment)
 
-    def create_one_order(self, product_variation_id: int, quantity: int) -> RawOrder:
-        cart = CartItem(item_id=product_variation_id, quantity=quantity)
-        param = CreateOrderParameter.example(items=[cart])
+    def create_one_order(self, cart_items: List[CartItem]) -> RawOrder:
+        param = CreateOrderParam.example(items=cart_items)
         order = OrderService().create_raw_order(param)
         return order
+
+    def make_product(self, restricted: bool = False) -> ProductVariation:
+        prod = Product.example()
+        prod.non_repeatable = restricted
+        prod.save()
+
+        pv = ProductVariation.example()
+        pv.product = prod
+        pv.save()
+        return pv
+
+    def procure_item(self, pv_id: int, quantity: int = 1) -> Procurement:
+        return Procurement.objects.create(product_variation_id=pv_id,
+                                          quantity=quantity,
+                                          unit_price=0,
+                                          warehouse=self.warehouses[0])
+
+    def order_item(self, pv_id: int, cid: str = '111') -> CreateOrderResponse:
+        param = CreateOrderParam.example()
+        param.patient.cid = cid
+        param.items = [CartItem(item_id=pv_id, quantity=1)]
+        res = OrderService().create_order(param)
+        return res
+
+    def order_item_no_fulfill(self, pv_id: int, cid: str = '111') -> RawOrder:
+        param = CreateOrderParam.example()
+        param.patient.cid = cid
+        param.items = [CartItem(item_id=pv_id, quantity=1)]
+        ro = OrderService().create_order_no_fulfill(param)
+        return ro
 
 
 def load_realistic_seed() -> RealisticSeed:
@@ -173,20 +220,3 @@ def load_realistic_seed() -> RealisticSeed:
 
     """
     return RealisticSeed.load_realistic_seed()
-
-
-def load_meaningful_seed():
-    seeder = Seed.seeder()
-    seeder.add_entity(Product, 1)
-    seeder.add_entity(ProductImage, 1)
-    seeder.add_entity(ProductVariation, 3)
-    seeder.execute(turn_off_auto_now=False)
-
-    warehouse = Warehouse.example()
-    warehouse.address.save()
-    warehouse.save()
-    DefaultWarehouse.objects.update_or_create(id=1, defaults={
-        'default_warehouse': Warehouse.objects.first()
-    })
-    orders = [OrderService().create_order(CreateOrderParameter.example_with_valid_item()) for _ in range(5)]
-    return orders

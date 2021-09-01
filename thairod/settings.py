@@ -16,6 +16,7 @@ from datetime import timedelta
 
 import dj_database_url
 import environ
+import pytz
 
 env = environ.Env(
     # set casting, default value
@@ -135,6 +136,9 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'thairod.utils.paginations.CustomPageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
@@ -150,6 +154,7 @@ REST_FRAMEWORK = {
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Bangkok'
+TIME_ZONE_PY = pytz.timezone(TIME_ZONE)
 
 USE_I18N = True
 
@@ -167,12 +172,24 @@ SHIPPOP_API_KEY = os.environ.get('SHIPPOP_API_KEY', "")
 SHIPPOP_URL = os.environ.get('SHIPPOP_URL', "https://mkpservice.shippop.dev")
 SHIPPOP_DEFAULT_COURIER_CODE = os.environ.get('SHIPPOP_DEFAULT_COURIER_CODE', "SPE")
 SHIPPOP_EMAIL = os.environ.get('SHIPPOP_EMAIL', "")
-
+SHIPPOP_LOT_CUTTING_TIME = 9  # 24 hr format (9 means cut at 9 am everyday)
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', "")
+
+LINE_ORDER_CREATED_MESSAGE = """
+เรียนคุณ {name}
+คำขอกล่องไทยรอดของท่านได้ถูกบันทึกแล้ว
+หมายเลขคำขอของท่านคือ {order_id}
+""".strip()
 
 LINE_TRACKING_MESSAGE = """
 กล่องไทยรอดกำลังถูกส่งไปให้ คุณ {name}
 โดยท่านสามารถติดตามสถานะได้ที่ {tracking_url}
+""".strip()
+
+LINE_PATIENT_CONFIRM_MESSAGE = """
+เรียนคุณ {name}
+กรุณายืนยันที่อยู่ในการจัดส่งสำหรับกล่องไทยรอด
+{patient_confirmation_url}
 """.strip()
 
 try:
@@ -186,7 +203,7 @@ SIMPLE_JWT = {
 }
 
 SHELL_PLUS_IMPORTS = [
-    'from thairod.utils.load_seed import load_seed, load_meaningful_seed'
+    'import thairod.utils.load_seed as load_seed'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -217,3 +234,13 @@ LOGGING = {
         },
     },
 }
+
+FRONTEND_URL = "http://localhost:3000/"
+DOCTOR_HASH_EXPIRATION_SECONDS = 2 * 60 * 60  # 2 hours
+PATIENT_HASH_EXPIRATION_SECONDS = 24 * 60 * 60  # 24 hours
+SHIPPOP_TEST_ERR = False
+
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'rpc')
+
+TEST_RUNNER = 'thairod.utils.test_util.ThairodTestRunner'

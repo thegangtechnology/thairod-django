@@ -1,17 +1,20 @@
+import logging
 from typing import List
 
 import requests
+from django.conf import settings
 
 from thairod.services.shippop.data import OrderData, OrderResponse, TrackingData, OrderLineResponse, TrackingState, \
     ParcelData, Pricing
-from thairod.settings import SHIPPOP_API_KEY, SHIPPOP_URL
 # flake8: noqa
 from thairod.utils.exceptions import ShippopAPIException
 
+logger = logging.getLogger(__name__)
+
 
 class ShippopAPI:
-    api_key: str = SHIPPOP_API_KEY
-    url: str = SHIPPOP_URL
+    api_key: str = settings.SHIPPOP_API_KEY
+    url: str = settings.SHIPPOP_URL
 
     def shippop_request(self, path: str, payload: dict, no_key: bool = False) -> dict:
         if not no_key:
@@ -19,7 +22,9 @@ class ShippopAPI:
         r = requests.request("POST", f"{self.url}/{path}", json=payload)
         r_json = r.json()
         if not r_json['status']:
-            raise ShippopAPIException(r_json['notice'])
+            from pprint import pformat
+            logger.warning(pformat(r_json))
+            raise ShippopAPIException(r_json)
         return r_json
 
     def create_order(self, order_data: OrderData) -> OrderResponse:

@@ -2,16 +2,19 @@ from dataclasses import dataclass
 from typing import List
 
 from django.db import transaction
+from rest_framework.exceptions import ValidationError
 
 from address.models import Address
-from order.dataclasses.order import CreateOrderParameter, CreateOrderResponse
+from order.dataclasses.order import CreateOrderParam, CreateOrderResponse
 from order.exceptions import ShippopConfirmationError, ShippopCreateOrderError
 from order.models.order import Order, OrderStatus
 from order.models.order_item import OrderItem
+from order.services.fulfiller_service import FulfilmentService
 from product.models import ProductVariation
 from shipment.models import Shipment
 from shipment.models.box_size import BoxSize
 from shipment.models.shipment import ShipmentStatus
+from thairod.services.line.line import send_line_order_created_message
 from thairod.services.shippop.data import AddressData
 from warehouse.models import Warehouse
 
@@ -24,32 +27,40 @@ class RawOrder:
 
 class OrderService:
 
-    def create_order(self, param: CreateOrderParameter) -> CreateOrderResponse:
+    def create_order(self, param: CreateOrderParam, auto_fulfill=True) -> CreateOrderResponse:
         try:
             with transaction.atomic():
-                ro = self.create_order_no_callback(param)
-                return CreateOrderResponse(success=True,
-                                           order_id=ro.order.id,
-                                           shippop_tracking_code=ro.shipment.tracking_code,
-                                           courier_tracking_code=ro.shipment.courier_tracking_code)
+                ro = self.create_order_no_fulfill(param)
+            self.on_order_created_callback(ro.order)
+            if auto_fulfill:
+                FulfilmentService().attempt_fulfill_shipment(ro.shipment)
+            return CreateOrderResponse(success=True,
+                                       order_id=ro.order.id,
+                                       shippop_tracking_code=ro.shipment.tracking_code,
+                                       courier_tracking_code=ro.shipment.courier_tracking_code)
 
         except (ShippopConfirmationError, ShippopCreateOrderError):
             return CreateOrderResponse(success=False)
 
-    def create_order_no_callback(self, param) -> RawOrder:
-        from order.services.fulfiller_service import FulFilmentService
+    def create_order_no_fulfill(self, param: CreateOrderParam) -> RawOrder:
+        if not param.is_valid_order():
+            raise ValidationError(detail={'cid': 'this cid has already ordered restricted item'})
         ro = self.create_raw_order(param)
-        FulFilmentService().attempt_fulfill_shipment(ro.shipment)
         return ro
 
-    def create_raw_order(self, param: CreateOrderParameter) -> RawOrder:
+    def on_order_created_callback(self, order: Order):
+        send_line_order_created_message(line_uid=order.line_id,
+                                        name=order.receiver_address.name,
+                                        order_id=order.id)
+
+    def create_raw_order(self, param: CreateOrderParam) -> RawOrder:
         address = self.create_address(param)
         order = self.create_order_from_param(param, address)
         shipment = self.create_shipment(param, order)
         self.create_order_items(param, shipment)
         return RawOrder(order=order, shipment=shipment)
 
-    def crate_shippop_address_data(self, param: CreateOrderParameter) -> AddressData:
+    def crate_shippop_address_data(self, param: CreateOrderParam) -> AddressData:
         return AddressData(
             name=param.patient.name,
             address=param.shipping_address.street,
@@ -59,7 +70,7 @@ class OrderService:
             tel=param.shipping_address.phone_number
         )
 
-    def create_address(self, param: CreateOrderParameter) -> Address:
+    def create_address(self, param: CreateOrderParam) -> Address:
         return Address.objects.create(
             name=param.patient.name,
             house_number=param.shipping_address.street,
@@ -72,7 +83,7 @@ class OrderService:
             note=param.shipping_address.note
         )
 
-    def create_order_from_param(self, param: CreateOrderParameter, address: Address) -> Order:
+    def create_order_from_param(self, param: CreateOrderParam, address: Address) -> Order:
         return Order.objects.create(
             status=OrderStatus.STARTED,
             receiver_address=address,
@@ -83,7 +94,7 @@ class OrderService:
             telemed_session_id=param.session_id
         )
 
-    def create_shipment(self, param: CreateOrderParameter, order: Order) -> Shipment:
+    def create_shipment(self, param: CreateOrderParam, order: Order) -> Shipment:
         return Shipment.objects.create(
             warehouse=Warehouse.default_warehouse(),
             shipping_method='SHIPPOP',
@@ -94,11 +105,11 @@ class OrderService:
             box_size=self.determine_box_size(param)
         )
 
-    def determine_box_size(self, param: CreateOrderParameter) -> BoxSize:
-        # Fix this in the future to do something meaningful
-        return BoxSize.get_default_box()
+    def determine_box_size(self, param: CreateOrderParam) -> BoxSize:
+        pv_ids = [it.item_id for it in param.items]
+        return BoxSize.determine_box_size_by_pv_ids(pv_ids)
 
-    def create_order_items(self, param: CreateOrderParameter,
+    def create_order_items(self, param: CreateOrderParam,
                            shipment: Shipment) -> List[OrderItem]:
         ret = []
 

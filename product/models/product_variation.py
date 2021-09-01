@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from django.db import models
+from django.db.models import PROTECT
 from django.utils.translation import gettext_lazy as _
 
 from core.models import AbstractModel
@@ -11,8 +14,10 @@ class ProductVariationUnit(models.TextChoices):
     BOXES = 'BOXES', _('Boxes (กล่อง)')
 
 
-class ProductVariation:
-    pass
+def get_default_box() -> int:
+    # avoid circular import
+    from shipment.models.box_size import BoxSize
+    return BoxSize.get_default_box_id()
 
 
 class ProductVariation(AbstractModel):
@@ -23,8 +28,8 @@ class ProductVariation(AbstractModel):
     unit = models.CharField(max_length=6,
                             choices=ProductVariationUnit.choices,
                             default=ProductVariationUnit.PIECES)
-    # reject order if ordered previously with the same cid
-    reject_order_on_duplicate_cid = models.BooleanField(default=False)
+    preferred_box_size = models.ForeignKey('shipment.Boxsize', default=get_default_box,
+                                           on_delete=PROTECT)
 
     @classmethod
     def example(cls) -> ProductVariation:

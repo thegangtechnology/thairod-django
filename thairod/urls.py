@@ -23,7 +23,12 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from django.conf import settings
+from thairod.views.async_test import AsyncView
+from thairod.views.dashboard_api import DashboardAPI
 from thairod.views.ipcheck import IPCheckView
+from thairod.views.ordered_non_repeatable import DidOrderNonRepeatableAPI
+from thairod.views.quick_snapshot_api import QuickSnapshotView
 from thairod.views.stock_api import StockAPI
 
 schema_view = get_schema_view(
@@ -50,13 +55,21 @@ urlpatterns = [
     path('api/', include('stock_adjustment.urls')),
     path('api/', include('warehouse.urls')),
     path('api/', include('user.urls')),
-    re_path(r'^docs/open_api(?P<format>\.json|\.yaml)$',
-            schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    re_path(r'^docs/open_api/$', schema_view.with_ui('swagger',
-                                                     cache_timeout=0), name='schema-swagger-ui'),
-    re_path(r'^docs/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('ping/', IPCheckView.as_view(), name='ip-check'),
-    path('api/stock/', StockAPI.as_view(), name='get-stock')
+    path('async/', AsyncView.as_view(), name='async'),
+    path('api/stock/', StockAPI.as_view(), name='get-stock'),
+    path('api/dashboard/', DashboardAPI.as_view(), name='dashboard'),
+    path('api/did-order-non-repeatable/', DidOrderNonRepeatableAPI.as_view(), name='did-order-non-repeatable'),
+    path('api/quick-snapshot/', QuickSnapshotView.as_view(), name='quick-snapshot')
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^docs/open_api(?P<format>\.json|\.yaml)$',
+                schema_view.without_ui(cache_timeout=0), name='schema-json'),
+        re_path(r'^docs/open_api/$', schema_view.with_ui('swagger',
+                                                         cache_timeout=0), name='schema-swagger-ui'),
+        re_path(r'^docs/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    ]

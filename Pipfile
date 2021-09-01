@@ -24,6 +24,9 @@ beautifulsoup4 = "*"
 line-bot-sdk = "*"
 django-filter = "*"
 sqlparse = "*"
+freezegun = "*"
+celery = "*"
+prettyprinter = "*"
 
 [dev-packages]
 

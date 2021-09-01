@@ -18,3 +18,16 @@ class BaseTestSimpleApiMixin:
     def test_update(self) -> None:
         response = self.client.put(self.detail_url, self.valid_field, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class BaseTestReadOnlySimpleApiMixin:
+
+    def test_401_create(self) -> None:
+        self.client.logout()
+        response = self.client.post(self.list_url, self.valid_field, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update(self) -> None:
+        self.client.logout()
+        response = self.client.put(self.detail_url, self.valid_field, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

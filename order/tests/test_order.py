@@ -1,16 +1,16 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Iterable
 
-import pytz
 from django.urls import reverse
 
 from address.models import Address
 from core.tests import BaseTestSimpleApiMixin
 from order.dataclasses.cart_item import CartItem
-from order.dataclasses.order import CreateOrderParameter
+from order.dataclasses.order import CreateOrderParam
 from order.models import Order
 from order.models.order_item import FulfilmentStatus, OrderItem
 from order.services.order_service import OrderService
+from thairod.utils import tzaware
 from thairod.utils.load_seed import load_realistic_seed
 from thairod.utils.test_util import APITestCase, TestCase
 
@@ -29,6 +29,7 @@ class OrderAPITestCase(BaseTestSimpleApiMixin, APITestCase):
             "orderer_name": 'piti',
             "orderer_license": 'sun',
         }
+        self.set_up_user()
 
 
 class TestOrderItemTotal(TestCase):
@@ -37,7 +38,7 @@ class TestOrderItemTotal(TestCase):
     def sample_orders(self, product_variation_id: int, n: int):
         for i in range(n):
             cart = CartItem(item_id=product_variation_id, quantity=1)
-            param = CreateOrderParameter.example(items=[cart])
+            param = CreateOrderParam.example(items=[cart])
             order = OrderService().create_raw_order(param)
             if i % 2 == 0:
                 for item in order.shipment.orderitem_set.all():
@@ -57,7 +58,7 @@ class TestOrderItemTotal(TestCase):
         fulfilled_item = OrderItem.objects.get(pk=item.id)
         self.assertEqual(fulfilled_item.fulfilment_status, FulfilmentStatus.FULFILLED)
         self.assertGreaterEqual(fulfilled_item.fulfill_datetime,
-                                datetime.now(pytz.utc) - timedelta(seconds=1))
+                                tzaware.now() - timedelta(seconds=1))
 
     def test_total_fulfilled(self):
         total = OrderItem.total_fulfilled(self.seed.product_variations[0])

@@ -9,7 +9,8 @@ class Product(AbstractModel):
     sku = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    repeatable = models.BooleanField(default=False)
+    non_repeatable = models.BooleanField(default=False)
+    # same cid can order any of non-repeatable at most once
 
     @classmethod
     def example(cls) -> Product:

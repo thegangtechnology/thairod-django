@@ -1,13 +1,12 @@
 from django.urls import reverse
 from rest_framework import status
-
-from core.tests import BaseTestSimpleApiMixin
+from core.tests import BaseTestReadOnlySimpleApiMixin, BaseTestSimpleApiMixin
 from product.models import Product, ProductVariation
 from product.models.product_variation import ProductVariationUnit
 from thairod.utils.test_util import APITestCase
 
 
-class ProductVariationAPITestCase(APITestCase, BaseTestSimpleApiMixin):
+class ProductVariationAPITestCase(APITestCase, BaseTestReadOnlySimpleApiMixin, BaseTestSimpleApiMixin):
 
     def setUp(self):
         self.model = ProductVariation
@@ -20,9 +19,9 @@ class ProductVariationAPITestCase(APITestCase, BaseTestSimpleApiMixin):
             "name": "product test name",
             "description": "test description"
         }
+        self.set_up_user()
 
     def test_update(self) -> None:
-        self.set_up_user()
         response = self.client.put(self.detail_url, {
             "product": Product.objects.first().id,
             "price": 3133.123,

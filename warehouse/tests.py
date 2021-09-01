@@ -1,12 +1,12 @@
 from django.urls import reverse
 
 from address.models import Address
-from core.tests import BaseTestSimpleApiMixin
+from core.tests import BaseTestSimpleApiMixin, BaseTestReadOnlySimpleApiMixin
 from thairod.utils.test_util import APITestCase
 from warehouse.models import Warehouse
 
 
-class WarehouseAPITestCase(BaseTestSimpleApiMixin, APITestCase):
+class WarehouseAPITestCase(BaseTestSimpleApiMixin, APITestCase, BaseTestReadOnlySimpleApiMixin):
 
     def setUp(self):
         self.model = Warehouse
@@ -19,3 +19,4 @@ class WarehouseAPITestCase(BaseTestSimpleApiMixin, APITestCase):
             "address": self.address.pk,
             "tel": "0987654321",
         }
+        self.set_up_user()

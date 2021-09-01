@@ -1,11 +1,11 @@
 from django.urls import reverse
 
-from core.tests import BaseTestSimpleApiMixin
+from core.tests import BaseTestSimpleApiMixin, BaseTestReadOnlySimpleApiMixin
 from product.models import Product
 from thairod.utils.test_util import APITestCase
 
 
-class ProductAPITestCase(BaseTestSimpleApiMixin, APITestCase):
+class ProductAPITestCase(BaseTestSimpleApiMixin, APITestCase, BaseTestReadOnlySimpleApiMixin):
 
     def setUp(self):
         self.mode = Product
@@ -17,3 +17,4 @@ class ProductAPITestCase(BaseTestSimpleApiMixin, APITestCase):
             "name": "test product name",
             "description": "23456",
         }
+        self.set_up_user()

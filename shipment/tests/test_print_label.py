@@ -2,16 +2,18 @@ from os.path import dirname, join
 
 from bs4 import BeautifulSoup
 
-from order.views import OrderService, CreateOrderParameter
+from order.services.fulfiller_service import FulfilmentService
+from order.views import OrderService, CreateOrderParam
 from product.models import ProductVariation
 from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
 from shipment.services.print_label_service import PrintLabelService
 from shipment.utils.print_label_util import split_print_label
-from shipment.views.print_label_views import PrintLabelView
 from thairod.services.shippop.tests import load_test_data
 from thairod.utils.load_seed import RealisticSeed
 from thairod.utils.test_util import TestCase
+from django.conf import settings
+from unittest import skipIf
 
 
 class TestPrintLabel(TestCase):
@@ -27,7 +29,7 @@ class TestPrintLabel(TestCase):
 
     def test_split_print_label(self):
         pages = split_print_label(self.label_html)
-        assert len(pages) == 2
+        self.assertEqual(len(pages), 2)
 
     def test_generate_label(self):
         shipments = Shipment.objects.all()
@@ -36,15 +38,27 @@ class TestPrintLabel(TestCase):
             labels=labels, shipments=shipments)
         soup = BeautifulSoup(s, features="html.parser")
         pages = soup.find_all("div", {"class": "page"})
-        assert len(pages) == 4
+        self.assertEqual(len(pages), 4)
 
+
+class TestPrintLabelLive(TestCase):
+    with_seed = False
+    patch_shippop = False
+
+    def setUp(self):
+        self.seed = RealisticSeed.load_realistic_seed()
+        self.seed.procure_items()
+
+    @skipIf(settings.SHIPPOP_TEST_ERR, reason="Shippop breaks, minimum order 3")
     def test_print_label_live(self):
-        param = CreateOrderParameter.example()
+        param = CreateOrderParam.example()
         param.items[0].item_id = ProductVariation.objects.first().id
         first_order = OrderService().create_order(param)
         second_order = OrderService().create_order(param)
         shipments = Shipment.objects.filter(order_id__in=[first_order.order_id, second_order.order_id])
-        html = PrintLabelView().generate_label(PrintLabelParam(
+        for shipment in shipments:
+            FulfilmentService().attempt_fulfill_shipment(shipment)
+        html = PrintLabelService().generate_label(PrintLabelParam(
             shipments=shipments
         ))
         soup = BeautifulSoup(html, features="html.parser")

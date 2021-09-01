@@ -2,9 +2,9 @@ import functools
 import logging
 from typing import List
 
+from django.conf import settings
 from django.http import HttpResponseForbidden
 
-from thairod.settings import DEBUG
 from thairod.utils.html_tools import get_client_ip
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def ip_whitelist(ip_list: List[str], allow_all_if_debug=False):
         @functools.wraps(f)
         def ret(self, request, *arg, **kwds):
             ip = get_client_ip(request)
-            allow_while_debug = DEBUG and allow_all_if_debug
+            allow_while_debug = settings.DEBUG and allow_all_if_debug
             if allow_while_debug or ip in ip_list:
                 return f(self, request, *arg, **kwds)
             else:

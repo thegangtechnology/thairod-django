@@ -1,4 +1,10 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Optional
+
+from rest_framework.exceptions import ValidationError
+
 from thairod.utils.auto_serialize import AutoSerialize
 
 
@@ -10,7 +16,13 @@ class ShippingAddress(AutoSerialize):
     province: str
     zipcode: str
     phone_number: str
-    note: str
+    note: Optional[str] = field(metadata={'serializer_kwargs': {'allow_blank': True}})
+
+    @classmethod
+    def validate_data(cls, data: ShippingAddress):
+        if len(data.zipcode) != 5 or not data.zipcode.isnumeric():
+            raise ValidationError(detail='Incorrect Postal Code', code='zipcode_error')
+        return data
 
     @classmethod
     def example(cls):
@@ -19,7 +31,7 @@ class ShippingAddress(AutoSerialize):
             street='99 ถ.ราชดำเนิน',
             sub_district='ราชดำเนิน',
             district='พระนคร',
-            province='กรุงเทพ',
-            zipcode='10400',
+            province='กรุงเทพมหานคร',
+            zipcode='10200',
             note="บ้านอยู่ชั้นสอง"
         )
