@@ -1,6 +1,8 @@
 import logging
+from pprint import pprint
 from typing import Iterable, DefaultDict, List
 
+from django.conf import settings
 from django.db import transaction
 
 from order.exceptions import ShippopConfirmationError
@@ -16,7 +18,6 @@ from thairod.services.shippop.api import ShippopAPI
 from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse, \
     spe_postal_codes
 from thairod.services.stock.stock import StockService, StockInfo
-from django.conf import settings
 from thairod.utils import tzaware
 from thairod.utils.exceptions import ShippopAPIException
 
@@ -128,9 +129,17 @@ class FulfilmentService:
 
     def book_shipment_with_shippop(self, shipments: List[Shipment]):
         shippop_api = ShippopAPI()
-        response = shippop_api.create_order(self.create_order_data(shipments))
-        # some of them bound to fail
-        return response
+        shipping_methods = ['SPE', 'NJV', 'KRYP', 'THP']
+        errors = []
+        for shipping_method in shipping_methods:
+            try:
+                order_data = self.create_order_data(shipments, shipping_method=shipping_method)
+                response = shippop_api.create_order(order_data)
+                # some of them bound to fail
+                return response
+            except ShippopAPIException as e:
+                errors.append(e)
+        raise UnsupportedZipCode() from errors[-1]
 
     def confirm_shipment_with_shippop(self, shipment: Shipment):
         shippop_api = ShippopAPI()
@@ -172,14 +181,14 @@ class FulfilmentService:
             courier_tracking_code=response.lines[0].tracking_code
         )
 
-    def create_order_data(self, shipments: List[Shipment]) -> OrderData:
+    def create_order_data(self, shipments: List[Shipment], shipping_method: str) -> OrderData:
         return OrderData(
             email=settings.SHIPPOP_EMAIL,
             success_url='',
             fail_url='',
             data=[
                 OrderLineData(
-                    courier_code=self.determine_courier_code(shipment),
+                    courier_code=shipping_method,
                     from_address=AddressData.from_address_model(
                         shipment.warehouse.address
                     ),

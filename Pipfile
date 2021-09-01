@@ -26,6 +26,7 @@ django-filter = "*"
 sqlparse = "*"
 freezegun = "*"
 celery = "*"
+prettyprinter = "*"
 
 [dev-packages]
 

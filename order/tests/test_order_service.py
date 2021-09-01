@@ -131,10 +131,3 @@ class TestCreateOrderParam(TestCase):
         with self.assertRaises(ValidationError) as cm:
             CreateOrderParam.validate_data(param)
         self.assertIn('negative', cm.exception.detail[0])
-
-    def test_item_invalid_zipcode(self):
-        param = CreateOrderParam.example_with_valid_item()
-        param.shipping_address.zipcode = '99999'
-        with self.assertRaises(ValidationError) as cm:
-            CreateOrderParam.validate_data(param)
-        self.assertIn('99999', cm.exception.detail[0])

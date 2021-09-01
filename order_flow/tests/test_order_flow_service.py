@@ -2,7 +2,6 @@ import json
 from os.path import join, dirname
 
 from django.conf import settings
-from rest_framework.exceptions import ValidationError
 
 from order.dataclasses.cart_item import CartItem
 from order.dataclasses.shipping_address import ShippingAddress
@@ -141,13 +140,6 @@ class TestOrderFlowService(TestCase):
             with self.assertRaises(PatientAlreadyConfirmedException):
                 OrderFlowService().save_patient_confirmation_and_make_order(
                     patient_confirmation_request=patient_confirmation)
-
-    def test_invalid_service_area(self):
-        filename = 'create_order_flow_phuket.json'
-        with open(join(dirname(__file__), filename), 'r') as json_file:
-            order_flow_json = json.load(json_file)
-            with self.assertRaises(ValidationError):
-                CreateOrderFlowParam.from_data(order_flow_json)
 
     def test_confirm_doctor_order_did_send_line_message(self):
         items = [CartItem(item_id=self.seed.product_variations[0].id, quantity=1)]
