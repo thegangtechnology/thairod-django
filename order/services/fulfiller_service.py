@@ -1,5 +1,4 @@
 import logging
-from pprint import pprint
 from typing import Iterable, DefaultDict, List
 
 from django.conf import settings
@@ -15,8 +14,7 @@ from shipment.models.shipment import ShipmentStatus
 from shipment.services.batch_shipment_service import BatchShipmentService
 from thairod.services.line.line import send_line_tracking_message
 from thairod.services.shippop.api import ShippopAPI
-from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse, \
-    spe_postal_codes
+from thairod.services.shippop.data import ParcelData, AddressData, OrderLineData, OrderData, OrderResponse
 from thairod.services.stock.stock import StockService, StockInfo
 from thairod.utils import tzaware
 from thairod.utils.exceptions import ShippopAPIException
@@ -198,13 +196,6 @@ class FulfilmentService:
                 for shipment in shipments
             ],
         )
-
-    def determine_courier_code(self, shipment: Shipment):
-        zip_code = shipment.order.receiver_address.postal_code
-        if zip_code in spe_postal_codes:
-            return 'SPE'
-        else:
-            raise UnsupportedZipCode(zip_code)
 
     def parcel_adapter(self, box_size: BoxSize, name="ไทยรอด") -> ParcelData:
         return ParcelData(
