@@ -1,5 +1,6 @@
-from django.template import loader
 from typing import List, Optional
+
+from django.template import loader
 
 from shipment.dataclasses.print_label import PrintLabelParam
 from shipment.models import Shipment
@@ -20,7 +21,11 @@ class PrintLabelService:
         return s
 
     def generate_label(self, param: PrintLabelParam) -> Optional[str]:
-        shipments = Shipment.objects.filter(id__in=param.shipments).exclude(tracking_code__isnull=True).all()
+        shipments = (Shipment.objects
+                     .filter(id__in=param.shipments)
+                     .exclude(tracking_code__isnull=True)
+                     .order_by('courier_code')
+                     .all())
         if len(shipments) == 0:
             return None
         shippop = ShippopAPI()

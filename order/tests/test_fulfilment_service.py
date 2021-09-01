@@ -49,15 +49,17 @@ class TestFulfilmentService(TestCase):
         success = FulfilmentService().attempt_fulfill_shipment(order.shipment_set.first())
         self.assertFalse(success)
 
-    def test_attempt_fulfill_shipment_invalid_zipcode(self):
+    def test_attempt_fulfill_shipment_funny_zipcode(self):
         pv = self.seed.make_product()
         self.seed.procure_item(pv.id, 10)
         ro = self.seed.order_item_no_fulfill(pv.id, '111')
         order = Order.objects.get(pk=ro.order.id)
-        order.receiver_address.postal_code = '999aa'
+
+        order.receiver_address.postal_code = '50100'
+        order.receiver_address.province = 'เชียงใหม่'
         order.receiver_address.save()
-        with self.assertRaises(UnsupportedZipCode):
-            FulfilmentService().attempt_fulfill_shipment(order.shipment_set.first())
+        # for some reason they dont' reject SPE to อ่างทอง
+        FulfilmentService().attempt_fulfill_shipment(order.shipment_set.first())
 
     def test_fulfill_pending_order_items(self):
         begin = len(OrderItem.sorted_pending_order_items())

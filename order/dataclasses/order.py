@@ -27,10 +27,6 @@ class CreateOrderParam(AutoSerialize):
 
     @classmethod
     def validate_data(cls, data: CreateOrderParam) -> CreateOrderParam:
-        # validate zipcode in service range
-        if data.shipping_address.zipcode not in spe_postal_codes:
-            raise ValidationError(detail=f'Postcode {data.shipping_address.zipcode} is not in service area.')
-
         # item
         for item in data.items:
             if not ProductVariation.objects.filter(id=item.item_id).exists():
